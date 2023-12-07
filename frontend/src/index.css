@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"] {
+    -webkit-appearance: none;
+    margin: 0;
+    -moz-appearance: textfield !important;
+  }
+}
+
+.swiper {
+  padding-bottom: 100px !important;
+}
+
+.swiper-button-next {
+  top: 590px !important;
+  right: 600px !important;
+  z-index: 9999 !important;
+  width: 45px !important;
+  height: 45px !important;
+  background-image: url("assets//imgs/base/arrow-forward-outline.svg");
+  background-repeat: no-repeat;
+  background-size: 50% auto;
+  background-position: center;
+  border-radius: 100px;
+  background-color: white;
+}
+.swiper-button-prev {
+  top: 590px !important;
+  left: 600px !important;
+  z-index: 9999 !important;
+  width: 45px !important;
+  height: 45px !important;
+  background-image: url("assets//imgs/base/arrow-back-outline.svg");
+  background-repeat: no-repeat;
+  background-size: 50% auto;
+  background-position: center;
+  border-radius: 100px;
+  background-color: white;
+}
+
+.swiper-button-next::after {
+  content: "" !important;
+}
+.swiper-button-prev::after {
+  content: "" !important;
+}
+
+.swiper-pagination {
+  padding-bottom: 30px;
+}
+
+.swiper-pagination-bullet-active {
+  background: #9c783e !important;
+}

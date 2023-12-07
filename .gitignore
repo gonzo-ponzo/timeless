@@ -1,0 +1,20 @@
+### Env
+backend/.env
+
+### Modules
+venv/
+frontend/node_modules
+
+### Python
+__pycache__
+*.pyc
+
+### VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+.history/
+*.vsix
