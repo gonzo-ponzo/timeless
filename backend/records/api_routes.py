@@ -12,17 +12,7 @@ from .schemas import (
     RecordIdSchema,
     NewRecordWithRegisterSchema,
 )
-from .services import (
-    _get_client_records,
-    _upload_record_image,
-    _update_record_by_id,
-    _get_available_records,
-    _create_new_record,
-    _get_available_crm_records,
-    _cancel_record,
-    _create_new_record_with_register,
-    get_record_datetime,
-)
+from .services import RecordService
 
 records_api_router = APIRouter(prefix="/records")
 
@@ -36,7 +26,8 @@ async def create_new_record(
     db: AsyncSession = Depends(get_async_session),
 ) -> None:
     """Create new record"""
-    await _create_new_record(body=body, db=db)
+    record_service = RecordService(db=db)
+    await record_service.create_new_record(body=body)
 
 
 @records_api_router.post("/register-and-record")
@@ -45,7 +36,8 @@ async def register_and_record(
     db: AsyncSession = Depends(get_async_session),
 ):
     """Register new user and create record for him"""
-    await _create_new_record_with_register(body=body, db=db)
+    record_service = RecordService(db=db)
+    await record_service.create_new_record_with_register(body=body)
 
 
 @records_api_router.post("/cancel")
@@ -54,7 +46,8 @@ async def cancel_record(
     db: AsyncSession = Depends(get_async_session),
 ) -> None:
     """Cancel existing record"""
-    await _cancel_record(record_id=body.recordId, db=db)
+    record_service = RecordService(db=db)
+    await record_service.cancel_record(record_id=body.recordId)
 
 
 @records_api_router.get("/get-available/{service_id}/{user_id}/{date}/")
@@ -64,7 +57,8 @@ async def get_available_records_by_data(
     db: AsyncSession = Depends(get_async_session),
 ) -> list[AvailableRecordSchema]:
     """Get available records for client side by date/service/user data"""
-    records = await _get_available_records(user_id=user_id, date=date, db=db)
+    record_service = RecordService(db=db)
+    records = await record_service.get_available_records(user_id=user_id, date=date)
     return records
 
 
@@ -76,8 +70,9 @@ async def get_available_crm_records_by_data(
     db: AsyncSession = Depends(get_async_session),
 ) -> list[AvailableCrmRecordSchema]:
     """Get available records for crm side by date/service/user data"""
-    records = await _get_available_crm_records(
-        user_id=user_id, master_id=master_id, date=date, db=db
+    record_service = RecordService(db=db)
+    records = await record_service.get_available_crm_records(
+        user_id=user_id, master_id=master_id, date=date
     )
     return records
 
@@ -87,7 +82,8 @@ async def get_records(
     db: AsyncSession = Depends(get_async_session),
 ) -> list[GetRecordSchema]:
     """Get all records"""
-    records = await _get_client_records(db=db)
+    record_service = RecordService(db=db)
+    records = await record_service.get_client_records()
     return records
 
 
@@ -98,7 +94,8 @@ async def update_record_by_id(
     db: AsyncSession = Depends(get_async_session),
 ) -> None:
     """Update record by id"""
-    await _update_record_by_id(record_id=recordId, body=body, db=db)
+    record_service = RecordService(db=db)
+    await record_service.update_record_by_id(record_id=recordId, body=body)
 
 
 @records_api_router.patch("/image/{recordId}/")
@@ -112,8 +109,8 @@ async def update_record_image(
     avatar = await image.read()
     with open(file_path, "wb") as f:
         f.write(avatar)
-
-    await _upload_record_image(record_id=recordId, image=file_path, db=db)
+    record_service = RecordService(db=db)
+    await record_service.upload_record_image(record_id=recordId, image=file_path)
 
 
 @records_api_router.get("/record-time/{recordId}/")
@@ -121,5 +118,6 @@ async def get_record_time(
     recordId,
     db: AsyncSession = Depends(get_async_session),
 ) -> str:
-    record_datetime = await get_record_datetime(record_id=recordId, db=db)
+    record_service = RecordService(db=db)
+    record_datetime = await record_service.get_record_datetime(record_id=recordId)
     return record_datetime

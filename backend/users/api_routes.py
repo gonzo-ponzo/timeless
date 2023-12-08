@@ -19,26 +19,8 @@ from .schemas import (
     NewClientSchema,
 )
 
-from .services import (
-    _get_client_by_phone,
-    _register_new_client,
-    _set_client_auth_code,
-    _get_client_auth,
-    _send_auth_code_with_sms,
-    _get_user_by_phone,
-    _register_new_user,
-    _get_all_users,
-    _get_client_by_id,
-    _update_client_by_id,
-    _upload_client_image,
-    _get_all_clients,
-    _get_user_by_id,
-    _upload_user_image,
-    _update_user_by_id,
-    _get_client_by_instagram,
-    _get_client_by_telegram,
-    _create_new_client,
-)
+from .services import ClientService, UserService
+from sms.services import SmsService
 from config import ALGORITHM, SECRET, ACCESS_TOKEN_LIFETIME
 
 
@@ -54,7 +36,8 @@ async def create_new_client(
     body: NewClientSchema, db: AsyncSession = Depends(get_async_session)
 ) -> None:
     """Create new client"""
-    await _create_new_client(body=body, db=db)
+    client_service = ClientService(db=db)
+    await client_service.create_new_client(body=body)
 
 
 @clients_api_router.post("/auth-code")
@@ -62,13 +45,15 @@ async def auth_code(
     data: PhoneSchema, db: AsyncSession = Depends(get_async_session)
 ) -> PhoneSchema:
     """Send auth code to client, register if not exist"""
+    client_service = ClientService(db=db)
+    sms_service = SmsService()
     phone = data.phone
-    client = await _get_client_by_phone(client_phone=phone, db=db)
+    client = await client_service.get_client_by_phone(client_phone=phone)
     if not client:
-        client = await _register_new_client(client_phone=phone, db=db)
+        client = await client_service.register_new_client(client_phone=phone)
     auth_code = str(random.randint(10000, 99999))
-    await _set_client_auth_code(client_id=client.id, auth_code=auth_code, db=db)
-    await _send_auth_code_with_sms(auth_code=auth_code, client_phone=phone)
+    await client_service.set_client_auth_code(client_id=client.id, auth_code=auth_code)
+    await sms_service.send_auth_code_with_sms(auth_code=auth_code, client_phone=phone)
 
     return PhoneSchema(phone=phone)
 
@@ -78,8 +63,9 @@ async def login_client(
     data: VerifyPhoneSchema, db: AsyncSession = Depends(get_async_session)
 ) -> Optional[dict]:
     """Get tokens for login"""
+    client_service = ClientService(db=db)
     phone = data.phone
-    client = await _get_client_auth(client_phone=phone, db=db)
+    client = await client_service.get_client_auth(client_phone=phone)
     if client.auth_code == data.code:
         data = {"sub": phone}
         jwt_token: str = jwt.encode(data, SECRET, algorithm=ALGORITHM)
@@ -96,7 +82,8 @@ async def get_client_by_phone(
     client_phone: str, db: AsyncSession = Depends(get_async_session)
 ) -> GetClientSchema:
     """Get client by phone"""
-    client = await _get_client_by_phone(client_phone=client_phone, db=db)
+    client_service = ClientService(db=db)
+    client = await client_service.get_client_by_phone(client_phone=client_phone)
     return client
 
 
@@ -105,7 +92,10 @@ async def get_client_by_instagram(
     client_instagram: str, db: AsyncSession = Depends(get_async_session)
 ) -> GetClientSchema:
     """Get client by instagram"""
-    client = await _get_client_by_instagram(client_instagram=client_instagram, db=db)
+    client_service = ClientService(db=db)
+    client = await client_service.get_client_by_instagram(
+        client_instagram=client_instagram
+    )
     return client
 
 
@@ -114,7 +104,10 @@ async def get_client_by_telegram(
     client_telegram: str, db: AsyncSession = Depends(get_async_session)
 ) -> GetClientSchema:
     """Get client by telegram"""
-    client = await _get_client_by_telegram(client_telegram=client_telegram, db=db)
+    client_service = ClientService(db=db)
+    client = await client_service.get_client_by_telegram(
+        client_telegram=client_telegram
+    )
     return client
 
 
@@ -123,7 +116,8 @@ async def get_all_clients(
     db: AsyncSession = Depends(get_async_session),
 ) -> list[GetClientSchema]:
     """Get all clients"""
-    clients = await _get_all_clients(db=db)
+    client_service = ClientService(db=db)
+    clients = await client_service.get_all_clients()
     return clients
 
 
@@ -132,7 +126,8 @@ async def get_client_by_id(
     client_id: int, db: AsyncSession = Depends(get_async_session)
 ) -> GetClientSchema:
     """Get client by id"""
-    client = await _get_client_by_id(client_id=client_id, db=db)
+    client_service = ClientService(db=db)
+    client = await client_service.get_client_by_id(client_id=client_id)
     return client
 
 
@@ -143,7 +138,8 @@ async def update_client_by_id(
     db: AsyncSession = Depends(get_async_session),
 ) -> None:
     """Update client by id"""
-    await _update_client_by_id(client_id=clientId, body=body, db=db)
+    client_service = ClientService(db=db)
+    await client_service.update_client_by_id(client_id=clientId, body=body)
 
 
 @clients_api_router.patch("/image/{clientId}/")
@@ -153,12 +149,13 @@ async def update_client_image(
     db: AsyncSession = Depends(get_async_session),
 ) -> None:
     """Upload image to client by id"""
+    client_service = ClientService(db=db)
     file_path = f"public/client-{clientId}.jpeg"
     avatar = await image.read()
     with open(file_path, "wb") as f:
         f.write(avatar)
 
-    await _upload_client_image(client_id=clientId, image=file_path, db=db)
+    await client_service.upload_client_image(client_id=clientId, image=file_path)
 
 
 """USER SECTION"""
@@ -169,9 +166,10 @@ async def login_user(
     data: UserLoginSchema, db: AsyncSession = Depends(get_async_session)
 ) -> Optional[dict]:
     """Send tokens for login, register if not exist"""
+    user_service = UserService(db=db)
     phone = data.phone
     password = data.password
-    user = await _get_user_by_phone(user_phone=phone, db=db)
+    user = await user_service.get_user_by_phone(user_phone=phone)
     if user:
         if Hasher.verify_password(password, user.hashed_password):
             data = {"sub": phone}
@@ -184,7 +182,9 @@ async def login_user(
                 "isAdmin": user.is_admin,
             }
         return None
-    user = await _register_new_user(user_phone=phone, user_password=password, db=db)
+    user = await user_service.register_new_user(
+        user_phone=phone, user_password=password
+    )
     data = {"sub": phone}
     jwt_token: str = jwt.encode(data, SECRET, algorithm=ALGORITHM)
     return {
@@ -201,7 +201,8 @@ async def get_all_users(
     db: AsyncSession = Depends(get_async_session),
 ) -> list[GetUserSchema]:
     """Get all users"""
-    users = await _get_all_users(db=db)
+    user_service = UserService(db=db)
+    users = await user_service.get_all_users()
     return users
 
 
@@ -210,7 +211,8 @@ async def get_user_by_id(
     user_id: int, db: AsyncSession = Depends(get_async_session)
 ) -> GetUserSchema:
     """Get user by id"""
-    user = await _get_user_by_id(user_id=user_id, db=db)
+    user_service = UserService(db=db)
+    user = await user_service.get_user_by_id(user_id=user_id)
     return user
 
 
@@ -221,12 +223,13 @@ async def update_user_image(
     db: AsyncSession = Depends(get_async_session),
 ) -> None:
     """Upload image to user by id"""
+    user_service = UserService(db=db)
     file_path = f"public/user-{userId}.jpeg"
     avatar = await image.read()
     with open(file_path, "wb") as f:
         f.write(avatar)
 
-    await _upload_user_image(user_id=userId, image=file_path, db=db)
+    await user_service.upload_user_image(user_id=userId, image=file_path)
 
 
 @users_api_router.patch("/user/{userId}/")
@@ -236,7 +239,8 @@ async def update_user_by_id(
     db: AsyncSession = Depends(get_async_session),
 ) -> None:
     """Update user biy id"""
-    await _update_user_by_id(user_id=userId, body=body, db=db)
+    user_service = UserService(db=db)
+    await user_service.update_user_by_id(user_id=userId, body=body)
 
 
 """"""

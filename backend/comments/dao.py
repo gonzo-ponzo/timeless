@@ -1,5 +1,4 @@
 from sqlalchemy import select, update
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.models import Comment, Record, RecordsUsers
 from .schemas import (
@@ -9,13 +8,11 @@ from .schemas import (
     GetCommentSchema,
 )
 from config import IP_SERVER
+from utils.abstract.dao import DAO
 
 
-class CommentDAO:
+class CommentDAO(DAO):
     """Data Access Object for operating comment info"""
-
-    def __init__(self, db_session: AsyncSession):
-        self.db: AsyncSession = db_session
 
     async def get_comments(self) -> list[GetCommentSchema]:
         async with self.db.begin():

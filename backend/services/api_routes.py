@@ -1,12 +1,10 @@
-from fastapi import APIRouter, Depends, File
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.session import get_async_session
 from .schemas import GetServiceSchema
 
-from .services import (
-    _get_services,
-)
+from .services import ServiceService
 
 
 services_api_router = APIRouter(prefix="/services")
@@ -20,6 +18,6 @@ async def get_services(
     db: AsyncSession = Depends(get_async_session),
 ) -> list[GetServiceSchema]:
     """Get all services"""
-    services = await _get_services(db=db)
-
+    service_service = ServiceService(db=db)
+    services = await service_service.get_services()
     return services

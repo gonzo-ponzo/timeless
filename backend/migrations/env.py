@@ -4,6 +4,16 @@ from sqlalchemy import pool
 from alembic import context
 
 from db.models import Base
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+DB_HOST = os.environ.get("DB_HOST")
+DB_PORT = int(os.environ.get("DB_PORT"))
+DB_NAME = os.environ.get("DB_NAME")
+DB_USER = os.environ.get("DB_USER")
+DB_PASSWORD = os.environ.get("DB_PASSWORD")
 
 
 config = context.config
@@ -45,6 +55,8 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    connect_url = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    config.set_main_option("sqlalchemy.url", connect_url)
     connectable = engine_from_config(
         config.get_section(config.config_ini_section),
         prefix="sqlalchemy.",

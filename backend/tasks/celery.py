@@ -1,5 +1,6 @@
 from celery import Celery
-from dotenv import load_dotenv
+from sms.services import SmsService
+
 
 app = Celery(
     __name__, broker="redis://localhost:6379/0", backend="redis://localhost:6379/0"

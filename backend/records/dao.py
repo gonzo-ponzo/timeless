@@ -1,6 +1,5 @@
 from sqlalchemy import select, update
 import datetime
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.models import Record, RecordsServices, RecordsUsers, Service, Client, User
 from .schemas import (
@@ -13,13 +12,11 @@ from .schemas import (
 )
 from config import IP_SERVER
 from tasks.tasks import send_sms
+from utils.abstract.dao import DAO
 
 
-class RecordDAO:
+class RecordDAO(DAO):
     """Data Access Object for operating record info"""
-
-    def __init__(self, db_session: AsyncSession):
-        self.db: AsyncSession = db_session
 
     async def get_client_records(self) -> list[GetRecordSchema]:
         query = select(Record).order_by(Record.date.desc(), Record.time.desc())
@@ -172,7 +169,6 @@ class RecordDAO:
             seconds = (planned_date - now).total_seconds()
             if seconds > 0 and phone != "0000":
                 send_sms.apply_async(args=[time, phone, record_id], countdown=seconds)
-
 
     async def update_record_by_id(
         self, record_id: int, body: UpdateRecordSchema

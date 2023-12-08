@@ -14,13 +14,11 @@ from .schemas import (
     NewClientSchema,
 )
 from config import IP_SERVER
+from utils.abstract.dao import DAO
 
 
-class UserDAO:
+class UserDAO(DAO):
     """Data Access Object for operating user info"""
-
-    def __init__(self, db_session: AsyncSession):
-        self.db: AsyncSession = db_session
 
     async def get_all_users(self) -> list[GetUserSchema]:
         users_query = select(User)
@@ -139,11 +137,8 @@ class UserDAO:
             return user
 
 
-class ClientDAO:
+class ClientDAO(DAO):
     """Data Access Object for operating client info"""
-
-    def __init__(self, db_session: AsyncSession):
-        self.db: AsyncSession = db_session
 
     async def get_all_clients(self) -> list[GetClientSchema]:
         clients_query = select(Client).where(Client.id != 1)

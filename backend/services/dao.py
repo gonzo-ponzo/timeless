@@ -1,15 +1,12 @@
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.models import Service
 from .schemas import GetServiceSchema
+from utils.abstract.dao import DAO
 
 
-class ServiceDAO:
+class ServiceDAO(DAO):
     """Data Access Object for operating service info"""
-
-    def __init__(self, db_session: AsyncSession):
-        self.db: AsyncSession = db_session
 
     async def get_services(self) -> list[GetServiceSchema]:
         query = select(Service)
