@@ -10,8 +10,9 @@ import { useSelector } from "react-redux"
 import userService from "../../services/user.service"
 import clientService from "../../services/client.service"
 import commentService from "../../services/comment.service"
-import dropdownArrow from "../../assets/imgs/dropdown-arrow.png"
+// import dropdownArrow from "../../assets/imgs/dropdown-arrow.png"
 import Close from "../../assets/imgs/Close-icon.png"
+import StatusButton from "./statusButton"
 
 const DetailedRecordInfo = ({ recordId, handleClose, reset, currentUser }) => {
   const selectedLanguage = useSelector((state) => state.lang.lang)
@@ -19,7 +20,7 @@ const DetailedRecordInfo = ({ recordId, handleClose, reset, currentUser }) => {
   const [clients, setClients] = useState(null)
   const [users, setUsers] = useState(null)
   const [comments, setComments] = useState(null)
-  const [showStatus, setShowStatus] = useState(false)
+  // const [showStatus, setShowStatus] = useState(false)
   const [selectedStatus, setSelectedStatus] = useState()
   const [selectedDate, setSelectedDate] = useState()
   const [selectedTime, setSelectedTime] = useState()
@@ -54,18 +55,17 @@ const DetailedRecordInfo = ({ recordId, handleClose, reset, currentUser }) => {
   const handleSelectStatus = (status) => {
     setSelectedStatus(status)
     setData((prevState) => ({ ...prevState, status: selectedStatus }))
-    setShowStatus(!showStatus)
   }
 
-  const statusDropdown = ["created", "completed", "canceled"].map((status) => (
-    <div
-      className="border-b border-gray px-[16px] py-[7px] bg-white text-brown cursor-pointer hover:text-lightBrown last:border-none last:rounded-b-lg first:rounded-t-lg"
-      onClick={() => handleSelectStatus(status)}
-      key={status}
-    >
-      {status}
-    </div>
-  ))
+  // const statusDropdown = ["created", "completed", "canceled"].map((status) => (
+  //   <div
+  //     className="border-b border-gray px-[16px] py-[7px] bg-white text-brown cursor-pointer hover:text-lightBrown last:border-none last:rounded-b-lg first:rounded-t-lg"
+  //     onClick={() => handleSelectStatus(status)}
+  //     key={status}
+  //   >
+  //     {status}
+  //   </div>
+  // ))
   const user = users?.find((user) => record.users.includes(user.id))
 
   const handleChange = (target) => {
@@ -171,10 +171,27 @@ const DetailedRecordInfo = ({ recordId, handleClose, reset, currentUser }) => {
           : `${dictionary[selectedLanguage].clientHimself}`}
       </p>
       <p className="font-thin mb-[4px]">
-        {dictionary[selectedLanguage].status}
+        {dictionary[selectedLanguage].status}: {record?.status}
       </p>
+      <div className="w-full flex items-center justify-start pb-[12px]">
+        <StatusButton
+          type={"completed"}
+          handleSelectStatus={handleSelectStatus}
+          selectedStatus={selectedStatus}
+        ></StatusButton>
+        <StatusButton
+          type={"created"}
+          handleSelectStatus={handleSelectStatus}
+          selectedStatus={selectedStatus}
+        ></StatusButton>
+        <StatusButton
+          type={"canceled"}
+          handleSelectStatus={handleSelectStatus}
+          selectedStatus={selectedStatus}
+        ></StatusButton>
+      </div>
 
-      <div className="flex justify-between items-center px-[8px] py-[7px] mb-[8px] border border-lightBrown text-lightBrown rounded-lg cursor-pointer relative">
+      {/* <div className="flex justify-between items-center px-[8px] py-[7px] mb-[8px] border border-lightBrown text-lightBrown rounded-lg cursor-pointer relative">
         <div
           className={"w-full flex justify-between items-center"}
           onClick={() => setShowStatus(!showStatus)}
@@ -197,7 +214,7 @@ const DetailedRecordInfo = ({ recordId, handleClose, reset, currentUser }) => {
             </div>
           </>
         ) : null}
-      </div>
+      </div> */}
 
       <input
         type="date"
