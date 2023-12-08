@@ -12,32 +12,34 @@ class SmsService:
         self.url = f"https://msg.messaggio.com/api/v1/send?API Key={MESSAGGIO_API_KEY}"
 
     async def send_auth_code_with_sms(self, auth_code: str, client_phone: str) -> None:
-        content = f"Dobar dan,\nVaš autorizacioni kod {auth_code}.\nVaš Timeless"
-        data = self.get_data(client_phone=client_phone, content=content)
-        async with aiohttp.ClientSession() as session:
-            await session.post(url=self.url, data=data, headers=self.headers)
+        pass
+        # content = f"Dobar dan,\nVaš autorizacioni kod {auth_code}.\nVaš Timeless"
+        # data = self.get_data(client_phone=client_phone, content=content)
+        # async with aiohttp.ClientSession() as session:
+        #     await session.post(url=self.url, data=data, headers=self.headers)
 
     def send_notify_with_record_start(
         self, text: str, client_phone: str, record_id: int
     ) -> str:
-        content = f"Dobar dan,\nČekamo Vas danas u {text[:-3]}.\nVaš Timeless"
-        data = self.get_data(client_phone=client_phone, content=content)
-        record_datetime = requests.get(
-            f"http://{IP_SERVER}:8000/api/records/record-time/{record_id}"
-        ).text[1:-1]
-        if record_datetime == "null":
-            return False
-        planned_date, now = self.datetime_convert(record_datetime=record_datetime)
+        pass
+        # content = f"Dobar dan,\nČekamo Vas danas u {text[:-3]}.\nVaš Timeless"
+        # data = self.get_data(client_phone=client_phone, content=content)
+        # record_datetime = requests.get(
+        #     f"http://{IP_SERVER}:8000/api/records/record-time/{record_id}"
+        # ).text[1:-1]
+        # if record_datetime == "null":
+        #     return False
+        # planned_date, now = self.datetime_convert(record_datetime=record_datetime)
 
-        if not (
-            now - datetime.timedelta(minutes=10)
-            <= planned_date
-            <= now + datetime.timedelta(minutes=10)
-        ):
-            return "Booking canceled or changed"
+        # if not (
+        #     now - datetime.timedelta(minutes=10)
+        #     <= planned_date
+        #     <= now + datetime.timedelta(minutes=10)
+        # ):
+        #     return "Booking canceled or changed"
 
-        response = requests.post(url=self.url, headers=self.headers, data=data)
-        return response.text
+        # response = requests.post(url=self.url, headers=self.headers, data=data)
+        # return response.text
 
     def datetime_convert(self, record_datetime: str):
         date = record_datetime.split(" ")[0]

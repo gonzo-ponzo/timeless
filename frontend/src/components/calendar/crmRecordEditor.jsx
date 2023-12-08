@@ -58,14 +58,18 @@ const CrmRecordEditor = ({
     if (search.length > 0) {
       setDropdownServices(
         services
-          .filter((service) => service.name !== "Day off")
+          .filter((service) =>
+            ["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(service.name)
+          )
           .filter((service) => service.name.toLowerCase().includes(search))
       )
     } else {
       setDropdownServices(
         services
           .filter((service) => service !== selectedService)
-          .filter((service) => service.name !== "Day off")
+          .filter((service) =>
+            ["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(service.name)
+          )
       )
     }
   }, [search, selectedService, services])
@@ -268,13 +272,19 @@ const CrmRecordEditor = ({
           <button
             className={`py-[12px] ${
               (!phoneError && selectedSlot && data.phone.length > 1) ||
-              (selectedService?.name === "Day off" && selectedSlot)
+              (["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
+                selectedService?.name
+              ) &&
+                selectedSlot)
                 ? "text-brown bg-cream border-darkBrown"
                 : "bg-white text-black border-gray"
             } border text-center rounded-lg w-full mt-[20px] hover:opacity-80`}
             disabled={
               (!phoneError && selectedSlot && data.phone.length > 1) ||
-              (selectedService?.name === "Day off" && selectedSlot)
+              (["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
+                selectedService?.name
+              ) &&
+                selectedSlot)
                 ? false
                 : true
             }

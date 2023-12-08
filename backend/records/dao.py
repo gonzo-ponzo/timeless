@@ -60,7 +60,7 @@ class RecordDAO(DAO):
             query = select(Service).where(Service.id == body.serviceId)
             service = await self.db.scalar(query)
             client_id = body.clientId
-            if service.name.lower() == "day off":
+            if service.name.lower() in ["day off", "odmar 1", "odmar 2", "odmar 4"]:
                 client_id = 1
             new_record = Record(
                 name=service.name,
@@ -290,7 +290,7 @@ class RecordDAO(DAO):
                     user_id == master_id or user.is_admin == True
                 ):
                     record_type = "yellow"
-                if "day off" in record_name.lower():
+                if record_name.lower() in ["day off", "odmar 1", "odmar 2", "odmar 4"]:
                     record_type = "gray"
 
                 start = int(record.time.strftime("%H:%M:%S")[:2]) * 60 + int(

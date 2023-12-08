@@ -98,7 +98,11 @@ const AdminRecordEditor = ({
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if (selectedService.name === "Day off") {
+    if (
+      ["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
+        selectedService.name
+      )
+    ) {
       const userId = localStorageService.getUserId()
       const selectedUser = await userService.getUserById(userId)
       await recordService.createNewRecord({
@@ -277,13 +281,19 @@ const AdminRecordEditor = ({
           <button
             className={`py-[12px] ${
               (!phoneError && selectedSlot && data.phone.length > 1) ||
-              (selectedService?.name === "Day off" && selectedSlot)
+              (["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
+                selectedService?.name
+              ) &&
+                selectedSlot)
                 ? "text-brown bg-cream border-darkBrown"
                 : "bg-white text-black border-gray"
             } border text-center rounded-lg w-full mt-[20px] hover:opacity-80`}
             disabled={
               (!phoneError && selectedSlot && data.phone.length > 1) ||
-              (selectedService?.name === "Day off" && selectedSlot)
+              (["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
+                selectedService?.name
+              ) &&
+                selectedSlot)
                 ? false
                 : true
             }

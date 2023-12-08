@@ -21,8 +21,11 @@ const ClientLoginForm = () => {
   const selectedLanguage = useSelector((state) => state.lang.lang)
 
   let phoneError
-  if (data.phone.startsWith("+3") && data.phone.length !== 13) {
-    phoneError = "phone must contain 12 digits"
+  if (
+    data.phone.startsWith("+3") &&
+    (data.phone.length > 13 || data.phone.length < 12)
+  ) {
+    phoneError = "phone must contain 11-12 digits"
   }
   if (data.phone.startsWith("+7") && data.phone.length !== 12) {
     phoneError = "phone must contain 11 digits"

@@ -81,7 +81,10 @@ const ClientCalendarPage = () => {
     setRecords(await recordService.getRecords())
     const filteredServices = await serviceService.getServices()
     setServices(
-      filteredServices.filter((service) => service.name !== "Day off")
+      filteredServices.filter(
+        (service) =>
+          !["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(service.name)
+      )
     )
   }
 

@@ -79,7 +79,7 @@ const CrmRecordElement = ({ record, lastEl, clients, records }) => {
       [target.name]: target.value,
     }))
   }
-  if (record.name === "Day off") {
+  if (["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(record.name)) {
     return
   }
 
