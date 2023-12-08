@@ -57,7 +57,7 @@ const ClientPageRecords = ({ clientId, date }) => {
           <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[6px] max-md:col-span-2">
             {dictionary[selectedLanguage].service}
           </div>
-          <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[6px] max-md:col-span-3">
+          <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[6px] max-md:col-span-3 max-md:text-center">
             {dictionary[selectedLanguage].price}
           </div>
           <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[6px] max-md:col-span-2">

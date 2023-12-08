@@ -6,7 +6,6 @@ import ContainerBox from "../components/ui/containerBox"
 import Calendar from "../components/ui/calendar"
 import AdminCalendarBoard from "../components/calendar/adminCalendarBoard"
 import AdminRecordEditor from "../components/calendar/adminRecordEditor"
-import recordService from "../services/record.service"
 import userService from "../services/user.service"
 import serviceService from "../services/service.service"
 import clientService from "../services/client.service"
@@ -34,7 +33,6 @@ const AdminCalendarPage = () => {
   const [users, setUsers] = useState([])
   const [user, setUser] = useState()
   const [services, setServices] = useState([])
-  const [records, setRecords] = useState([])
   const [clients, setClients] = useState(null)
   const [selectedSlot, setSelectedSlot] = useState(null)
   const selectedMaster = useSelector((state) => state.user.selectedMaster)
@@ -70,7 +68,6 @@ const AdminCalendarPage = () => {
 
   const loadData = async (userId) => {
     setClients(await clientService.getClients())
-    setRecords(await recordService.getRecords())
     setServices(await serviceService.getServices())
     const allUsers = await userService.getUsers()
     setUsers(allUsers.filter((user) => user.isStaff))
@@ -88,7 +85,7 @@ const AdminCalendarPage = () => {
   }, [users, selectedMaster])
 
   if (user) {
-    if (user.isStaff || user.isAdmin) {
+    if (user?.isStaff || user?.isAdmin) {
       return (
         <div className="container-fluid relative mx-auto h-[calc(100vh-252px)] text-lightBrown flex justify-center items-start bg-cream max-md:text-sm">
           <ContainerBox>
@@ -125,8 +122,6 @@ const AdminCalendarPage = () => {
                 <AdminCalendarBoard
                   key={reset}
                   firstDay={firstDay}
-                  records={records}
-                  services={services}
                   clients={clients}
                   users={users}
                   selectedService={selectedService}
@@ -134,7 +129,6 @@ const AdminCalendarPage = () => {
                   selectedSlot={selectedSlot}
                   handleSelectedSlot={handleSelectSlot}
                   setSlotForChange={setSlotForChange}
-                  handleSetDate={handleSetDate}
                 ></AdminCalendarBoard>
               </div>
               <div className="flex flex-col w-full relative max-md:-order-1 max-md:mb-[10px]">

@@ -23,7 +23,6 @@ const DetailedRecordInfo = ({ recordId, handleClose, reset, currentUser }) => {
   const [selectedStatus, setSelectedStatus] = useState()
   const [selectedDate, setSelectedDate] = useState()
   const [selectedTime, setSelectedTime] = useState()
-  console.log(currentUser)
 
   const [data, setData] = useState({
     price: 0,

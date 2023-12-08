@@ -15,7 +15,6 @@ const AdminCalendarBoard = ({
   selectedSlot,
   handleSelectedSlot,
   setSlotForChange,
-  handleSetDate,
 }) => {
   const windowWidth = window.innerWidth
   const [userStart, setUserStart] = useState(0)

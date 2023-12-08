@@ -108,7 +108,9 @@ const CrmRecordElement = ({ record, lastEl, clients, records }) => {
           {record.time.slice(0, 5)}
         </div>
         <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[10px]">
-          {record.status}
+          {record.status === "completed"
+            ? record?.price + " DIN"
+            : record.status}
         </div>
       </div>
       <span

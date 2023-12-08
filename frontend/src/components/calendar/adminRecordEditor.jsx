@@ -130,16 +130,6 @@ const AdminRecordEditor = ({
         time: selectedSlot.start,
         author: selectedUser?.name,
       })
-      handleSelectedSlot(null)
-      handleAddRecord()
-      setData({
-        phone: "+",
-        instagram: "",
-        telegram: "",
-        name: "",
-      })
-      setClient(null)
-      notify()
     } else {
       await recordService.createNewRecordWithRegister({
         userId: selectedSlot.userId,
@@ -153,17 +143,17 @@ const AdminRecordEditor = ({
         name: data.name,
         authorId: userId,
       })
-      handleSelectedSlot(null)
-      handleAddRecord()
-      setData({
-        phone: "+",
-        instagram: "",
-        telegram: "",
-        name: "",
-      })
-      setClient(null)
-      notify()
     }
+    handleSelectedSlot(null)
+    handleAddRecord()
+    setData({
+      phone: "+",
+      instagram: "",
+      telegram: "",
+      name: "",
+    })
+    setClient(null)
+    notify()
   }
 
   const handleChange = (target) => {
@@ -239,7 +229,7 @@ const AdminRecordEditor = ({
                 {dictionary[selectedLanguage].clientFound}
               </p>
               <div className="w-full py-2 px-3 border border-darkGreen rounded-lg text-darkGreen">
-                {client.name.length !== 0 ? client.name : client.phone}
+                {client?.name ? client.name : client.phone}
               </div>
             </>
           ) : null}

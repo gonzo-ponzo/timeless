@@ -41,8 +41,13 @@ const ClientPageRecordElement = ({ record, lastEl, services, users }) => {
         <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[6px] max-md:col-span-2">
           {recordServicesName}
         </div>
-        <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[6px] max-md:col-span-3">
+        <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[6px] max-md:col-span-3 max-md:text-center">
           {recordServicesPrice}
+          {record.status === "completed" ? (
+            <div>
+              <b>{record?.price}</b>
+            </div>
+          ) : null}
         </div>
         <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[6px] max-md:col-span-2">
           {record.time.slice(0, 5)}

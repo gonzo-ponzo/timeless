@@ -7,8 +7,6 @@ import { useSelector } from "react-redux"
 
 const AdminCalendarBoardDay = ({
   date,
-  records,
-  services,
   clients,
   user,
   selectedService,
@@ -16,6 +14,11 @@ const AdminCalendarBoardDay = ({
   onSlotSelect,
   setSlotForChange,
 }) => {
+  const userNameArray = user?.name.split(" ")
+  const userName =
+    userNameArray?.length > 1
+      ? userNameArray[0] + " " + userNameArray[1][0] + "."
+      : user?.name
   const selectedLanguage = useSelector((state) => state.lang.lang)
   const [recordsToShow, setRecordsToShow] = useState(null)
   const boardDayDate = transformDate(date)
@@ -234,7 +237,7 @@ const AdminCalendarBoardDay = ({
               alt=""
             />
           ) : null}
-          <p>{user?.name}</p>
+          <p>{userName}</p>
         </div>
         <div className="flex h-[60px] w-full justify-center items-center border-b border-t border-gray"></div>
         <div className="flex h-[60px] w-full justify-center items-center border-b border-gray"></div>
@@ -258,8 +261,6 @@ const AdminCalendarBoardDay = ({
 AdminCalendarBoardDay.propTypes = {
   date: PropTypes.object,
   user: PropTypes.object,
-  records: PropTypes.array,
-  services: PropTypes.array,
   clients: PropTypes.array,
   selectedService: PropTypes.object,
   onSlotSelect: PropTypes.func,

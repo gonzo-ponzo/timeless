@@ -50,7 +50,7 @@ const ClientLoginForm = () => {
       if (authData) {
         localStorageService.setClientTokens({ ...authData })
         dispatch(loginClient())
-        navigate("/")
+        navigate("/client")
       }
     }
   }
