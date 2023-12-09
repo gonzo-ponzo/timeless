@@ -21,7 +21,7 @@ const StatusButton = ({ type, handleSelectStatus, selectedStatus }) => {
 
   return (
     <span
-      className={`w-[24px] h-[24px] opacity-${
+      className={`w-[25px] h-[25px]  p-[2px] opacity-${
         selectedStatus === type ? "100" : "50"
       } hover:opacity-100 mr-[10px]`}
       onClick={() => handleSelectStatus(type)}

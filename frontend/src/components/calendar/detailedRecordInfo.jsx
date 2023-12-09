@@ -10,7 +10,7 @@ import { useSelector } from "react-redux"
 import userService from "../../services/user.service"
 import clientService from "../../services/client.service"
 import commentService from "../../services/comment.service"
-// import dropdownArrow from "../../assets/imgs/dropdown-arrow.png"
+import dropdownArrow from "../../assets/imgs/dropdown-arrow.png"
 import Close from "../../assets/imgs/Close-icon.png"
 import StatusButton from "./statusButton"
 
@@ -20,8 +20,10 @@ const DetailedRecordInfo = ({ recordId, handleClose, reset, currentUser }) => {
   const [clients, setClients] = useState(null)
   const [users, setUsers] = useState(null)
   const [comments, setComments] = useState(null)
-  // const [showStatus, setShowStatus] = useState(false)
+  const [showMaster, setShowMaster] = useState(false)
   const [selectedStatus, setSelectedStatus] = useState()
+  const [selectedMaster, setSelectedMaster] = useState()
+  const [selectedMasterId, setSelectedMasterId] = useState()
   const [selectedDate, setSelectedDate] = useState()
   const [selectedTime, setSelectedTime] = useState()
 
@@ -29,6 +31,7 @@ const DetailedRecordInfo = ({ recordId, handleClose, reset, currentUser }) => {
     price: 0,
     comment: "",
     status: "completed",
+    masterId: null,
   })
   const loadData = async () => {
     setRecords(await recordService.getRecords())
@@ -47,6 +50,8 @@ const DetailedRecordInfo = ({ recordId, handleClose, reset, currentUser }) => {
       setSelectedDate(record.date)
       setSelectedTime(record.time)
       setSelectedStatus(record.status)
+      setSelectedMaster(users?.find((user) => user.id === record.users[0]).name)
+      setSelectedMasterId(record.users[0])
     }
   }, [record])
 
@@ -57,15 +62,24 @@ const DetailedRecordInfo = ({ recordId, handleClose, reset, currentUser }) => {
     setData((prevState) => ({ ...prevState, status: selectedStatus }))
   }
 
-  // const statusDropdown = ["created", "completed", "canceled"].map((status) => (
-  //   <div
-  //     className="border-b border-gray px-[16px] py-[7px] bg-white text-brown cursor-pointer hover:text-lightBrown last:border-none last:rounded-b-lg first:rounded-t-lg"
-  //     onClick={() => handleSelectStatus(status)}
-  //     key={status}
-  //   >
-  //     {status}
-  //   </div>
-  // ))
+  const handleSelectMaster = (master) => {
+    setSelectedMaster(master.name)
+    setSelectedMasterId(master.id)
+    setData((prevState) => ({ ...prevState, masterId: selectedMasterId }))
+    setShowMaster(!showMaster)
+  }
+
+  const masterDropdown = users
+    ?.filter((user) => user.isStaff)
+    .map((master) => (
+      <div
+        className="border-b border-gray px-[16px] py-[7px] bg-white text-brown cursor-pointer hover:text-lightBrown last:border-none last:rounded-b-lg first:rounded-t-lg"
+        onClick={() => handleSelectMaster(master)}
+        key={master}
+      >
+        {master.name}
+      </div>
+    ))
   const user = users?.find((user) => record.users.includes(user.id))
 
   const handleChange = (target) => {
@@ -96,6 +110,7 @@ const DetailedRecordInfo = ({ recordId, handleClose, reset, currentUser }) => {
       time: selectedTime,
       date: selectedDate,
       userId: user?.id,
+      masterId: selectedMasterId,
     })
     records[records.findIndex((record) => record.id === recordId)].status =
       selectedStatus
@@ -191,31 +206,6 @@ const DetailedRecordInfo = ({ recordId, handleClose, reset, currentUser }) => {
         ></StatusButton>
       </div>
 
-      {/* <div className="flex justify-between items-center px-[8px] py-[7px] mb-[8px] border border-lightBrown text-lightBrown rounded-lg cursor-pointer relative">
-        <div
-          className={"w-full flex justify-between items-center"}
-          onClick={() => setShowStatus(!showStatus)}
-        >
-          <span className="hover:opacity-80">
-            {selectedStatus ? selectedStatus : record?.status}
-          </span>
-          <img
-            className={
-              !showStatus ? "w-[16px] h-[16px]" : "w-[16px] h-[16px] rotate-180"
-            }
-            src={dropdownArrow}
-            alt=""
-          />
-        </div>
-        {showStatus ? (
-          <>
-            <div className="w-full bg-wh border-gray rounded-lg border absolute top-[100%] left-0 opacity-100">
-              {statusDropdown}
-            </div>
-          </>
-        ) : null}
-      </div> */}
-
       <input
         type="date"
         value={selectedDate}
@@ -235,7 +225,34 @@ const DetailedRecordInfo = ({ recordId, handleClose, reset, currentUser }) => {
       <p className="font-thin mb-[4px]">
         {dictionary[selectedLanguage].master}
       </p>
-      <p className="mb-[16px]">{user?.name}</p>
+
+      <div className="flex justify-between items-center px-[8px] py-[7px] mb-[8px] border border-lightBrown text-lightBrown rounded-lg cursor-pointer relative">
+        <div
+          className={"w-full flex justify-between items-center"}
+          onClick={() =>
+            record?.status === "created" ? setShowMaster(!showMaster) : null
+          }
+        >
+          <span className="hover:opacity-80">
+            {selectedMaster ? selectedMaster : user?.name}
+          </span>
+          <img
+            className={
+              !showMaster ? "w-[16px] h-[16px]" : "w-[16px] h-[16px] rotate-180"
+            }
+            src={dropdownArrow}
+            alt=""
+          />
+        </div>
+        {showMaster ? (
+          <>
+            <div className="w-full bg-wh border-gray rounded-lg border absolute top-[100%] left-0 opacity-100">
+              {masterDropdown}
+            </div>
+          </>
+        ) : null}
+      </div>
+
       <p className="font-thin mb-[4px]">
         {dictionary[selectedLanguage].feedback}
       </p>

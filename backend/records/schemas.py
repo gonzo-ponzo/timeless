@@ -34,6 +34,7 @@ class UpdateRecordSchema(BaseModel):
     date: Optional[datetime.date]
     time: Optional[datetime.time]
     userId: Optional[int]
+    masterId: Optional[int]
 
 
 class AvailableRecordsDataScheme(BaseModel):

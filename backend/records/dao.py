@@ -174,6 +174,13 @@ class RecordDAO(DAO):
         self, record_id: int, body: UpdateRecordSchema
     ) -> None:
         async with self.db.begin():
+            if body.masterId:
+                query = (
+                    update(RecordsUsers)
+                    .where(RecordsUsers.record_id == record_id)
+                    .values(user_id=body.masterId)
+                )
+                await self.db.execute(query)
             if body.date and body.time:
                 query = select(Record).where(Record.id == record_id)
                 record = await self.db.scalar(query)
