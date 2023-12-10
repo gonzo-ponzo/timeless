@@ -58,8 +58,11 @@ const CrmRecordEditor = ({
     if (search.length > 0) {
       setDropdownServices(
         services
-          .filter((service) =>
-            ["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(service.name)
+          .filter(
+            (service) =>
+              !["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
+                service.name
+              )
           )
           .filter((service) => service.name.toLowerCase().includes(search))
       )
@@ -67,8 +70,11 @@ const CrmRecordEditor = ({
       setDropdownServices(
         services
           .filter((service) => service !== selectedService)
-          .filter((service) =>
-            ["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(service.name)
+          .filter(
+            (service) =>
+              !["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
+                service.name
+              )
           )
       )
     }
