@@ -20,13 +20,13 @@ const recordService = {
     )
     return data
   },
-  getAvailableCrmRecords: async (
+  getAvailableCrmRecords: (
     selectedServiceId,
     userId,
     selectedUserId,
     boardDayDate
   ) => {
-    const { data } = await httpRecord.get(
+    const { data } = httpRecord.get(
       `get-available-crm/${selectedServiceId}/${userId}/${selectedUserId}/${boardDayDate}`
     )
     return data

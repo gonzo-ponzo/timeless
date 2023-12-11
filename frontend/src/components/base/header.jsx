@@ -21,10 +21,6 @@ const Header = () => {
     }
   }, [])
 
-  const handleSetActive = (to) => {
-    console.log(to)
-  }
-
   const selectedLanguage = useSelector((state) => state.lang.lang)
 
   return (
@@ -65,7 +61,6 @@ const Header = () => {
                 smooth={true}
                 offset={50}
                 duration={500}
-                onSetActive={handleSetActive}
                 className="px-8 py-2 hover:bg-[#FFF8E1] max-[740px] max-[400px]:text-sm transition rounded-md  scroll-smooth"
               >
                 {dictionary[selectedLanguage].home}
