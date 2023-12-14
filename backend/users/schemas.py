@@ -1,8 +1,6 @@
 from typing import Optional
 import datetime
-import re
 from pydantic import BaseModel, validator
-from fastapi import HTTPException, UploadFile, File
 
 
 class PhoneSchema(BaseModel):
@@ -65,5 +63,6 @@ class GetUserSchema(BaseModel):
     rating: float
     position: Optional[str]
     image: Optional[str]
+    services: Optional[list[int]]
     isAdmin: bool
     isStaff: bool

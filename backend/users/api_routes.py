@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 from jose import jwt
 import random
+import string
 from auth.hashing import Hasher
 from typing import Optional
 
@@ -194,6 +195,28 @@ async def login_user(
         "userExpiresIn": ACCESS_TOKEN_LIFETIME,
         "isAdmin": user.is_admin,
     }
+
+
+@users_api_router.post("/password-recovery")
+async def users_password_recovery(
+    data: PhoneSchema, db: AsyncSession = Depends(get_async_session)
+) -> Optional[dict]:
+    """Send new password to user with sms"""
+    user_service = UserService(db=db)
+    phone = data.phone
+    user = await user_service.get_user_by_phone(user_phone=phone)
+    if not user:
+        return {"data": "User not found"}
+
+    characters = string.ascii_letters + string.digits
+    password = "".join(random.choice(characters) for _ in range(8))
+    hashed_password = Hasher.get_password_hash(password)
+    user_service.recover_password(user_phone=phone, hashed_password=hashed_password)
+
+    sms_service = SmsService()
+    sms_service.send_new_password(user_phone=phone, password=password)
+
+    return {"data": "Password sent with sms"}
 
 
 @users_api_router.get("/")

@@ -62,7 +62,7 @@ async def get_available_records_by_data(
     return records
 
 
-@records_api_router.get("/get-available-crm/{service_id}/{user_id}/{master_id}/{date}/")
+@records_api_router.get("/get-available-crm/{user_id}/{master_id}/{date}/")
 async def get_available_crm_records_by_data(
     user_id: int,
     master_id: int,

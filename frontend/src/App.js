@@ -20,6 +20,7 @@ import CrmProfilePage from "./pages/crmProfilePage"
 import ClientCalendarPage from "./pages/clientCalendarPage"
 import CrmCalendarPage from "./pages/crmCalendarPage"
 import StartPage from "./pages/startPage"
+import CrmPasswordRecoveryPage from "./pages/crmPasswordRecoveryPage"
 
 function App() {
   return (
@@ -33,6 +34,10 @@ function App() {
               <Route path="/" element={<StartPage />} />
 
               <Route path="/crm/login" element={<UserLoginPage />} />
+              <Route
+                path="/crm/password-recovery"
+                element={<CrmPasswordRecoveryPage />}
+              />
               <Route path="/client/login" element={<ClientLoginPage />} />
 
               <Route path="/client/record" element={<ClientCalendarPage />} />

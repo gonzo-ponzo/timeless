@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux"
 import Calendar from "../components/ui/calendar"
 import CrmRecordEditor from "../components/calendar/crmRecordEditor"
 import UserEditor from "../components/calendar/userEditor"
-import CalendarBoard from "../components/calendar/calendarBoard"
+import CrmCalendarBoard from "../components/calendar/crmCalendarBoard"
 import { setDate } from "../store/dateSlice"
 import { useNavigate } from "react-router-dom"
 import localStorageService from "../services/localStorage.service"
@@ -50,12 +50,23 @@ const CrmCalendarPage = () => {
     setClients(await clientService.getClients())
     setRecords(await recordService.getRecords())
     const allUsers = await userService.getUsers()
-    setUsers(allUsers.filter((user) => user.isStaff))
+    setUsers(
+      selectedService
+        ? allUsers.filter(
+            (user) =>
+              user.isStaff &&
+              (user.services.includes(selectedService.id) ||
+                ["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
+                  selectedService.name
+                ))
+          )
+        : allUsers.filter((user) => user.isStaff)
+    )
     setServices(await serviceService.getServices())
   }
   useEffect(() => {
     loadData(userId)
-  }, [userId, recordAdded])
+  }, [userId, recordAdded, selectedService])
 
   const handleShowUserDropdown = () => {
     setShowUserDropdown(!showUserDropdown)
@@ -63,7 +74,6 @@ const CrmCalendarPage = () => {
 
   const handleDateSelect = async (date) => {
     setCalendarDate(new Date(date.year, date.month - 1, date.day))
-    console.log(date)
     const dateStore = `${date.day}.${date.month}.${date.year}`
     await dispatch(setDate(dateStore))
   }
@@ -99,9 +109,14 @@ const CrmCalendarPage = () => {
 
   useEffect(() => {
     if (users && !selectedMaster) {
-      setSelectedUser(
-        users[users.indexOf(users.find((user) => user.id === Number(userId)))]
+      const currentUserInUsers = users.find(
+        (user) => user.id === Number(userId)
       )
+      if (currentUserInUsers) {
+        setSelectedUser(currentUserInUsers)
+      } else {
+        setSelectedUser(users[0])
+      }
     }
   }, [users, selectedMaster, userId])
 
@@ -144,20 +159,17 @@ const CrmCalendarPage = () => {
             </div>
             <div className="md:grid md:grid-cols-5  mt-[10px] max-md:flex max-md:flex-col">
               <div className="col-span-4 mr-[6px] flex border border-gray rounded-lg">
-                <CalendarBoard
+                <CrmCalendarBoard
                   key={reset}
                   firstDay={firstDay}
-                  records={records}
-                  services={services}
                   selectedService={selectedService}
                   selectedUser={selectedUser}
                   selectedSlot={selectedSlot}
                   clients={clients}
                   handleSelectedSlot={handleSelectSlot}
-                  pageType={"crm"}
                   setSlotForChange={setSlotForChange}
                   handleSetDate={handleSetDate}
-                ></CalendarBoard>
+                ></CrmCalendarBoard>
               </div>
               <div className="flex flex-col w-full relative max-md:-order-1 max-md:mb-[10px]">
                 <UserEditor

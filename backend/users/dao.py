@@ -50,6 +50,7 @@ class UserDAO(DAO):
                         rating=rating,
                         isAdmin=user.is_admin,
                         isStaff=user.is_staff,
+                        services=[i.id for i in user.services],
                     )
                 )
             return result
@@ -89,6 +90,7 @@ class UserDAO(DAO):
                 image=user.image,
                 isAdmin=user.is_admin,
                 isStaff=user.is_staff,
+                services=[i.id for i in user.services],
             )
             return result
 
@@ -135,6 +137,16 @@ class UserDAO(DAO):
             self.db.add(user)
             await self.db.flush()
             return user
+
+    async def recover_password(self, user_phone: str, hashed_password: str):
+        async with self.db.begin():
+            query = (
+                update(User)
+                .where(User.phone == user_phone)
+                .values(hashed_password=hashed_password)
+            )
+            await self.db.execute(query)
+            await self.db.commit()
 
 
 class ClientDAO(DAO):

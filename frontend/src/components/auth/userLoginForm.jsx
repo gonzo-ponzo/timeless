@@ -8,6 +8,7 @@ import { loginUser } from "../../store/authSlice"
 import dictionary from "../../utils/dictionary"
 import { useSelector } from "react-redux"
 import userService from "../../services/user.service"
+import { Link } from "react-router-dom"
 
 const ClientLoginForm = () => {
   const userId = localStorageService.getUserId()
@@ -109,6 +110,9 @@ const ClientLoginForm = () => {
       >
         {dictionary[selectedLanguage].login}
       </button>
+      <Link to={"/crm/password-recovery"}>
+        {dictionary[selectedLanguage].passwordRecovery}
+      </Link>
     </form>
   )
 }

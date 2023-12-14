@@ -1,3 +1,4 @@
+import { property } from "lodash"
 import dictionary from "../../utils/dictionary"
 import PropTypes from "prop-types"
 import { useSelector } from "react-redux"
@@ -171,6 +172,14 @@ AdminCalendarBoardDay.propTypes = {
   recordsToShowElements: PropTypes.array,
   user: PropTypes.object,
   userName: PropTypes.string,
+  selectedService: PropTypes.object,
+  existingRecords: PropTypes.array,
+  boardDayDate: PropTypes.string,
+  clients: PropTypes.array,
+  handleSelectSlot: PropTypes.func,
+  onSlotChange: PropTypes.func,
+  selectedSlot: PropTypes.object,
+  date: PropTypes.object,
 }
 
 export default AdminCalendarBoardDay

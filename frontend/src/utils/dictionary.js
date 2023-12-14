@@ -122,6 +122,10 @@ const dictionary = {
     lm: "Старший мастер и руководитель смены",
     am: "Управляющий администратор",
     contacts: "Контакты",
+    passwordRecovery: "Восстановить пароль",
+    passwordRecoveryDescrcription:
+      "Введите номер телефона, пароль придет в виде смс",
+    recover: "Восстановить",
   },
   en: {
     home: "Home",
@@ -251,6 +255,10 @@ const dictionary = {
     lm: "Lead Master",
     am: "Administrative Manager",
     contacts: "Contacts",
+    passwordRecovery: "Password recovery",
+    passwordRecoveryDescrcription:
+      "Enter your phone, password will be sent to you with sms",
+    recover: "Recover",
   },
   sr: {},
 }

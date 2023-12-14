@@ -137,9 +137,7 @@ const ClientCalendarPage = () => {
               selectedService={selectedService}
               selectedUser={selectedUser}
               selectedSlot={selectedSlot}
-              handleSetDate={handleSetDate}
               handleSelectedSlot={handleSelectSlot}
-              pageType={"client"}
             ></CalendarBoard>
           </div>
           <div className="flex flex-col w-full relative max-md:-order-1 max-md:mb-[10px]">

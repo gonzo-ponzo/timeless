@@ -20,14 +20,9 @@ const recordService = {
     )
     return data
   },
-  getAvailableCrmRecords: (
-    selectedServiceId,
-    userId,
-    selectedUserId,
-    boardDayDate
-  ) => {
+  getAvailableCrmRecords: (userId, selectedUserId, boardDayDate) => {
     const { data } = httpRecord.get(
-      `get-available-crm/${selectedServiceId}/${userId}/${selectedUserId}/${boardDayDate}`
+      `get-available-crm/${userId}/${selectedUserId}/${boardDayDate}`
     )
     return data
   },

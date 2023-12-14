@@ -9,8 +9,6 @@ import fillDayWithAvailableSlots from "../../utils/fillDayWithAvailableSlots"
 
 const AdminCalendarBoard = ({
   firstDay,
-  records,
-  services,
   clients,
   users,
   selectedService,
@@ -26,7 +24,7 @@ const AdminCalendarBoard = ({
   useEffect(() => {
     for (const user of users) {
       fetch(
-        `http://localhost:8000/api/records/get-available-crm/1/${user.id}/${user.id}/${boardDayDate}`
+        `http://localhost:8000/api/records/get-available-crm/${user.id}/${user.id}/${boardDayDate}`
       )
         .then((response) => response.json())
         .then((data) => {
@@ -161,8 +159,6 @@ const AdminCalendarBoard = ({
 
 AdminCalendarBoard.propTypes = {
   date: PropTypes.instanceOf(Date),
-  records: PropTypes.array,
-  services: PropTypes.array,
   clients: PropTypes.array,
   users: PropTypes.array,
   selectedService: PropTypes.object,

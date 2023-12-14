@@ -46,6 +46,21 @@ class RecordsUsers(Base):
     )
 
 
+class UserServices(Base):
+    __tablename__ = "user_services"
+
+    service_id = Column(
+        Integer,
+        ForeignKey("services.id", onupdate="CASCADE", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"),
+        primary_key=True,
+    )
+
+
 class Client(Base):
     __tablename__ = "clients"
 
@@ -106,6 +121,14 @@ class User(Base):
 
     clients = relationship("Client", back_populates="registered_by")
 
+    services = relationship(
+        "Service",
+        lazy="selectin",
+        secondary="user_services",
+        back_populates="users",
+        passive_deletes=True,
+    )
+
     comments = relationship("Comment", back_populates="user")
 
     def __str__(self) -> str:
@@ -165,6 +188,14 @@ class Service(Base):
 
     records = relationship(
         "Record", secondary="records_services", back_populates="services"
+    )
+
+    users = relationship(
+        "User",
+        lazy="selectin",
+        secondary="user_services",
+        back_populates="services",
+        passive_deletes=True,
     )
 
     def __str__(self) -> str:

@@ -4,6 +4,7 @@ export default function fillDayWithAvailableSlots(
   boardDayDate
 ) {
   const existingRecordsWithSlots = []
+
   existingRecords?.forEach((record) => {
     existingRecordsWithSlots.push(record)
   })
@@ -14,7 +15,7 @@ export default function fillDayWithAvailableSlots(
     start += 10
   ) {
     let conflict = false
-    existingRecords.forEach((record) => {
+    existingRecordsWithSlots.forEach((record) => {
       if (
         record.start <= start &&
         start < record.end &&

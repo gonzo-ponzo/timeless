@@ -70,13 +70,24 @@ const AdminCalendarPage = () => {
     setClients(await clientService.getClients())
     setServices(await serviceService.getServices())
     const allUsers = await userService.getUsers()
-    setUsers(allUsers.filter((user) => user.isStaff))
+    setUsers(
+      selectedService
+        ? allUsers.filter(
+            (user) =>
+              user.isStaff &&
+              (user.services.includes(selectedService.id) ||
+                ["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
+                  selectedService.name
+                ))
+          )
+        : allUsers.filter((user) => user.isStaff)
+    )
     setUser(await userService.getUserById(userId))
   }
 
   useEffect(() => {
     loadData(userId)
-  }, [recordAdded, userId])
+  }, [recordAdded, userId, selectedService])
 
   useEffect(() => {
     if (users && !selectedMaster) {

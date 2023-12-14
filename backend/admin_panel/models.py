@@ -23,16 +23,12 @@ class UserAdmin(ModelView, model=User):
     column_sortable_list = [User.name, User.experience]
     column_details_exclude_list = [
         User.hashed_password,
-        User.clients,
         User.records,
-        User.comments,
         User.image,
     ]
     form_excluded_columns = [
         User.hashed_password,
-        User.clients,
         User.records,
-        User.comments,
         User.image,
     ]
     column_labels = {
@@ -44,6 +40,9 @@ class UserAdmin(ModelView, model=User):
         User.is_admin: "Администратор",
         User.is_staff: "Сотрудник",
         User.registered_at: "Дата регистрации",
+        User.services: "Услуги",
+        User.clients: "Клиенты",
+        User.comments: "Комментарии",
     }
 
 
@@ -68,15 +67,11 @@ class ClientAdmin(ModelView, model=Client):
     ]
     column_details_exclude_list = [
         # Client.auth_code,
-        Client.records,
-        Client.comments,
         Client.image,
         Client.user_id,
     ]
     form_excluded_columns = [
         Client.auth_code,
-        Client.records,
-        Client.comments,
         Client.image,
         Client.user_id,
     ]
@@ -89,6 +84,8 @@ class ClientAdmin(ModelView, model=Client):
         Client.telegram: "Телеграм",
         Client.registered_at: "Дата регистрации",
         Client.registered_by: "Кем зарегистрирован",
+        Client.records: "Записи",
+        Client.comments: "Комментарии",
     }
 
 
@@ -109,9 +106,11 @@ class ServiceAdmin(ModelView, model=Service):
     ]
     column_details_exclude_list = [
         Service.records,
+        Service.users,
     ]
     form_excluded_columns = [
         Service.records,
+        Service.users,
     ]
     column_labels = {
         Service.name: "Название",
@@ -144,12 +143,10 @@ class RecordAdmin(ModelView, model=Record):
         Record.client,
     ]
     column_details_exclude_list = [
-        Record.comments,
         Record.image,
         Record.client_id,
     ]
     form_excluded_columns = [
-        Record.comments,
         Record.image,
         Record.client_id,
     ]
@@ -166,6 +163,7 @@ class RecordAdmin(ModelView, model=Record):
         Record.client: "Клиент",
         Record.created_at: "Дата создания",
         Record.author: "Автор",
+        Record.comments: "Комментарии",
     }
 
 

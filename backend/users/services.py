@@ -111,3 +111,9 @@ class UserService(Service):
             user_phone=user_phone, user_password=user_password
         )
         return user
+
+    async def recover_password(self, user_phone: str, hashed_password: str):
+        user_dao = UserDAO(db_session=self.db)
+        await user_dao.recover_password(
+            user_phone=user_phone, hashed_password=hashed_password
+        )

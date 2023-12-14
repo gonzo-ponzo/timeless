@@ -10,6 +10,9 @@ const userService = {
     const { data } = await httpUser.get("user/" + userId)
     return data
   },
+  passwordRecovery: async (phone) => {
+    await httpUser.post("password-recovery", { phone })
+  },
   getUsers: async () => {
     const { data } = await httpUser.get("")
     return data
