@@ -56,8 +56,12 @@ const AdminCalendarBoard = ({
 
       const date = new Date(firstDay.getTime())
       if (selectedService) {
-        fillDayWithAvailableSlots(selectedService, userRecords, boardDayDate)
-        const slotsForRecord = existingRecords[user.id].filter(
+        const existingRecordsWithSlots = fillDayWithAvailableSlots(
+          selectedService,
+          userRecords,
+          boardDayDate
+        )
+        const slotsForRecord = existingRecordsWithSlots.filter(
           (record) => record.type === "green"
         )
 
@@ -67,7 +71,7 @@ const AdminCalendarBoard = ({
               userName={userName}
               user={user}
               selectedService={selectedService}
-              existingRecords={userRecords}
+              existingRecords={existingRecordsWithSlots}
               boardDayDate={boardDayDate}
               clients={clients}
               handleSelectSlot={handleSelectedSlot}

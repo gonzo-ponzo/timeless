@@ -19,15 +19,31 @@ Base = declarative_base()
 class RecordsServices(Base):
     __tablename__ = "records_services"
 
-    record_id = Column(Integer, ForeignKey("records.id"), primary_key=True)
-    service_id = Column(Integer, ForeignKey("services.id"), primary_key=True)
+    record_id = Column(
+        Integer,
+        ForeignKey("records.id", onupdate="CASCADE", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    service_id = Column(
+        Integer,
+        ForeignKey("services.id", onupdate="CASCADE", ondelete="CASCADE"),
+        primary_key=True,
+    )
 
 
 class RecordsUsers(Base):
     __tablename__ = "records_users"
 
-    record_id = Column(Integer, ForeignKey("records.id"), primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
+    record_id = Column(
+        Integer,
+        ForeignKey("records.id", onupdate="CASCADE", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"),
+        primary_key=True,
+    )
 
 
 class Client(Base):
@@ -48,7 +64,9 @@ class Client(Base):
         String, default=f"http://{IP_SERVER}:8000/static/defaultLogo.jpg", nullable=True
     )
 
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(
+        Integer, ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE")
+    )
     registered_by = relationship("User", back_populates="clients")
 
     records = relationship("Record", back_populates="client", lazy="selectin")
@@ -79,7 +97,11 @@ class User(Base):
     is_staff = Column(Boolean, default=False, nullable=False)
 
     records = relationship(
-        "Record", secondary="records_users", back_populates="users", lazy="selectin"
+        "Record",
+        lazy="selectin",
+        secondary="records_users",
+        back_populates="users",
+        passive_deletes=True,
     )
 
     clients = relationship("Client", back_populates="registered_by")
@@ -106,18 +128,25 @@ class Record(Base):
         DateTime(timezone=True), default=datetime.datetime.now, nullable=True
     )
 
-    client_id = Column(Integer, ForeignKey("clients.id"))
-    client = relationship("Client", back_populates="records")
+    client_id = Column(
+        Integer, ForeignKey("clients.id", onupdate="CASCADE", ondelete="CASCADE")
+    )
+    client = relationship("Client", lazy="selectin", back_populates="records")
 
     services = relationship(
         "Service",
         secondary="records_services",
         back_populates="records",
         lazy="selectin",
+        passive_deletes=True,
     )
 
     users = relationship(
-        "User", secondary="records_users", back_populates="records", lazy="selectin"
+        "User",
+        secondary="records_users",
+        back_populates="records",
+        lazy="selectin",
+        passive_deletes=True,
     )
 
     comments = relationship("Comment", back_populates="record", lazy="selectin")
@@ -155,11 +184,23 @@ class Comment(Base):
         String, default=f"http://{IP_SERVER}:8000/static/defaultLogo.jpg", nullable=True
     )
 
-    client_id = Column(Integer, ForeignKey("clients.id"), nullable=True)
+    client_id = Column(
+        Integer,
+        ForeignKey("clients.id", onupdate="CASCADE", ondelete="CASCADE"),
+        nullable=True,
+    )
     client = relationship("Client", back_populates="comments", lazy="selectin")
 
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"),
+        nullable=True,
+    )
     user = relationship("User", back_populates="comments", lazy="selectin")
 
-    record_id = Column(Integer, ForeignKey("records.id"), nullable=True)
+    record_id = Column(
+        Integer,
+        ForeignKey("records.id", onupdate="CASCADE", ondelete="CASCADE"),
+        nullable=True,
+    )
     record = relationship("Record", back_populates="comments", lazy="selectin")

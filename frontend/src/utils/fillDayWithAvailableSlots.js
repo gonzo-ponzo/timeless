@@ -15,22 +15,30 @@ export default function fillDayWithAvailableSlots(
   ) {
     let conflict = false
     existingRecords.forEach((record) => {
-      if (record.start <= start && start < record.end) {
+      if (
+        record.start <= start &&
+        start < record.end &&
+        record.type !== "green"
+      ) {
         conflict = true
       } else if (
         record.start < start + selectedService?.duration &&
-        start + selectedService?.duration < record.end
+        start + selectedService?.duration < record.end &&
+        record.type !== "green"
       ) {
         conflict = true
       } else if (
         start < record.start &&
-        record.start < start + selectedService?.duration
+        record.start < start + selectedService?.duration &&
+        record.type !== "green"
       ) {
+        conflict = true
+      } else if (conflict === false && start % 30 > 0) {
         conflict = true
       }
     })
     if (!conflict) {
-      existingRecords.push({
+      existingRecordsWithSlots.push({
         start: start,
         end: start + selectedService?.duration,
         duration: selectedService?.duration,
