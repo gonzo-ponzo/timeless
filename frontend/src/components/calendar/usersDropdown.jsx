@@ -2,7 +2,7 @@ import PropTypes from "prop-types"
 import React from "react"
 
 const UsersDropdown = ({ users, show, selectedUser, handleClick }) => {
-  const dropdownUsers = users.filter((user) => user !== selectedUser)
+  const dropdownUsers = users.filter((user) => user?.id !== selectedUser?.id)
 
   const userElements = dropdownUsers.map((user) => (
     <div

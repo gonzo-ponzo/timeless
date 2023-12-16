@@ -53,7 +53,7 @@ const DetailedRecordInfo = ({ recordId, handleClose, reset, currentUser }) => {
       setSelectedMaster(users?.find((user) => user.id === record.users[0]).name)
       setSelectedMasterId(record.users[0])
     }
-  }, [record])
+  }, [record, recordId])
 
   const client = clients?.find((client) => client.id === record.clientId)
 
@@ -234,32 +234,44 @@ const DetailedRecordInfo = ({ recordId, handleClose, reset, currentUser }) => {
         {dictionary[selectedLanguage].master}
       </p>
 
-      <div className="flex justify-between items-center px-[8px] py-[7px] mb-[8px] border border-lightBrown text-lightBrown rounded-lg cursor-pointer relative">
-        <div
-          className={"w-full flex justify-between items-center"}
-          onClick={() =>
-            record?.status === "created" ? setShowMaster(!showMaster) : null
-          }
-        >
-          <span className="hover:opacity-80">
-            {selectedMaster ? selectedMaster : user?.name}
-          </span>
-          <img
-            className={
-              !showMaster ? "w-[16px] h-[16px]" : "w-[16px] h-[16px] rotate-180"
+      {user?.isAdmin ? (
+        <div className="flex justify-between items-center px-[8px] py-[7px] mb-[8px] border border-lightBrown text-lightBrown rounded-lg cursor-pointer relative">
+          <div
+            className={"w-full flex justify-between items-center"}
+            onClick={() =>
+              record?.status === "created" ? setShowMaster(!showMaster) : null
             }
-            src={dropdownArrow}
-            alt=""
-          />
+          >
+            <span className="hover:opacity-80">
+              {selectedMaster ? selectedMaster : user?.name}
+            </span>
+            <img
+              className={
+                !showMaster
+                  ? "w-[16px] h-[16px]"
+                  : "w-[16px] h-[16px] rotate-180"
+              }
+              src={dropdownArrow}
+              alt=""
+            />
+          </div>
+          {showMaster ? (
+            <>
+              <div className="w-full bg-wh border-gray rounded-lg border absolute top-[100%] left-0 opacity-100">
+                {masterDropdown}
+              </div>
+            </>
+          ) : null}
         </div>
-        {showMaster ? (
-          <>
-            <div className="w-full bg-wh border-gray rounded-lg border absolute top-[100%] left-0 opacity-100">
-              {masterDropdown}
-            </div>
-          </>
-        ) : null}
-      </div>
+      ) : users ? (
+        <p className="text-darkBrown mb-[4px]">
+          {
+            Object.values(users).filter(
+              (user) => user.id === record.users[0]
+            )[0].name
+          }
+        </p>
+      ) : null}
 
       <p className="font-thin mb-[4px]">
         {dictionary[selectedLanguage].feedback}

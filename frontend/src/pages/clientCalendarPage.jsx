@@ -106,7 +106,6 @@ const ClientCalendarPage = () => {
   useEffect(() => {
     loadData()
   }, [recordAdded, selectedService])
-
   return (
     <div className="container-fluid relative mx-auto h-[calc(100vh-252px)] text-lightBrown flex justify-center items-start bg-cream max-md:text-sm">
       <ContainerBox>
