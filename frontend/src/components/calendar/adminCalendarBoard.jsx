@@ -6,6 +6,7 @@ import AdminCalendarBoardDay from "./adminCalendarBoardDay"
 import brownTriangle from "../../assets/imgs/brownTriangle.png"
 import transformDate from "../../utils/transformDate"
 import fillDayWithAvailableSlots from "../../utils/fillDayWithAvailableSlots"
+import apiEnpoint from "../../services/config"
 
 const AdminCalendarBoard = ({
   firstDay,
@@ -24,7 +25,7 @@ const AdminCalendarBoard = ({
   useEffect(() => {
     for (const user of users) {
       fetch(
-        `http://localhost:8000/api/records/get-available-crm/${user.id}/${user.id}/${boardDayDate}`
+        `${apiEnpoint}api/records/get-available-crm/${user.id}/${user.id}/${boardDayDate}`
       )
         .then((response) => response.json())
         .then((data) => {

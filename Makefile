@@ -8,7 +8,7 @@ revision:
 	cd backend && alembic revision --autogenerate
 
 back:
-	cd backend && alembic upgrade heads && gunicorn main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000
+	cd backend && alembic upgrade heads && gunicorn main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000 --daemon
 	
 front:
 	cd frontend && npm run start

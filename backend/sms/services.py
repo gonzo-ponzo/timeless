@@ -14,14 +14,14 @@ class SmsService:
     async def send_auth_code_with_sms(self, auth_code: str, client_phone: str) -> None:
         content = f"Dobar dan,\nVaš autorizacioni kod {auth_code}.\nVaš Timeless"
         data = self.get_data(client_phone=client_phone, content=content)
-        # async with aiohttp.ClientSession() as session:
-        #     await session.post(url=self.url, data=data, headers=self.headers)
+        async with aiohttp.ClientSession() as session:
+            await session.post(url=self.url, data=data, headers=self.headers)
 
     async def send_new_password(self, user_phone: str, password: str):
         content = f"Dobar dan,\nVaš новый пароль {password}.\nVaš Timeless"
         data = self.get_data(client_phone=user_phone, content=content)
-        # async with aiohttp.ClientSession() as session:
-        #     await session.post(url=self.url, data=data, headers=self.headers)
+        async with aiohttp.ClientSession() as session:
+            await session.post(url=self.url, data=data, headers=self.headers)
 
     def send_notify_with_record_start(
         self, text: str, client_phone: str, record_id: int
@@ -42,8 +42,8 @@ class SmsService:
         ):
             return "Booking canceled or changed"
 
-        # response = requests.post(url=self.url, headers=self.headers, data=data)
-        # return response.text
+        response = requests.post(url=self.url, headers=self.headers, data=data)
+        return response.text
 
     def datetime_convert(self, record_datetime: str):
         date = record_datetime.split(" ")[0]

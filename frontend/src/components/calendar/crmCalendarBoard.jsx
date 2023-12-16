@@ -6,6 +6,7 @@ import CrmCalendarBoardDay from "./crmCalendarBoardDay"
 import transformDate from "../../utils/transformDate"
 import localStorageService from "../../services/localStorage.service"
 import fillDayWithAvailableSlots from "../../utils/fillDayWithAvailableSlots"
+import apiEnpoint from "../../services/config"
 
 const CrmCalendarBoard = ({
   firstDay,
@@ -27,7 +28,7 @@ const CrmCalendarBoard = ({
       )
 
       fetch(
-        `http://localhost:8000/api/records/get-available-crm/${userId}/${
+        `${apiEnpoint}api/records/get-available-crm/${userId}/${
           selectedUser ? selectedUser.id : userId
         }/${boardDayDate}`
       )
