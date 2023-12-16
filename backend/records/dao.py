@@ -70,6 +70,27 @@ class RecordDAO(DAO):
                 client_id=client_id,
                 author=body.author,
             )
+            query = (
+                select(Record)
+                .join(RecordsUsers)
+                .where(RecordsUsers.user_id == body.userId)
+                .where(Record.date == datetime.datetime.strptime(body.date, "%Y-%m-%d"))
+                .where(Record.status != "canceled")
+            )
+            res = await self.db.scalars(query)
+            all_records = res.all()
+
+            new_start = body.time
+            new_end = new_start + service.duration
+            flag = True
+            for record in all_records:
+                record_duration = sum([service.duration for service in record.services])
+                start = record.time.hour * 60 + record.time.minute
+                end = start + record_duration
+                if start < new_start < end or start < new_end < end:
+                    flag = False
+            if not flag:
+                return
             self.db.add(new_record)
             await self.db.flush()
             new_record_service = RecordsServices(

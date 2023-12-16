@@ -37,6 +37,10 @@ const ClientLoginForm = () => {
   ) {
     phoneError = "phone must start  with '7' or '3'"
   }
+  const phoneValid =
+    /^\+3\d{10}$/.test(data.phone) ||
+    /^\+3\d{11}$/.test(data.phone) ||
+    /^\+7\d{10}$/.test(data.phone)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -121,7 +125,9 @@ const ClientLoginForm = () => {
           />
           <button
             className="bg-brown rounded-lg text-white text-center w-full py-[8px] mt-[24px] hover:opacity-80"
-            disabled={phoneError || data.phone.length < 2 ? true : false}
+            disabled={
+              phoneError || data.phone.length < 2 ? true : false || !phoneValid
+            }
           >
             {dictionary[selectedLanguage].login}
           </button>

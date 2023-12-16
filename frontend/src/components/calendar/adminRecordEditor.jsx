@@ -51,11 +51,16 @@ const AdminRecordEditor = ({
     phoneError = "phone must start  with '7' or '3'"
   }
 
+  const phoneValid =
+    /^\+3\d{10}$/.test(data.phone) ||
+    /^\+3\d{11}$/.test(data.phone) ||
+    /^\+7\d{10}$/.test(data.phone)
+
   useEffect(() => {
     if (search.length > 0) {
       setDropdownServices(
         services.filter((service) =>
-          service.name.toLowerCase().includes(search)
+          service.name.toLowerCase().includes(search.toLowerCase())
         )
       )
     } else {
@@ -279,7 +284,10 @@ const AdminRecordEditor = ({
                 : "bg-white text-black border-gray"
             } border text-center rounded-lg w-full mt-[20px] hover:opacity-80`}
             disabled={
-              (!phoneError && selectedSlot && data.phone.length > 1) ||
+              (!phoneError &&
+                selectedSlot &&
+                data.phone.length > 1 &&
+                phoneValid) ||
               (["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
                 selectedService?.name
               ) &&

@@ -38,6 +38,10 @@ const CrmRecordEditor = ({
     telegram: "",
     name: "",
   })
+  const phoneValid =
+    /^\+3\d{10}$/.test(data.phone) ||
+    /^\+3\d{11}$/.test(data.phone) ||
+    /^\+7\d{10}$/.test(data.phone)
 
   let phoneError
   if (data.phone.startsWith("+3") && data.phone.length !== 13) {
@@ -64,7 +68,9 @@ const CrmRecordEditor = ({
                 service.name
               )
           )
-          .filter((service) => service.name.toLowerCase().includes(search))
+          .filter((service) =>
+            service.name.toLowerCase().includes(search.toLowerCase())
+          )
       )
     } else {
       setDropdownServices(
@@ -286,7 +292,10 @@ const CrmRecordEditor = ({
                 : "bg-white text-black border-gray"
             } border text-center rounded-lg w-full mt-[20px] hover:opacity-80`}
             disabled={
-              (!phoneError && selectedSlot && data.phone.length > 1) ||
+              (!phoneError &&
+                selectedSlot &&
+                data.phone.length > 1 &&
+                phoneValid) ||
               (["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
                 selectedService?.name
               ) &&

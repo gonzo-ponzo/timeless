@@ -26,7 +26,9 @@ const RecordEditor = ({
   useEffect(() => {
     if (data.length > 0) {
       setDropdownServices(
-        services.filter((service) => service.name.toLowerCase().includes(data))
+        services.filter((service) =>
+          service.name.toLowerCase().includes(data.toLowerCase())
+        )
       )
     } else {
       setDropdownServices(
