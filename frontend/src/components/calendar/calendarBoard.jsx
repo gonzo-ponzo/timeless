@@ -20,9 +20,9 @@ const CalendarBoard = ({
       services={services}
       selectedService={selectedService}
       selectedUser={selectedUser}
-      key={day}
       selectedSlot={selectedSlot}
       onSlotSelect={handleSelectedSlot}
+      key={day}
     />
   ))
 

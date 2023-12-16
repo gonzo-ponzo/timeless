@@ -14,7 +14,6 @@ const CrmCalendarBoard = ({
   selectedUser,
   selectedSlot,
   handleSelectedSlot,
-  handleSetDate,
   setSlotForChange,
 }) => {
   const userId = localStorageService.getUserId()
@@ -28,7 +27,9 @@ const CrmCalendarBoard = ({
       )
 
       fetch(
-        `http://localhost:8000/api/records/get-available-crm/${userId}/${selectedUser?.id}/${boardDayDate}`
+        `http://localhost:8000/api/records/get-available-crm/${userId}/${
+          selectedUser ? selectedUser.id : userId
+        }/${boardDayDate}`
       )
         .then((response) => response.json())
         .then((data) => {

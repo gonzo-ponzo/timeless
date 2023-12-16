@@ -28,7 +28,7 @@ const CrmCalendarBoardDay = ({
         record.type
       } text-dark${capitalize(record.type)} border-dark${capitalize(
         record.type
-      )} hover:bg-opacity-100`
+      )} hover:bg-opacity-100 `
       let elementStyleName = `absolute left-0 top-[8px] ml-auto mr-auto rounded-r-lg w-[12px] bg-dark${capitalize(
         record.type
       )}`

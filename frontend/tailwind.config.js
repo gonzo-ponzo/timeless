@@ -24,4 +24,10 @@ module.exports = {
     },
   },
   plugins: [],
-};
+  safelist: [
+    {
+      pattern:
+        /(bg|text|border)-(red|cream|blue|darkBlue|green|darkGreen|pink|darkPing|white|brown|lightBrown|darkBrown|lightCream|gray|lightGray|black|transparent})/,
+    },
+  ],
+}

@@ -168,7 +168,6 @@ const CrmCalendarPage = () => {
                   clients={clients}
                   handleSelectedSlot={handleSelectSlot}
                   setSlotForChange={setSlotForChange}
-                  handleSetDate={handleSetDate}
                 ></CrmCalendarBoard>
               </div>
               <div className="flex flex-col w-full relative max-md:-order-1 max-md:mb-[10px]">

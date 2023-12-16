@@ -126,6 +126,11 @@ const dictionary = {
     passwordRecoveryDescrcription:
       "Введите номер телефона, пароль придет в виде смс",
     recover: "Восстановить",
+    all: "Все",
+    mine: "Мои",
+    created: "Созданые",
+    completed: "Завершенные",
+    canceled: "Отмененные",
   },
   en: {
     home: "Home",
@@ -259,6 +264,11 @@ const dictionary = {
     passwordRecoveryDescrcription:
       "Enter your phone, password will be sent to you with sms",
     recover: "Recover",
+    all: "All",
+    mine: "Mine",
+    created: "Created",
+    completed: "Completed",
+    canceled: "Canceled",
   },
   sr: {},
 }

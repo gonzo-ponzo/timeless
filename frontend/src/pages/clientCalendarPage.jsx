@@ -77,7 +77,7 @@ const ClientCalendarPage = () => {
 
   const loadData = async () => {
     const allUsers = await userService.getUsers()
-    setUsers(allUsers.filter((user) => user.isStaff))
+
     setRecords(await recordService.getRecords())
     const filteredServices = await serviceService.getServices()
     setServices(
@@ -86,19 +86,26 @@ const ClientCalendarPage = () => {
           !["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(service.name)
       )
     )
+    setUsers(
+      selectedService
+        ? allUsers.filter(
+            (user) =>
+              user.isStaff &&
+              (user.services.includes(selectedService.id) ||
+                ["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
+                  selectedService.name
+                ))
+          )
+        : allUsers.filter((user) => user.isStaff)
+    )
+    setSelectedUser(
+      users.filter((user) => user.services.includes(selectedService.id))[0]
+    )
   }
 
   useEffect(() => {
     loadData()
-  }, [recordAdded])
-  useEffect(() => {
-    if (users && !selectedMaster) {
-      setSelectedUser(users[0])
-    }
-    if (services) {
-      setSelectedService(services[0])
-    }
-  }, [users, services, selectedMaster])
+  }, [recordAdded, selectedService])
 
   return (
     <div className="container-fluid relative mx-auto h-[calc(100vh-252px)] text-lightBrown flex justify-center items-start bg-cream max-md:text-sm">

@@ -24,6 +24,8 @@ const CrmMainPage = () => {
   const firstDay = new Date(calendarDate)
   const [records, setRecords] = useState([])
   const [user, setUser] = useState(null)
+  const [userTypeStatus, setUserTypeStatus] = useState(true)
+  const [recordTypeStatus, setRecordTypeStatus] = useState("created")
   const loadData = async (userId) => {
     setRecords(await recordService.getRecords())
     setUser(await userService.getUserById(userId))
@@ -51,13 +53,18 @@ const CrmMainPage = () => {
     Number(date[0]) > 9 ? date[0] : "0" + Number(date[0])
   }`
 
-  const userRecords = records
-    ? user?.isAdmin && !user?.isStaff
-      ? records.filter((record) => record.date === date)
-      : records
-          .filter((record) => record.users.includes(Number(userId)))
-          .filter((record) => record.date === date)
-    : null
+  const recordsByDate = records.filter((record) => record.date === date)
+  const recordsByRecordStatus =
+    recordTypeStatus === "all"
+      ? recordsByDate
+      : recordsByDate.filter((record) => record.status === recordTypeStatus)
+
+  const userRecords =
+    (user?.isAdmin && user?.isStaff && userTypeStatus) || !user?.isAdmin
+      ? recordsByRecordStatus.filter((record) =>
+          record.users.includes(Number(userId))
+        )
+      : recordsByRecordStatus
 
   if (user) {
     if (user.isStaff || user.isAdmin) {
@@ -92,6 +99,60 @@ const CrmMainPage = () => {
                   )
                 }
               />
+            </div>
+            <div className="flex justify-center items-center">
+              {user.isAdmin && user.isStaff ? (
+                <>
+                  <span
+                    className={`px-[8px] py-[4px] text-darkBrown border-darkBrown border rounded-lg cursor-pointer mr-[5px] ${
+                      userTypeStatus ? "bg-cream" : ""
+                    }`}
+                    onClick={() => setUserTypeStatus(true)}
+                  >
+                    {dictionary[selectedLanguage].mine}
+                  </span>
+                  <span
+                    className={`px-[8px] py-[4px] text-darkBrown border-darkBrown border rounded-lg cursor-pointer mr-[24px] ${
+                      !userTypeStatus ? "bg-cream" : ""
+                    }`}
+                    onClick={() => setUserTypeStatus(false)}
+                  >
+                    {dictionary[selectedLanguage].all}
+                  </span>
+                </>
+              ) : null}
+              <span
+                className={`px-[8px] py-[4px] text-darkBrown border-darkBrown border rounded-lg cursor-pointer mr-[5px] ${
+                  recordTypeStatus === "created" ? "bg-cream" : ""
+                }`}
+                onClick={() => setRecordTypeStatus("created")}
+              >
+                {dictionary[selectedLanguage].created}
+              </span>
+              <span
+                className={`px-[8px] py-[4px] text-darkBrown border-darkBrown border rounded-lg cursor-pointer mr-[5px] ${
+                  recordTypeStatus === "completed" ? "bg-cream" : ""
+                }`}
+                onClick={() => setRecordTypeStatus("completed")}
+              >
+                {dictionary[selectedLanguage].completed}
+              </span>
+              <span
+                className={`px-[8px] py-[4px] text-darkBrown border-darkBrown border rounded-lg cursor-pointer mr-[5px] ${
+                  recordTypeStatus === "canceled" ? "bg-cream" : ""
+                }`}
+                onClick={() => setRecordTypeStatus("canceled")}
+              >
+                {dictionary[selectedLanguage].canceled}
+              </span>
+              <span
+                className={`px-[8px] py-[4px] text-darkBrown border-darkBrown border rounded-lg cursor-pointer ${
+                  recordTypeStatus === "all" ? "bg-cream" : ""
+                }`}
+                onClick={() => setRecordTypeStatus("all")}
+              >
+                {dictionary[selectedLanguage].all}
+              </span>
             </div>
             <RecordsList
               filteredRecords={userRecords}

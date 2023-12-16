@@ -205,13 +205,21 @@ const DetailedRecordInfo = ({ recordId, handleClose, reset, currentUser }) => {
           selectedStatus={selectedStatus}
         ></StatusButton>
       </div>
+      {selectedStatus === "completed" ? (
+        <TextField
+          name={"price"}
+          type={"number"}
+          placeholder={dictionary[selectedLanguage].price}
+          onChange={handleChange}
+        ></TextField>
+      ) : null}
 
       <input
         type="date"
         value={selectedDate}
         onChange={(e) => setSelectedDate(e.target.value)}
         disabled={record?.status === "completed" ? true : false}
-        className="border border-lightBrown text-lightBrown rounded-lg w-full px-[8px] py-[7px] mb-[8px]"
+        className="border border-lightBrown text-lightBrown rounded-lg w-full px-[8px] py-[7px] my-[8px]"
       />
 
       <input
@@ -268,6 +276,7 @@ const DetailedRecordInfo = ({ recordId, handleClose, reset, currentUser }) => {
       <button
         className="bg-cream text-brown border border-darkBrown px-[12px] py-[10px] mb-[8px] items-end rounded-lg hover:opacity-80"
         onClick={handleSubmit}
+        disabled={!data.price && selectedStatus === "completed" ? true : false}
       >
         {dictionary[selectedLanguage].confirm}
       </button>
