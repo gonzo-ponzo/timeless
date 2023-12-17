@@ -234,7 +234,7 @@ const DetailedRecordInfo = ({ recordId, handleClose, reset, currentUser }) => {
         {dictionary[selectedLanguage].master}
       </p>
 
-      {user?.isAdmin ? (
+      {currentUser?.isAdmin ? (
         <div className="flex justify-between items-center px-[8px] py-[7px] mb-[8px] border border-lightBrown text-lightBrown rounded-lg cursor-pointer relative">
           <div
             className={"w-full flex justify-between items-center"}
