@@ -51,15 +51,15 @@ class RecordService(Service):
         )
         return records
 
-    async def create_new_record(self, body: NewRecordSchema) -> None:
+    async def create_new_record(self, body: NewRecordSchema) -> Optional[str]:
         record_dao = RecordDAO(db_session=self.db)
-        await record_dao.create_new_record(body=body)
+        return await record_dao.create_new_record(body=body)
 
     async def create_new_record_with_register(
         self, body: NewRecordWithRegisterSchema
-    ) -> None:
+    ) -> Optional[str]:
         record_dao = RecordDAO(db_session=self.db)
-        await record_dao.create_new_record_with_register(body=body)
+        return await record_dao.create_new_record_with_register(body=body)
 
     async def get_record_datetime(self, record_id: int) -> str:
         record_dao = RecordDAO(db_session=self.db)

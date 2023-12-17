@@ -13,6 +13,7 @@ import dictionary from "../utils/dictionary"
 import { useDispatch } from "react-redux"
 import { setDate } from "../store/dateSlice"
 import brownTriangle from "../assets/imgs/brownTriangle.png"
+import { toast, ToastContainer } from "react-toastify"
 
 const AdminCalendarPage = () => {
   const selectedLanguage = useSelector((state) => state.lang.lang)
@@ -24,6 +25,10 @@ const AdminCalendarPage = () => {
   }
   const [calendarDate, setCalendarDate] = useState(new Date())
   const firstDay = new Date(calendarDate)
+
+  const successNotify = () =>
+    toast.success(dictionary[selectedLanguage].success)
+  const errorNotify = () => toast.error(dictionary[selectedLanguage].error)
 
   const handleSetDate = (date) => {
     setCalendarDate(date)
@@ -154,11 +159,25 @@ const AdminCalendarPage = () => {
                   handleSelectedSlot={handleSelectSlot}
                   handleAddRecord={handleAddRecord}
                   slotForChange={slotForChange}
+                  successNotify={successNotify}
+                  errorNotify={errorNotify}
                   reset={setReset}
                 ></AdminRecordEditor>
               </div>
             </div>
           </ContainerBox>
+          <ToastContainer
+            position="top-right"
+            autoClose={2000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+          />
         </div>
       )
     } else {

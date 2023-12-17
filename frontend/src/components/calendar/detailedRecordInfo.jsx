@@ -14,7 +14,14 @@ import dropdownArrow from "../../assets/imgs/dropdown-arrow.png"
 import Close from "../../assets/imgs/Close-icon.png"
 import StatusButton from "./statusButton"
 
-const DetailedRecordInfo = ({ recordId, handleClose, reset, currentUser }) => {
+const DetailedRecordInfo = ({
+  recordId,
+  handleClose,
+  reset,
+  currentUser,
+  successNotify,
+  errorNotify,
+}) => {
   const selectedLanguage = useSelector((state) => state.lang.lang)
   const [records, setRecords] = useState(null)
   const [clients, setClients] = useState(null)
@@ -103,7 +110,7 @@ const DetailedRecordInfo = ({ recordId, handleClose, reset, currentUser }) => {
 
   const handleSubmit = async () => {
     const recordId = record.id
-    await recordService.UpdateRecord({
+    const result = await recordService.UpdateRecord({
       recordId: recordId,
       price: data.price,
       comment: data.comment,
@@ -113,6 +120,12 @@ const DetailedRecordInfo = ({ recordId, handleClose, reset, currentUser }) => {
       userId: user?.id,
       masterId: selectedMasterId,
     })
+    if (result === "Success") {
+      successNotify()
+    } else {
+      errorNotify()
+    }
+
     records[records.findIndex((record) => record.id === recordId)].status =
       selectedStatus
     reset(Math.random())
@@ -325,6 +338,8 @@ DetailedRecordInfo.propTypes = {
   handleClose: PropTypes.func,
   setUpdatedRecords: PropTypes.func,
   currentUser: PropTypes.object,
+  successNotify: PropTypes.func,
+  errorNotify: PropTypes.func,
 }
 
 export default DetailedRecordInfo

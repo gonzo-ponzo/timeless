@@ -26,12 +26,12 @@ const recordService = {
     )
     return data
   },
-  UpdateRecord: async (data) => {
-    const { updatedRecord } = await httpRecord.patch(
-      "/record/" + data.recordId,
-      data
+  UpdateRecord: async (payload) => {
+    const { data } = await httpRecord.patch(
+      "/record/" + payload.recordId,
+      payload
     )
-    return updatedRecord
+    return data
   },
   CancelRecord: async ({ recordId }) => {
     await httpRecord.post("cancel", { recordId })

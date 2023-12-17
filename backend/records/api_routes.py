@@ -25,20 +25,20 @@ records_api_router = APIRouter(prefix="/records")
 async def create_new_record(
     body: NewRecordSchema,
     db: AsyncSession = Depends(get_async_session),
-) -> None:
+) -> Optional[str]:
     """Create new record"""
     record_service = RecordService(db=db)
-    await record_service.create_new_record(body=body)
+    return await record_service.create_new_record(body=body)
 
 
 @records_api_router.post("/register-and-record")
 async def register_and_record(
     body: NewRecordWithRegisterSchema,
     db: AsyncSession = Depends(get_async_session),
-):
+) -> Optional[str]:
     """Register new user and create record for him"""
     record_service = RecordService(db=db)
-    await record_service.create_new_record_with_register(body=body)
+    return await record_service.create_new_record_with_register(body=body)
 
 
 @records_api_router.post("/cancel")

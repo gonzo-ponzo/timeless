@@ -50,7 +50,7 @@ class RecordDAO(DAO):
             await self.db.execute(query)
             await self.db.commit()
 
-    async def create_new_record(self, body: NewRecordSchema) -> None:
+    async def create_new_record(self, body: NewRecordSchema) -> Optional[str]:
         async with self.db.begin():
             hours = body.time // 60
             minutes = body.time % 60
@@ -63,22 +63,15 @@ class RecordDAO(DAO):
             client_id = body.clientId
             if service.name.lower() in ["day off", "odmar 1", "odmar 2", "odmar 4"]:
                 client_id = 1
-            new_record = Record(
-                name=service.name,
-                date=date,
-                time=time,
-                status="created",
-                client_id=client_id,
-                author=body.author,
-            )
-            query = (
+
+            master_records_query = (
                 select(Record)
                 .join(RecordsUsers)
                 .where(RecordsUsers.user_id == body.userId)
                 .where(Record.date == datetime.datetime.strptime(body.date, "%Y-%m-%d"))
                 .where(Record.status != "canceled")
             )
-            res = await self.db.scalars(query)
+            res = await self.db.scalars(master_records_query)
             all_records = res.all()
 
             new_start = body.time
@@ -91,7 +84,16 @@ class RecordDAO(DAO):
                 if start <= new_start < end or start < new_end <= end:
                     flag = False
             if not flag:
-                return
+                return "Error"
+
+            new_record = Record(
+                name=service.name,
+                date=date,
+                time=time,
+                status="created",
+                client_id=client_id,
+                author=body.author,
+            )
             self.db.add(new_record)
             await self.db.flush()
             new_record_service = RecordsServices(
@@ -124,13 +126,14 @@ class RecordDAO(DAO):
             seconds = (planned_date - now).total_seconds()
             if seconds > 0 and phone != "0000":
                 send_sms.apply_async(args=[time, phone, record_id], countdown=seconds)
+            return "Success"
 
     async def create_new_record_with_register(
         self, body: NewRecordWithRegisterSchema
-    ) -> None:
+    ) -> Optional[str]:
         async with self.db.begin():
-            query = select(Client).where(Client.phone == body.phone)
-            client = await self.db.scalar(query)
+            client_query = select(Client).where(Client.phone == body.phone)
+            client = await self.db.scalar(client_query)
             if not client:
                 client = Client(
                     phone=body.phone,
@@ -149,8 +152,30 @@ class RecordDAO(DAO):
             year, month, day = body.date.split("-")
             date = datetime.date(year=int(year), month=int(month), day=int(day))
 
-            query = select(Service).where(Service.id == body.serviceId)
-            service = await self.db.scalar(query)
+            service_query = select(Service).where(Service.id == body.serviceId)
+            service = await self.db.scalar(service_query)
+
+            master_records_query = (
+                select(Record)
+                .join(RecordsUsers)
+                .where(RecordsUsers.user_id == body.userId)
+                .where(Record.date == datetime.datetime.strptime(body.date, "%Y-%m-%d"))
+                .where(Record.status != "canceled")
+            )
+            res = await self.db.scalars(master_records_query)
+            all_records = res.all()
+
+            new_start = body.time
+            new_end = new_start + service.duration
+            flag = True
+            for record in all_records:
+                record_duration = sum([service.duration for service in record.services])
+                start = record.time.hour * 60 + record.time.minute
+                end = start + record_duration
+                if start <= new_start < end or start < new_end <= end:
+                    flag = False
+            if not flag:
+                return "Error"
 
             new_record = Record(
                 name=service.name,
@@ -162,22 +187,22 @@ class RecordDAO(DAO):
             )
             self.db.add(new_record)
             await self.db.flush()
+
             new_record_service = RecordsServices(
                 record_id=new_record.id, service_id=service.id
             )
             self.db.add(new_record_service)
             await self.db.flush()
+
             new_record_user = RecordsUsers(record_id=new_record.id, user_id=body.userId)
             self.db.add(new_record_user)
             await self.db.flush()
 
             phone = client.phone
             record_id = new_record.id
-
             record_datetime = f"{new_record.date} {new_record.time}"
             date = record_datetime.split(" ")[0]
             time = record_datetime.split(" ")[1]
-
             year = int(date.split("-")[0])
             month = int(date.split("-")[1])
             day = int(date.split("-")[2])
@@ -191,6 +216,7 @@ class RecordDAO(DAO):
             seconds = (planned_date - now).total_seconds()
             if seconds > 0 and phone != "0000":
                 send_sms.apply_async(args=[time, phone, record_id], countdown=seconds)
+            return "Success"
 
     async def update_record_by_id(
         self, record_id: int, body: UpdateRecordSchema
@@ -217,16 +243,17 @@ class RecordDAO(DAO):
                 all_records = res.all()
 
                 flag = True
-                for record in all_records:
-                    record_duration = sum(
-                        [service.duration for service in record.services]
-                    )
-                    start = record.time.hour * 60 + record.time.minute
-                    end = start + record_duration
-                    if start <= new_start < end or start < new_end <= end:
-                        flag = False
-                if not flag:
-                    return "Error"
+                if body.status != "canceled":
+                    for record in all_records:
+                        record_duration = sum(
+                            [service.duration for service in record.services]
+                        )
+                        start = record.time.hour * 60 + record.time.minute
+                        end = start + record_duration
+                        if start <= new_start < end or start < new_end <= end:
+                            flag = False
+                    if not flag:
+                        return "Error"
 
                 if body.masterId != record.users[0]:
                     update_record_master_query = (

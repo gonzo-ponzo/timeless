@@ -15,6 +15,7 @@ import clientService from "../services/client.service"
 import serviceService from "../services/service.service"
 import dictionary from "../utils/dictionary"
 import brownTriangle from "../assets/imgs/brownTriangle.png"
+import { toast, ToastContainer } from "react-toastify"
 
 const CrmCalendarPage = () => {
   const selectedLanguage = useSelector((state) => state.lang.lang)
@@ -26,6 +27,9 @@ const CrmCalendarPage = () => {
   const dispatch = useDispatch()
   const [calendarDate, setCalendarDate] = useState(new Date())
   const firstDay = new Date(calendarDate)
+  const successNotify = () =>
+    toast.success(dictionary[selectedLanguage].success)
+  const errorNotify = () => toast.error(dictionary[selectedLanguage].error)
 
   const handleSetDate = (date) => {
     setCalendarDate(date)
@@ -42,13 +46,11 @@ const CrmCalendarPage = () => {
   const [clients, setClients] = useState(null)
   const [users, setUsers] = useState([])
   const [services, setServices] = useState([])
-  const [records, setRecords] = useState([])
   const [recordAdded, setRecordAdded] = useState(false)
 
   const loadData = async (userId) => {
     setUser(await userService.getUserById(userId))
     setClients(await clientService.getClients())
-    setRecords(await recordService.getRecords())
     const allUsers = await userService.getUsers()
     setUsers(
       selectedService
@@ -99,12 +101,6 @@ const CrmCalendarPage = () => {
 
   const handleAddRecord = () => {
     setRecordAdded(!recordAdded)
-  }
-
-  const handleCancel = async (recordId, notify) => {
-    await recordService.CancelRecord({ recordId })
-    setServices(records.filter((record) => record.id !== recordId))
-    notify()
   }
 
   useEffect(() => {
@@ -188,13 +184,26 @@ const CrmCalendarPage = () => {
                   selectedUser={selectedUser}
                   selectedSlot={selectedSlot}
                   handleSelectedSlot={handleSelectSlot}
-                  handleCancel={handleCancel}
                   slotForChange={slotForChange}
+                  successNotify={successNotify}
+                  errorNotify={errorNotify}
                   reset={setReset}
                 ></CrmRecordEditor>
               </div>
             </div>
           </ContainerBox>
+          <ToastContainer
+            position="top-right"
+            autoClose={2000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+          />
         </div>
       )
     } else {

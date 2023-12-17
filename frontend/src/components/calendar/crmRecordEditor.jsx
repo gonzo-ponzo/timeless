@@ -14,21 +14,19 @@ import { useSelector } from "react-redux"
 const CrmRecordEditor = ({
   selectedService,
   services,
-  records,
-  clients,
   show,
   handleClick,
   handleShow,
   selectedSlot,
   selectedUser,
   handleSelectedSlot,
-  handleCancel,
   handleAddRecord,
   slotForChange,
+  successNotify,
+  errorNotify,
   reset,
 }) => {
   const selectedLanguage = useSelector((state) => state.lang.lang)
-  const notify = () => toast.success("Сохранено")
   const [client, setClient] = useState(null)
   const [search, setSearch] = useState("")
   const [dropdownServices, setDropdownServices] = useState()
@@ -127,7 +125,7 @@ const CrmRecordEditor = ({
     const currentUser = await userService.getUserById(userId)
 
     if (client) {
-      await recordService.createNewRecord({
+      const result = await recordService.createNewRecord({
         userId: selectedUser.id,
         clientId: client?.id,
         serviceId: selectedService.id,
@@ -135,6 +133,11 @@ const CrmRecordEditor = ({
         time: selectedSlot.start,
         author: currentUser?.name,
       })
+      if (result === "Success") {
+        successNotify()
+      } else {
+        errorNotify()
+      }
       handleSelectedSlot(null)
       handleAddRecord()
       setData({
@@ -144,9 +147,8 @@ const CrmRecordEditor = ({
         name: "",
       })
       setClient(null)
-      notify()
     } else {
-      await recordService.createNewRecordWithRegister({
+      const result = await recordService.createNewRecordWithRegister({
         userId: selectedUser.id,
         serviceId: selectedService.id,
         date: selectedSlot.date,
@@ -158,6 +160,11 @@ const CrmRecordEditor = ({
         name: data.name,
         authorId: userId,
       })
+      if (result === "Success") {
+        successNotify()
+      } else {
+        errorNotify()
+      }
       handleSelectedSlot(null)
       handleAddRecord()
       setData({
@@ -167,7 +174,6 @@ const CrmRecordEditor = ({
         name: "",
       })
       setClient(null)
-      notify()
     }
   }
 
@@ -199,6 +205,8 @@ const CrmRecordEditor = ({
           recordId={slotForChange}
           handleClose={handleSelectedSlot}
           reset={reset}
+          successNotify={successNotify}
+          errorNotify={errorNotify}
         ></DetailedRecordInfo>
       ) : (
         <>
@@ -342,6 +350,8 @@ CrmRecordEditor.propTypes = {
   handleAddRecord: PropTypes.func,
   selectedSlot: PropTypes.object,
   slotForChange: PropTypes.number,
+  successNotify: PropTypes.func,
+  errorNotify: PropTypes.func,
   reset: PropTypes.func,
 }
 

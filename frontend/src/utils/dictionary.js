@@ -131,6 +131,7 @@ const dictionary = {
     created: "Созданые",
     completed: "Завершенные",
     canceled: "Отмененные",
+    error: "Неудача",
   },
   en: {
     home: "Home",
@@ -269,6 +270,7 @@ const dictionary = {
     created: "Created",
     completed: "Completed",
     canceled: "Canceled",
+    error: "Error",
   },
   sr: {},
 }

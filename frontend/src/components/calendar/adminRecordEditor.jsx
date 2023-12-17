@@ -22,10 +22,11 @@ const AdminRecordEditor = ({
   handleSelectedSlot,
   handleAddRecord,
   slotForChange,
+  successNotify,
+  errorNotify,
   reset,
 }) => {
   const selectedLanguage = useSelector((state) => state.lang.lang)
-  const notify = () => toast.success(dictionary[selectedLanguage].success)
   const [client, setClient] = useState(null)
   const [search, setSearch] = useState("")
   const [dropdownServices, setDropdownServices] = useState()
@@ -108,7 +109,7 @@ const AdminRecordEditor = ({
     ) {
       const userId = localStorageService.getUserId()
       const selectedUser = await userService.getUserById(userId)
-      await recordService.createNewRecord({
+      const result = await recordService.createNewRecord({
         userId: selectedSlot.userId,
         clientId: 1,
         serviceId: selectedService.id,
@@ -118,14 +119,18 @@ const AdminRecordEditor = ({
       })
       handleSelectedSlot(null)
       handleAddRecord()
-      notify()
+      if (result === "Success") {
+        successNotify()
+      } else {
+        errorNotify()
+      }
       return
     }
     const userId = localStorageService.getUserId()
     const selectedUser = await userService.getUserById(userId)
 
     if (client) {
-      await recordService.createNewRecord({
+      const result = await recordService.createNewRecord({
         userId: selectedSlot.userId,
         clientId: client?.id,
         serviceId: selectedService.id,
@@ -133,8 +138,13 @@ const AdminRecordEditor = ({
         time: selectedSlot.start,
         author: selectedUser?.name,
       })
+      if (result === "Success") {
+        successNotify()
+      } else {
+        errorNotify()
+      }
     } else {
-      await recordService.createNewRecordWithRegister({
+      const result = await recordService.createNewRecordWithRegister({
         userId: selectedSlot.userId,
         serviceId: selectedService.id,
         date: selectedSlot.date,
@@ -146,6 +156,11 @@ const AdminRecordEditor = ({
         name: data.name,
         authorId: userId,
       })
+      if (result === "Success") {
+        successNotify()
+      } else {
+        errorNotify()
+      }
     }
     handleSelectedSlot(null)
     handleAddRecord()
@@ -156,7 +171,6 @@ const AdminRecordEditor = ({
       name: "",
     })
     setClient(null)
-    notify()
   }
 
   const handleChange = (target) => {
@@ -188,6 +202,8 @@ const AdminRecordEditor = ({
           handleClose={handleSelectedSlot}
           reset={reset}
           currentUser={currentUser}
+          successNotify={successNotify}
+          errorNotify={errorNotify}
         ></DetailedRecordInfo>
       ) : (
         <>
@@ -324,6 +340,8 @@ AdminRecordEditor.propTypes = {
   currentUser: PropTypes.object,
   slotForChange: PropTypes.number,
   reset: PropTypes.func,
+  successNotify: PropTypes.func,
+  errorNotify: PropTypes.func,
 }
 
 export default AdminRecordEditor
