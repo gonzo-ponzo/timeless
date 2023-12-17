@@ -22,6 +22,7 @@ const CrmMainPage = () => {
   }
   const [calendarDate, setCalendarDate] = useState(new Date())
   const firstDay = new Date(calendarDate)
+  const [reset, setReset] = useState(1)
   const [records, setRecords] = useState([])
   const [user, setUser] = useState(null)
   const [userTypeStatus, setUserTypeStatus] = useState(true)
@@ -32,7 +33,7 @@ const CrmMainPage = () => {
   }
   useEffect(() => {
     loadData(userId)
-  }, [userId])
+  }, [userId, reset])
 
   const handleDateSelect = async (date) => {
     setCalendarDate(new Date(date.year, date.month - 1, date.day))
@@ -157,6 +158,7 @@ const CrmMainPage = () => {
             <RecordsList
               filteredRecords={userRecords}
               pageType={"user"}
+              setReset={setReset}
             ></RecordsList>
           </ContainerBox>
         </div>

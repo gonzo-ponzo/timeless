@@ -7,7 +7,7 @@ import serviceService from "../../services/service.service"
 import dictionary from "../../utils/dictionary"
 import { useSelector } from "react-redux"
 
-const RecordsList = ({ filteredRecords, pageType }) => {
+const RecordsList = ({ filteredRecords, pageType, setReset }) => {
   const selectedLanguage = useSelector((state) => state.lang.lang)
   const [clients, setClients] = useState(null)
   const [services, setServices] = useState(null)
@@ -41,6 +41,7 @@ const RecordsList = ({ filteredRecords, pageType }) => {
             clients={clients}
             records={filteredRecords}
             key={record.id}
+            setReset={setReset}
           ></CrmRecordElement>
         ))
       : null
@@ -95,6 +96,7 @@ const RecordsList = ({ filteredRecords, pageType }) => {
 RecordsList.propTypes = {
   filteredRecords: PropTypes.array,
   pageType: PropTypes.string.isRequired,
+  setReset: PropTypes.func,
 }
 
 export default RecordsList

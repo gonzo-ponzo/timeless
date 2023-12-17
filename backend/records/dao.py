@@ -87,7 +87,7 @@ class RecordDAO(DAO):
                 record_duration = sum([service.duration for service in record.services])
                 start = record.time.hour * 60 + record.time.minute
                 end = start + record_duration
-                if start < new_start < end or start < new_end < end:
+                if start <= new_start < end or start < new_end <= end:
                     flag = False
             if not flag:
                 return

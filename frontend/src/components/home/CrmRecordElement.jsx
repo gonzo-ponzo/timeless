@@ -10,7 +10,7 @@ import serviceService from "../../services/service.service"
 import dictionary from "../../utils/dictionary"
 import { useSelector } from "react-redux"
 
-const CrmRecordElement = ({ record, lastEl, clients, records }) => {
+const CrmRecordElement = ({ record, lastEl, clients, records, setReset }) => {
   const selectedLanguage = useSelector((state) => state.lang.lang)
   const notify = () => toast.success("Сохранено")
   const [selectedImage, setSelectedImage] = useState()
@@ -64,6 +64,7 @@ const CrmRecordElement = ({ record, lastEl, clients, records }) => {
     setBlur(!blur)
     records[records.findIndex((record) => record.id === recordId)].status =
       "completed"
+    setReset(Math.random())
   }
 
   const handleImageChange = (event) => {
@@ -102,15 +103,14 @@ const CrmRecordElement = ({ record, lastEl, clients, records }) => {
           {recordServicesName}
         </div>
         <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[10px]">
-          {recordServicesPrice}
+          {recordServicesPrice}{" "}
+          {record.status === "completed" ? <b>({record?.price})</b> : null}
         </div>
         <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[10px]">
           {record.time.slice(0, 5)}
         </div>
         <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[10px]">
-          {record.status === "completed"
-            ? record?.price + " DIN"
-            : record.status}
+          {record.status}
         </div>
       </div>
       <span
@@ -195,6 +195,7 @@ CrmRecordElement.propTypes = {
   record: PropTypes.object.isRequired,
   lastEl: PropTypes.bool,
   records: PropTypes.array,
+  setReset: PropTypes.func,
 }
 
 export default CrmRecordElement
