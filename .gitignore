@@ -4,6 +4,7 @@ backend/.env
 ### Modules
 venv/
 frontend/node_modules
+backend/public
 
 ### Python
 __pycache__
