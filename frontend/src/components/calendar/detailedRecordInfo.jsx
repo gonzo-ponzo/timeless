@@ -71,6 +71,7 @@ const DetailedRecordInfo = ({ recordId, handleClose, reset, currentUser }) => {
 
   const masterDropdown = users
     ?.filter((user) => user.isStaff)
+    .filter((user) => user.services.includes(record.services[0]))
     .map((master) => (
       <div
         className="border-b border-gray px-[16px] py-[7px] bg-white text-brown cursor-pointer hover:text-lightBrown last:border-none last:rounded-b-lg first:rounded-t-lg"

@@ -1,4 +1,5 @@
 import datetime
+from typing import Optional
 
 from utils.abstract.service import Service
 from .dao import RecordDAO
@@ -20,9 +21,9 @@ class RecordService(Service):
 
     async def update_record_by_id(
         self, record_id: int, body: UpdateRecordSchema
-    ) -> None:
+    ) -> Optional[str]:
         record_dao = RecordDAO(db_session=self.db)
-        await record_dao.update_record_by_id(record_id=record_id, body=body)
+        return await record_dao.update_record_by_id(record_id=record_id, body=body)
 
     async def upload_record_image(self, record_id: int, image: str):
         record_dao = RecordDAO(db_session=self.db)

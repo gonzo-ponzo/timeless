@@ -1,5 +1,6 @@
 from sqlalchemy import select, update
 import datetime
+from typing import Optional
 
 from db.models import Record, RecordsServices, RecordsUsers, Service, Client, User
 from .schemas import (
@@ -193,31 +194,26 @@ class RecordDAO(DAO):
 
     async def update_record_by_id(
         self, record_id: int, body: UpdateRecordSchema
-    ) -> None:
+    ) -> Optional[str]:
         async with self.db.begin():
-            if body.masterId:
-                query = (
-                    update(RecordsUsers)
-                    .where(RecordsUsers.record_id == record_id)
-                    .values(user_id=body.masterId)
-                )
-                await self.db.execute(query)
             if body.date and body.time:
-                query = select(Record).where(Record.id == record_id)
-                record = await self.db.scalar(query)
-                duration = sum([service.duration for service in record.services])
-                new_start = body.time.hour * 60 + body.time.minute
-                new_end = new_start + duration
+                record_for_update_query = select(Record).where(Record.id == record_id)
+                record = await self.db.scalar(record_for_update_query)
+                new_start, new_end = self.get_timing(record=record, body=body)
 
-                query = (
+                target_master = body.masterId
+                if body.masterId != record.users[0]:
+                    target_master = body.masterId
+
+                target_master_records_query = (
                     select(Record)
                     .join(RecordsUsers)
-                    .where(RecordsUsers.user_id == body.userId)
+                    .where(RecordsUsers.user_id == target_master)
                     .where(Record.date == body.date)
                     .where(Record.id != record_id)
                     .where(Record.status != "canceled")
                 )
-                res = await self.db.scalars(query)
+                res = await self.db.scalars(target_master_records_query)
                 all_records = res.all()
 
                 flag = True
@@ -227,12 +223,20 @@ class RecordDAO(DAO):
                     )
                     start = record.time.hour * 60 + record.time.minute
                     end = start + record_duration
-                    if start < new_start < end or start < new_end < end:
+                    if start <= new_start < end or start < new_end <= end:
                         flag = False
                 if not flag:
-                    return
+                    return "Error"
 
-                query_update = (
+                if body.masterId != record.users[0]:
+                    update_record_master_query = (
+                        update(RecordsUsers)
+                        .where(RecordsUsers.record_id == record_id)
+                        .values(user_id=body.masterId)
+                    )
+                    await self.db.execute(update_record_master_query)
+
+                update_record_query = (
                     update(Record)
                     .where(Record.id == record_id)
                     .values(
@@ -244,7 +248,7 @@ class RecordDAO(DAO):
                     )
                 )
             else:
-                query_update = (
+                update_record_query = (
                     update(Record)
                     .where(Record.id == record_id)
                     .values(
@@ -253,8 +257,9 @@ class RecordDAO(DAO):
                         comment=body.comment,
                     )
                 )
-            await self.db.execute(query_update)
+            await self.db.execute(update_record_query)
             await self.db.commit()
+            return "Success"
 
     async def get_available_records(
         self,
@@ -360,3 +365,9 @@ class RecordDAO(DAO):
                 return result
             else:
                 return "null"
+
+    def get_timing(self, record: Record, body: UpdateRecordSchema) -> list:
+        duration = sum([service.duration for service in record.services])
+        new_start = body.time.hour * 60 + body.time.minute
+        new_end = new_start + duration
+        return [new_start, new_end]

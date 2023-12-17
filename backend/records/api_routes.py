@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 import datetime
+from typing import Optional
 
 from db.session import get_async_session
 from .schemas import (
@@ -92,10 +93,10 @@ async def update_record_by_id(
     recordId: int,
     body: UpdateRecordSchema,
     db: AsyncSession = Depends(get_async_session),
-) -> None:
+) -> Optional[str]:
     """Update record by id"""
     record_service = RecordService(db=db)
-    await record_service.update_record_by_id(record_id=recordId, body=body)
+    return await record_service.update_record_by_id(record_id=recordId, body=body)
 
 
 @records_api_router.patch("/image/{recordId}/")
