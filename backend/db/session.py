@@ -11,11 +11,11 @@ DB_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_
 engine = create_async_engine(
     DB_URL,
     future=True,
-    echo=True,
     execution_options={"isolation_level": "AUTOCOMMIT"},
 )
 
 async_session_maker = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     try:
