@@ -62,7 +62,7 @@ class SmsService:
 
         return planned_date, now
 
-    def get_data(client_phone: str, content: str) -> dict:
+    def get_data(self, client_phone: str, content: str) -> dict:
         data = {
             "recipients": [{"phone": client_phone[1:]}],
             "channels": ["sms"],

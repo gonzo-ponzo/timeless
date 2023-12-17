@@ -214,7 +214,7 @@ async def users_password_recovery(
     user_service.recover_password(user_phone=phone, hashed_password=hashed_password)
 
     sms_service = SmsService()
-    sms_service.send_new_password(user_phone=phone, password=password)
+    await sms_service.send_new_password(user_phone=phone, password=password)
 
     return {"data": "Password sent with sms"}
 

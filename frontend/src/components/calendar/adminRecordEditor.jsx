@@ -37,10 +37,13 @@ const AdminRecordEditor = ({
   })
 
   let phoneError
-  if (data.phone.startsWith("+3") && data.phone.length !== 13) {
-    phoneError = "phone must contain 12 digits"
+  if (
+    data.phone.startsWith("+3") &&
+    !(/^\+3\d{10}$/.test(data.phone) || /^\+3\d{11}$/.test(data.phone))
+  ) {
+    phoneError = "phone must contain 11-12 digits"
   }
-  if (data.phone.startsWith("+7") && data.phone.length !== 12) {
+  if (data.phone.startsWith("+7") && !/^\+7\d{10}$/.test(data.phone)) {
     phoneError = "phone must contain 11 digits"
   }
   if (
@@ -50,11 +53,6 @@ const AdminRecordEditor = ({
   ) {
     phoneError = "phone must start  with '7' or '3'"
   }
-
-  const phoneValid =
-    /^\+3\d{10}$/.test(data.phone) ||
-    /^\+3\d{11}$/.test(data.phone) ||
-    /^\+7\d{10}$/.test(data.phone)
 
   useEffect(() => {
     if (search.length > 0) {
@@ -284,10 +282,7 @@ const AdminRecordEditor = ({
                 : "bg-white text-black border-gray"
             } border text-center rounded-lg w-full mt-[20px] hover:opacity-80`}
             disabled={
-              (!phoneError &&
-                selectedSlot &&
-                data.phone.length > 1 &&
-                phoneValid) ||
+              (!phoneError && selectedSlot && data.phone.length > 1) ||
               (["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
                 selectedService?.name
               ) &&

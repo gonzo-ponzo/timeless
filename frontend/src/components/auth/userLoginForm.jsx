@@ -31,10 +31,13 @@ const ClientLoginForm = () => {
   const dispatch = useDispatch()
 
   let phoneError
-  if (data.phone.startsWith("+3") && data.phone.length !== 13) {
-    phoneError = "phone must contain 12 digits"
+  if (
+    data.phone.startsWith("+3") &&
+    !(/^\+3\d{10}$/.test(data.phone) || /^\+3\d{11}$/.test(data.phone))
+  ) {
+    phoneError = "phone must contain 11-12 digits"
   }
-  if (data.phone.startsWith("+7") && data.phone.length !== 12) {
+  if (data.phone.startsWith("+7") && !/^\+7\d{10}$/.test(data.phone)) {
     phoneError = "phone must contain 11 digits"
   }
   if (
@@ -44,10 +47,6 @@ const ClientLoginForm = () => {
   ) {
     phoneError = "phone must start  with '7' or '3'"
   }
-  const phoneValid =
-    /^\+3\d{10}$/.test(data.phone) ||
-    /^\+3\d{11}$/.test(data.phone) ||
-    /^\+7\d{10}$/.test(data.phone)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -110,9 +109,7 @@ const ClientLoginForm = () => {
       />
       <button
         className="bg-brown rounded-lg text-white text-center w-full py-[8px] mt-[24px] hover:opacity-80"
-        disabled={
-          phoneError || data.phone.length < 2 ? true : false || !phoneValid
-        }
+        disabled={phoneError || data.phone.length < 2 ? true : false}
       >
         {dictionary[selectedLanguage].login}
       </button>
