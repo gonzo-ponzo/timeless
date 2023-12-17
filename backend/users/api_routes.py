@@ -211,7 +211,9 @@ async def users_password_recovery(
     characters = string.ascii_letters + string.digits
     password = "".join(random.choice(characters) for _ in range(8))
     hashed_password = Hasher.get_password_hash(password)
-    user_service.recover_password(user_phone=phone, hashed_password=hashed_password)
+    await user_service.recover_password(
+        user_phone=phone, hashed_password=hashed_password
+    )
 
     sms_service = SmsService()
     await sms_service.send_new_password(user_phone=phone, password=password)
