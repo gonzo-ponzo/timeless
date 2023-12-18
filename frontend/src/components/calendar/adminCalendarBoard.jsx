@@ -18,7 +18,6 @@ const AdminCalendarBoard = ({
   setSlotForChange,
 }) => {
   let calendarBoardDays
-  let skippedDays = 0
   const [existingRecords, setExistingRecords] = useState({})
   const boardDayDate = transformDate(new Date(firstDay.getTime()))
 
@@ -27,9 +26,9 @@ const AdminCalendarBoard = ({
     setCalendarEnd(
       windowWidth <= 767
         ? 1
-        : calendarBoardDays?.length > 4
+        : filteredCalendarBoardDays?.length > 4
         ? 5
-        : calendarBoardDays?.length
+        : filteredCalendarBoardDays?.length
     )
     for (const user of users) {
       fetch(
@@ -86,8 +85,6 @@ const AdminCalendarBoard = ({
               date={date}
             />
           )
-        } else {
-          skippedDays += 1
         }
       } else {
         return (
@@ -108,18 +105,8 @@ const AdminCalendarBoard = ({
     })
   }
 
-  const windowWidth = window.innerWidth
-  const [calendarStart, setCalendarStart] = useState(0)
-  const [calendarEnd, setCalendarEnd] = useState(
-    windowWidth <= 767
-      ? 1
-      : calendarBoardDays.length > 4
-      ? 5
-      : calendarBoardDays.length
-  )
-
   const handleSetCalendars = (value) => {
-    if (value > 0 && calendarEnd !== calendarBoardDays.length) {
+    if (value > 0 && calendarEnd !== filteredCalendarBoardDays.length) {
       setCalendarEnd(calendarEnd + 1)
       setCalendarStart(calendarStart + 1)
     } else if (value < 0 && calendarStart !== 0) {
@@ -128,10 +115,22 @@ const AdminCalendarBoard = ({
     }
   }
 
-  const calendarRange = _.range(calendarStart, windowWidth < 760 ? calendarEnd : calendarEnd + skippedDays)
-  const calendarBoardDaysToRender = calendarRange.map(
-    (calendarIndex) => calendarBoardDays[calendarIndex]
+  const filteredCalendarBoardDays = Object.values(calendarBoardDays).filter((value) => value != undefined)
+  const windowWidth = window.innerWidth
+  const [calendarStart, setCalendarStart] = useState(0)
+  const [calendarEnd, setCalendarEnd] = useState(
+    windowWidth <= 767
+      ? 1
+      : filteredCalendarBoardDays.length > 4
+      ? 5
+      : filteredCalendarBoardDays.length
   )
+  const calendarRange = _.range(calendarStart, calendarEnd)
+
+  const calendarBoardDaysToRender = calendarRange.map(
+    (calendarIndex) => filteredCalendarBoardDays[calendarIndex]
+  )
+
   const numberOfCols = calendarBoardDaysToRender.filter(
     (item) => item !== undefined
   ).length
@@ -154,8 +153,8 @@ const AdminCalendarBoard = ({
         />
         <img
           className={`absolute z-50 w-[15px] h-[20px] right-[5px] top-[18px] rotate-90 ${
-            calendarBoardDays?.length ===
-            numberOfCols + skippedDays + calendarStart
+            filteredCalendarBoardDays?.length ===
+            numberOfCols + calendarStart
               ? "hidden"
               : ""
           }`}
