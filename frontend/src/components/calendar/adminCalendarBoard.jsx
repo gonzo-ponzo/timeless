@@ -132,7 +132,11 @@ const AdminCalendarBoard = ({
   return (
     <>
       <TimeGraph></TimeGraph>
-      <div className={`grid grid-cols-${numberOfCols} w-full relative`}>
+      <div
+        className={`grid grid-cols-${
+          windowWidth <= 767 ? "1" : numberOfCols
+        } w-full relative`}
+      >
         <img
           className={`absolute z-50 w-[15px] h-[20px] left-[5px] top-[18px] -rotate-90 ${
             calendarStart === 0 ? "hidden" : ""
