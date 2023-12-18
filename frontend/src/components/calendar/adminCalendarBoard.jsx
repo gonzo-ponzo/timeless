@@ -23,6 +23,14 @@ const AdminCalendarBoard = ({
   const boardDayDate = transformDate(new Date(firstDay.getTime()))
 
   useEffect(() => {
+    setCalendarStart(0)
+    setCalendarEnd(
+      windowWidth <= 767
+        ? 1
+        : calendarBoardDays?.length > 4
+        ? 5
+        : calendarBoardDays?.length
+    )
     for (const user of users) {
       fetch(
         `${apiEnpoint}api/records/get-available-crm/${user.id}/${user.id}/${boardDayDate}`
@@ -37,6 +45,7 @@ const AdminCalendarBoard = ({
         })
         .catch((error) => console.error(error))
     }
+    console.log(existingRecords)
   }, [boardDayDate, selectedService, users])
 
   const onSlotChange = (recordId) => {
@@ -63,7 +72,6 @@ const AdminCalendarBoard = ({
         const slotsForRecord = existingRecordsWithSlots.filter(
           (record) => record.type === "green"
         )
-
         if (slotsForRecord.length > 0) {
           return (
             <AdminCalendarBoardDay
@@ -121,7 +129,7 @@ const AdminCalendarBoard = ({
     }
   }
 
-  const calendarRange = _.range(calendarStart, calendarEnd + skippedDays)
+  const calendarRange = _.range(calendarStart, windowWidth < 760 ? calendarEnd : calendarEnd + skippedDays)
   const calendarBoardDaysToRender = calendarRange.map(
     (calendarIndex) => calendarBoardDays[calendarIndex]
   )
@@ -134,7 +142,7 @@ const AdminCalendarBoard = ({
       <TimeGraph></TimeGraph>
       <div
         className={`grid grid-cols-${
-          windowWidth <= 767 ? "1" : numberOfCols
+          numberOfCols
         } w-full relative`}
       >
         <img
