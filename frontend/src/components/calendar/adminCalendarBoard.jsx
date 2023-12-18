@@ -45,7 +45,6 @@ const AdminCalendarBoard = ({
         })
         .catch((error) => console.error(error))
     }
-    console.log(existingRecords)
   }, [boardDayDate, selectedService, users])
 
   const onSlotChange = (recordId) => {
