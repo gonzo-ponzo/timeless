@@ -101,9 +101,9 @@ const CrmMainPage = () => {
                 }
               />
             </div>
-            <div className="flex justify-center items-center">
+            <div className="flex justify-center items-center max-md:flex-col max-md:text-xs">
               {user.isAdmin && user.isStaff ? (
-                <>
+                <div className="flex mr-[24px] flex-center items-center max-md:mr-0 max-md:mb-[10px]">
                   <span
                     className={`px-[8px] py-[4px] text-darkBrown border-darkBrown border rounded-lg cursor-pointer mr-[5px] ${
                       userTypeStatus ? "bg-cream" : ""
@@ -113,47 +113,49 @@ const CrmMainPage = () => {
                     {dictionary[selectedLanguage].mine}
                   </span>
                   <span
-                    className={`px-[8px] py-[4px] text-darkBrown border-darkBrown border rounded-lg cursor-pointer mr-[24px] ${
+                    className={`px-[8px] py-[4px] text-darkBrown border-darkBrown border rounded-lg cursor-pointer ${
                       !userTypeStatus ? "bg-cream" : ""
                     }`}
                     onClick={() => setUserTypeStatus(false)}
                   >
                     {dictionary[selectedLanguage].all}
                   </span>
-                </>
+                </div>
               ) : null}
-              <span
-                className={`px-[8px] py-[4px] text-darkBrown border-darkBrown border rounded-lg cursor-pointer mr-[5px] ${
-                  recordTypeStatus === "created" ? "bg-cream" : ""
-                }`}
-                onClick={() => setRecordTypeStatus("created")}
-              >
-                {dictionary[selectedLanguage].created}
-              </span>
-              <span
-                className={`px-[8px] py-[4px] text-darkBrown border-darkBrown border rounded-lg cursor-pointer mr-[5px] ${
-                  recordTypeStatus === "completed" ? "bg-cream" : ""
-                }`}
-                onClick={() => setRecordTypeStatus("completed")}
-              >
-                {dictionary[selectedLanguage].completed}
-              </span>
-              <span
-                className={`px-[8px] py-[4px] text-darkBrown border-darkBrown border rounded-lg cursor-pointer mr-[5px] ${
-                  recordTypeStatus === "canceled" ? "bg-cream" : ""
-                }`}
-                onClick={() => setRecordTypeStatus("canceled")}
-              >
-                {dictionary[selectedLanguage].canceled}
-              </span>
-              <span
-                className={`px-[8px] py-[4px] text-darkBrown border-darkBrown border rounded-lg cursor-pointer ${
-                  recordTypeStatus === "all" ? "bg-cream" : ""
-                }`}
-                onClick={() => setRecordTypeStatus("all")}
-              >
-                {dictionary[selectedLanguage].all}
-              </span>
+              <div className="flex justify-center items-center">
+                <span
+                  className={`px-[8px] py-[4px] text-darkBrown border-darkBrown border rounded-lg cursor-pointer mr-[5px] ${
+                    recordTypeStatus === "created" ? "bg-cream" : ""
+                  }`}
+                  onClick={() => setRecordTypeStatus("created")}
+                >
+                  {dictionary[selectedLanguage].created}
+                </span>
+                <span
+                  className={`px-[8px] py-[4px] text-darkBrown border-darkBrown border rounded-lg cursor-pointer mr-[5px] ${
+                    recordTypeStatus === "completed" ? "bg-cream" : ""
+                  }`}
+                  onClick={() => setRecordTypeStatus("completed")}
+                >
+                  {dictionary[selectedLanguage].completed}
+                </span>
+                <span
+                  className={`px-[8px] py-[4px] text-darkBrown border-darkBrown border rounded-lg cursor-pointer mr-[5px] ${
+                    recordTypeStatus === "canceled" ? "bg-cream" : ""
+                  }`}
+                  onClick={() => setRecordTypeStatus("canceled")}
+                >
+                  {dictionary[selectedLanguage].canceled}
+                </span>
+                <span
+                  className={`px-[8px] py-[4px] text-darkBrown border-darkBrown border rounded-lg cursor-pointer ${
+                    recordTypeStatus === "all" ? "bg-cream" : ""
+                  }`}
+                  onClick={() => setRecordTypeStatus("all")}
+                >
+                  {dictionary[selectedLanguage].all}
+                </span>
+              </div>
             </div>
             <RecordsList
               filteredRecords={userRecords}
