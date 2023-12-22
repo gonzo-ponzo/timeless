@@ -148,6 +148,8 @@ const ClientCalendarBoardDay = ({
       </div>
     )
   })
+  let currentDate = new Date()
+  let currentHour = currentDate.getHours()
 
   if (recordsToShowElements) {
     return (
@@ -162,18 +164,66 @@ const ClientCalendarBoardDay = ({
             {date.getDay() === 0 ? weekDays[6] : weekDays[date.getDay() - 1]}
           </p>
         </div>
-        <div className="flex h-[60px] w-full justify-center items-center border-b border-t border-gray"></div>
-        <div className="flex h-[60px] w-full justify-center items-center border-b border-gray"></div>
-        <div className="flex h-[60px] w-full justify-center items-center border-b border-gray"></div>
-        <div className="flex h-[60px] w-full justify-center items-center border-b border-gray"></div>
-        <div className="flex h-[60px] w-full justify-center items-center border-b border-gray"></div>
-        <div className="flex h-[60px] w-full justify-center items-center border-b border-gray"></div>
-        <div className="flex h-[60px] w-full justify-center items-center border-b border-gray"></div>
-        <div className="flex h-[60px] w-full justify-center items-center border-b border-gray"></div>
-        <div className="flex h-[60px] w-full justify-center items-center border-b border-gray"></div>
-        <div className="flex h-[60px] w-full justify-center items-center border-b border-gray"></div>
-        <div className="flex h-[60px] w-full justify-center items-center border-b border-gray"></div>
-        <div className="flex h-[60px] w-full justify-center items-center border-b border-gray"></div>
+        <div
+          className={`flex h-[60px] w-full justify-center items-center border-b border-t border-gray ${
+            currentHour === 9 ? "border-b-red border-t-red" : null
+          } ${currentHour === 10 ? "border-b-red" : null}`}
+        ></div>
+        <div
+          className={`flex h-[60px] w-full justify-center items-center border-b border-gray ${
+            currentHour === 10 || currentHour === 11 ? "border-b-red" : null
+          }`}
+        ></div>
+        <div
+          className={`flex h-[60px] w-full justify-center items-center border-b border-gray ${
+            currentHour === 11 || currentHour === 12 ? "border-b-red" : null
+          }`}
+        ></div>{" "}
+        <div
+          className={`flex h-[60px] w-full justify-center items-center border-b border-gray ${
+            currentHour === 12 || currentHour === 13 ? "border-b-red" : null
+          }`}
+        ></div>{" "}
+        <div
+          className={`flex h-[60px] w-full justify-center items-center border-b border-gray ${
+            currentHour === 13 || currentHour === 14 ? "border-b-red" : null
+          }`}
+        ></div>
+        <div
+          className={`flex h-[60px] w-full justify-center items-center border-b border-gray ${
+            currentHour === 14 || currentHour === 15 ? "border-b-red" : null
+          }`}
+        ></div>
+        <div
+          className={`flex h-[60px] w-full justify-center items-center border-b border-gray ${
+            currentHour === 15 || currentHour === 16 ? "border-b-red" : null
+          }`}
+        ></div>
+        <div
+          className={`flex h-[60px] w-full justify-center items-center border-b border-gray ${
+            currentHour === 16 || currentHour === 17 ? "border-b-red" : null
+          }`}
+        ></div>
+        <div
+          className={`flex h-[60px] w-full justify-center items-center border-b border-gray ${
+            currentHour === 17 || currentHour === 18 ? "border-b-red" : null
+          }`}
+        ></div>
+        <div
+          className={`flex h-[60px] w-full justify-center items-center border-b border-gray ${
+            currentHour === 18 || currentHour === 19 ? "border-b-red" : null
+          }`}
+        ></div>
+        <div
+          className={`flex h-[60px] w-full justify-center items-center border-b border-gray ${
+            currentHour === 19 || currentHour === 20 ? "border-b-red" : null
+          }`}
+        ></div>
+        <div
+          className={`flex h-[60px] w-full justify-center items-center border-b border-gray ${
+            currentHour === 20 || currentHour === 21 ? "border-b-red" : null
+          }`}
+        ></div>{" "}
         <div className="flex h-[60px] w-full justify-center items-center"></div>
         {recordsToShowElements}
       </div>
