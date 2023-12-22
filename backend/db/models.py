@@ -75,6 +75,7 @@ class Client(Base):
     registered_at = Column(
         DateTime(timezone=True), default=datetime.datetime.now, nullable=False
     )
+    communication = Column(Boolean, default=True, nullable=False)
     image = Column(
         String, default=f"http://{IP_SERVER}:8000/static/defaultLogo.jpg", nullable=True
     )

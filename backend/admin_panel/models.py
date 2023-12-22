@@ -55,6 +55,7 @@ class ClientAdmin(ModelView, model=Client):
         Client.email,
         Client.instagram,
         Client.telegram,
+        Client.communication,
     ]
     column_searchable_list = [
         Client.name,
@@ -84,6 +85,7 @@ class ClientAdmin(ModelView, model=Client):
         Client.telegram: "Телеграм",
         Client.registered_at: "Дата регистрации",
         Client.registered_by: "Кем зарегистрирован",
+        Client.communication: "Коммуникация",
         Client.records: "Записи",
         Client.comments: "Комментарии",
     }

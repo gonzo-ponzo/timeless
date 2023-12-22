@@ -61,6 +61,8 @@ class RecordDAO(DAO):
             query = select(Service).where(Service.id == body.serviceId)
             service = await self.db.scalar(query)
             client_id = body.clientId
+            client_query = select(Client).where(Client.id == body.client_id)
+            client = await self.db.scalar(client_query)
             if service.name.lower() in ["day off", "odmar 1", "odmar 2", "odmar 4"]:
                 client_id = 1
 
@@ -124,7 +126,7 @@ class RecordDAO(DAO):
             ) - datetime.timedelta(hours=1)
 
             seconds = (planned_date - now).total_seconds()
-            if seconds > 0 and phone != "0000":
+            if seconds > 0 and phone != "0000" and client.communication:
                 send_sms.apply_async(args=[time, phone, record_id], countdown=seconds)
             return "Success"
 
@@ -214,7 +216,7 @@ class RecordDAO(DAO):
             ) - datetime.timedelta(hours=1)
 
             seconds = (planned_date - now).total_seconds()
-            if seconds > 0 and phone != "0000":
+            if seconds > 0 and phone != "0000" and client.communication:
                 send_sms.apply_async(args=[time, phone, record_id], countdown=seconds)
             return "Success"
 
