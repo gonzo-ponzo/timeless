@@ -91,7 +91,7 @@ const RecordEditor = ({
         </div>
         {show ? (
           <>
-            <div className="w-full bg-wh border-gray rounded-lg border absolute top-[100%] left-0 opacity-100">
+            <div className="w-full bg-white border-gray rounded-lg border absolute top-[100%] left-0 opacity-100 overflow-y-scroll max-h-[300px]">
               <input
                 type="text"
                 name="search"
