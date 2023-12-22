@@ -9,6 +9,7 @@ import dictionary from "../../utils/dictionary"
 import { useSelector } from "react-redux"
 import userService from "../../services/user.service"
 import { Link } from "react-router-dom"
+import ReCAPTCHA from "react-google-recaptcha"
 
 const ClientLoginForm = () => {
   const userId = localStorageService.getUserId()
@@ -78,6 +79,13 @@ const ClientLoginForm = () => {
       }))
     }
   }
+  const [reCaptcha, setReCaptcha] = useState(null)
+  const recaptchaRef = React.createRef()
+  const handleReCaptcha = () => {
+    const recaptchaValue = recaptchaRef.current.getValue()
+    setReCaptcha(recaptchaValue)
+  }
+  const reCaptchaKey = process.env.REACT_APP_RECAPTCHA_WEB_KEY
 
   return (
     <form onSubmit={handleSubmit}>
@@ -107,9 +115,19 @@ const ClientLoginForm = () => {
         type="password"
         onChange={handleChange}
       />
+      <div className="mt-[10px] w-full flex justify-center items-center">
+        <ReCAPTCHA
+          ref={recaptchaRef}
+          sitekey={reCaptchaKey}
+          onChange={handleReCaptcha}
+          size="compact"
+        />
+      </div>
       <button
         className="bg-brown rounded-lg text-white text-center w-full py-[8px] mt-[24px] hover:opacity-80"
-        disabled={phoneError || data.phone.length < 2 ? true : false}
+        disabled={
+          phoneError || data.phone.length < 2 || !reCaptcha ? true : false
+        }
       >
         {dictionary[selectedLanguage].login}
       </button>

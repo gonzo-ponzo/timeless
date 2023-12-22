@@ -6,6 +6,7 @@ import dictionary from "../utils/dictionary"
 import { useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import userService from "../services/user.service"
+import ReCAPTCHA from "react-google-recaptcha"
 
 const CrmPasswordRecoveryPage = () => {
   const selectedLanguage = useSelector((state) => state.lang.lang)
@@ -49,6 +50,14 @@ const CrmPasswordRecoveryPage = () => {
     navigate("/crm/login")
   }
 
+  const [reCaptcha, setReCaptcha] = useState(null)
+  const recaptchaRef = React.createRef()
+  const handleReCaptcha = () => {
+    const recaptchaValue = recaptchaRef.current.getValue()
+    setReCaptcha(recaptchaValue)
+  }
+  const reCaptchaKey = process.env.REACT_APP_RECAPTCHA_WEB_KEY
+
   return (
     <div className="container-fluid relative h-screen mx-auto flex justify-center items-center bg-cream max-md:text-sm">
       <AuthCard>
@@ -68,9 +77,19 @@ const CrmPasswordRecoveryPage = () => {
             onChange={handleChange}
             error={phoneError}
           />
+          <div className="mt-[10px] w-full flex justify-center items-center">
+            <ReCAPTCHA
+              ref={recaptchaRef}
+              sitekey={reCaptchaKey}
+              onChange={handleReCaptcha}
+              size="compact"
+            />
+          </div>
           <button
             className="bg-brown rounded-lg text-white text-center w-full py-[8px] mt-[24px] hover:opacity-80"
-            disabled={phoneError || data.phone.length < 2 ? true : false}
+            disabled={
+              phoneError || data.phone.length < 2 || !reCaptcha ? true : false
+            }
           >
             {dictionary[selectedLanguage].recover}
           </button>
