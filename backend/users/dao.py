@@ -181,6 +181,8 @@ class ClientDAO(DAO):
                         registered_at=client.registered_at,
                         image=client.image,
                         rating=rating,
+                        cameFrom=client.came_from,
+                        communication=client.communication,
                     )
                 )
             return result
@@ -215,6 +217,8 @@ class ClientDAO(DAO):
                     registered_at=client.registered_at,
                     registered_by=client.user_id,
                     image=client.image,
+                    cameFrom=client.came_from,
+                    communication=client.communication,
                 )
                 return data
             else:
@@ -236,6 +240,8 @@ class ClientDAO(DAO):
                     registered_at=client.registered_at,
                     registered_by=client.user_id,
                     image=client.image,
+                    cameFrom=client.came_from,
+                    communication=client.communication,
                 )
                 return data
             else:
@@ -259,6 +265,8 @@ class ClientDAO(DAO):
                     registered_at=client.registered_at,
                     registered_by=client.user_id,
                     image=client.image,
+                    cameFrom=client.came_from,
+                    communication=client.communication,
                 )
                 return data
             else:
@@ -282,6 +290,8 @@ class ClientDAO(DAO):
                     registered_at=client.registered_at,
                     registered_by=client.user_id,
                     image=client.image,
+                    cameFrom=client.came_from,
+                    communication=client.communication,
                 )
                 return data
             else:
@@ -304,6 +314,8 @@ class ClientDAO(DAO):
                 registered_at=client.registered_at,
                 registered_by=client.user_id,
                 image=client.image,
+                cameFrom=client.came_from,
+                communication=client.communication,
             )
             return data
 

@@ -41,6 +41,7 @@ const CrmRecordElement = ({ record, lastEl, clients, records, setReset }) => {
     price: 0,
     comment: "",
     status: "completed",
+    cameFrom: null,
   })
 
   const handleClick = () => {
@@ -54,6 +55,7 @@ const CrmRecordElement = ({ record, lastEl, clients, records, setReset }) => {
       price: data.price,
       status: data.status,
       comment: data.comment,
+      cameFrom: data.cameFrom,
     })
     if (selectedImage) {
       const formData = new FormData()
@@ -149,6 +151,19 @@ const CrmRecordElement = ({ record, lastEl, clients, records, setReset }) => {
             area={true}
             onChange={handleChange}
           ></TextField>
+          {client?.cameFrom ? null : (
+            <>
+              <label className="mt-[16px] text-white" htmlFor="cameFrom">
+                {dictionary[selectedLanguage].cameFrom}
+              </label>
+              <TextField
+                name={"cameFrom"}
+                type={"text"}
+                area={true}
+                onChange={handleChange}
+              ></TextField>
+            </>
+          )}
           <input
             className="py-2 px-3 mb-[16px] block w-full text-sm text-lightBrown placeholder-lightBrown border border-lightBrown rounded-lg cursor-pointer bg-white focus:outline-none file:text-brown file:bg-cream file:rounded-lg file:border-lightBrown file:outline-none file:border file:hover:opacity-80 file:cursor-pointer"
             id={"file"}

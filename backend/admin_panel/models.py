@@ -86,6 +86,7 @@ class ClientAdmin(ModelView, model=Client):
         Client.registered_at: "Дата регистрации",
         Client.registered_by: "Кем зарегистрирован",
         Client.communication: "Коммуникация",
+        Client.came_from: "Откуда узнали",
         Client.records: "Записи",
         Client.comments: "Комментарии",
     }

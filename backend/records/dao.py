@@ -61,7 +61,7 @@ class RecordDAO(DAO):
             query = select(Service).where(Service.id == body.serviceId)
             service = await self.db.scalar(query)
             client_id = body.clientId
-            client_query = select(Client).where(Client.id == body.client_id)
+            client_query = select(Client).where(Client.id == body.clientId)
             client = await self.db.scalar(client_query)
             if service.name.lower() in ["day off", "odmar 1", "odmar 2", "odmar 4"]:
                 client_id = 1
@@ -287,6 +287,15 @@ class RecordDAO(DAO):
                     )
                 )
             await self.db.execute(update_record_query)
+            if body.cameFrom:
+                record_query = select(Record).where(Record.id == record_id)
+                record = await self.db.scalar(record_query)
+                update_client_came_from_query = (
+                    update(Client)
+                    .where(Client.id == record.client_id)
+                    .values(came_from=body.cameFrom)
+                )
+                await self.db.execute(update_client_came_from_query)
             await self.db.commit()
             return "Success"
 

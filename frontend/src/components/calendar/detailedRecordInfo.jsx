@@ -13,6 +13,7 @@ import commentService from "../../services/comment.service"
 import dropdownArrow from "../../assets/imgs/dropdown-arrow.png"
 import Close from "../../assets/imgs/Close-icon.png"
 import StatusButton from "./statusButton"
+import Mute from "../../assets/imgs/mute.png"
 
 const DetailedRecordInfo = ({
   recordId,
@@ -39,6 +40,7 @@ const DetailedRecordInfo = ({
     comment: "",
     status: "completed",
     masterId: null,
+    cameFrom: null,
   })
   const loadData = async () => {
     setRecords(await recordService.getRecords())
@@ -119,6 +121,7 @@ const DetailedRecordInfo = ({
       date: selectedDate,
       userId: user?.id,
       masterId: selectedMasterId,
+      cameFrom: data.cameFrom,
     })
     if (result === "Success") {
       successNotify()
@@ -154,6 +157,9 @@ const DetailedRecordInfo = ({
           <Link to={"/crm/client/" + client?.id}>
             <div className="flex items-center justify-start mb-[4px]">
               <p className="text-darkBrown">{client?.name}</p>
+              {!client?.communication ? (
+                <img className="w-[18px] h-[18px]" src={Mute} alt="mute" />
+              ) : null}
             </div>
           </Link>
           {currentUser?.isAdmin && !currentUser.isStaff ? (
@@ -243,6 +249,18 @@ const DetailedRecordInfo = ({
         disabled={record?.status === "completed" ? true : false}
         className="border border-lightBrown text-lightBrown rounded-lg w-full px-[8px] py-[7px]"
       />
+      {!client?.cameFrom && selectedStatus === "completed" ? (
+        <>
+          <label className="text-lightBrown" htmlFor="cameFrom">
+            {dictionary[selectedLanguage].cameFrom}
+          </label>
+          <TextField
+            name={"cameFrom"}
+            type={"text"}
+            onChange={handleChange}
+          ></TextField>
+        </>
+      ) : null}
 
       <p className="font-thin mb-[4px]">
         {dictionary[selectedLanguage].master}
@@ -302,7 +320,11 @@ const DetailedRecordInfo = ({
       <button
         className="bg-cream text-brown border border-darkBrown px-[12px] py-[10px] mb-[8px] items-end rounded-lg hover:opacity-80"
         onClick={handleSubmit}
-        disabled={!data.price && selectedStatus === "completed" ? true : false}
+        disabled={
+          (!data.price || !data.cameFrom) && selectedStatus === "completed"
+            ? true
+            : false
+        }
       >
         {dictionary[selectedLanguage].confirm}
       </button>

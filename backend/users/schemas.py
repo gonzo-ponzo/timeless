@@ -30,6 +30,8 @@ class GetClientSchema(BaseModel):
     image: Optional[str]
     rating: Optional[float]
     auth_code: Optional[str]
+    cameFrom: Optional[str]
+    communication: bool
 
 
 class UpdateClientSchema(BaseModel):

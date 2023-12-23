@@ -20,7 +20,7 @@ const ClientMainPage = () => {
   const firstDay = new Date(calendarDate)
   const clientId = localStorageService.getClientId()
   if (!clientId) {
-    navigate("/login")
+    navigate("/client/login")
   }
   const [records, setRecords] = useState(null)
   const loadData = async () => {

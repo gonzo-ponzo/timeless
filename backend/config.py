@@ -27,3 +27,4 @@ EMAIL_LOGIN = os.environ.get("EMAIL_LOGIN")
 EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD")
 
 IP_SERVER = os.environ.get("IP_SERVER")
+DOMAIN = os.environ.get("DOMAIN")

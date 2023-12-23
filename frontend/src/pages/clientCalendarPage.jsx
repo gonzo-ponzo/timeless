@@ -19,7 +19,7 @@ const ClientCalendarPage = () => {
   const navigate = useNavigate()
   const clientId = localStorageService.getClientId()
   if (!clientId) {
-    navigate("/login")
+    navigate("/client/login")
   }
   const dispatch = useDispatch()
   const [calendarDate, setCalendarDate] = useState(new Date())

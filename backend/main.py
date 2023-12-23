@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from sqladmin import Admin
 
-from config import APP_PORT, SECRET, IP_SERVER
+from config import APP_PORT, SECRET, IP_SERVER, DOMAIN
 from db.session import engine
 
 from admin_panel.models import (
@@ -30,6 +30,12 @@ origins = [
     f"{IP_SERVER}",
     f"https://{IP_SERVER}",
     f"http://{IP_SERVER}",
+    f"{DOMAIN}",
+    f"https://{DOMAIN}",
+    f"http://{DOMAIN}",
+    f"www.{DOMAIN}",
+    f"https://www.{DOMAIN}",
+    f"http://www.{DOMAIN}",
 ]
 app.add_middleware(
     CORSMiddleware,

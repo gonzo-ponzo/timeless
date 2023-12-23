@@ -15,7 +15,7 @@ const ClientProfilePage = () => {
   const navigate = useNavigate()
   const clientId = localStorageService.getClientId()
   if (!clientId) {
-    navigate("/login")
+    navigate("/client/login")
   }
   const [client, setClient] = useState(null)
   const [selectedImage, setSelectedImage] = useState()
