@@ -162,7 +162,7 @@ const DetailedRecordInfo = ({
               ) : null}
             </div>
           </Link>
-          {currentUser?.isAdmin && !currentUser.isStaff ? (
+          {currentUser?.isAdmin ? (
             <>
               <p className="text-darkBrown flex items-center justify-start mb-[4px]">
                 <a

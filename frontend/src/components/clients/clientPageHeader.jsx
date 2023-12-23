@@ -61,7 +61,7 @@ const ClientPageHeader = ({ client, user }) => {
             />
             <div className="flex flex-col">
               <p className="text-3xl">{client.name}</p>
-              {user.isAdmin && !user.isStaff ? (
+              {user.isAdmin ? (
                 <>
                   <div>
                     <a
