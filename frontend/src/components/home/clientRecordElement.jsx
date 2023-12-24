@@ -15,20 +15,9 @@ const ClientRecordElement = ({ record, lastEl, services }) => {
   const notify = () => toast.success("Сохранено")
   const [selectedImage, setSelectedImage] = useState()
   const [selectedPreview, setSelectedPreview] = useState(null)
-  const recordServices = services
-    ? services.filter((service) => record.services.includes(Number(service.id)))
-    : []
   const [selectedRating, setSelectedRating] = useState()
   const [comment, setComment] = useState("")
   const [blur, setBlur] = useState(false)
-  let recordServicesName = ""
-  let recordServicesPrice = 0
-  for (let i = 0; i < recordServices.length; i++) {
-    recordServicesPrice = recordServicesPrice + recordServices[i].price
-    recordServicesName =
-      recordServicesName +
-      `${recordServices[i].name}${i === recordServices.length - 1 ? "" : "/"}`
-  }
 
   const onRatingSelected = (selectedValue) => {
     setSelectedRating(selectedValue)
@@ -62,6 +51,7 @@ const ClientRecordElement = ({ record, lastEl, services }) => {
     setSelectedPreview(url)
     setSelectedImage(file)
   }
+  console.log(record)
 
   return (
     <>
@@ -74,13 +64,13 @@ const ClientRecordElement = ({ record, lastEl, services }) => {
         }
       >
         <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[10px]">
-          {record.name}
+          {record?.user?.name}
         </div>
         <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[10px]">
-          {recordServicesName}
+          {record?.service?.[selectedLanguage]}
         </div>
         <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[10px]">
-          {recordServicesPrice}
+          {record?.service?.price}
         </div>
         <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[10px]">
           {record.time.slice(0, 5)}
@@ -140,6 +130,7 @@ const ClientRecordElement = ({ record, lastEl, services }) => {
             <button
               className="bg-black text-white px-[12px] py-[10px] rounded-lg hover:opacity-80"
               onClick={handleSubmit}
+              disabled={!selectedRating}
             >
               Отправить
             </button>

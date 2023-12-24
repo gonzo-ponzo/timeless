@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import PropTypes from "prop-types"
 import Close from "../../assets/imgs/plus-circle.png"
 import TextField from "../textField"
@@ -6,7 +6,6 @@ import recordService from "../../services/record.service"
 import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import { Link } from "react-router-dom"
-import serviceService from "../../services/service.service"
 import dictionary from "../../utils/dictionary"
 import { useSelector } from "react-redux"
 
@@ -15,27 +14,8 @@ const CrmRecordElement = ({ record, lastEl, clients, records, setReset }) => {
   const notify = () => toast.success("Сохранено")
   const [selectedImage, setSelectedImage] = useState()
   const [selectedPreview, setSelectedPreview] = useState(null)
-  const [services, setServices] = useState(null)
   const [blur, setBlur] = useState(false)
   const client = clients?.find((client) => client.id === record.clientId)
-  const loadData = async () => {
-    setServices(await serviceService.getServices())
-  }
-  useEffect(() => {
-    loadData()
-  }, [])
-  const recordServices = services
-    ? services.filter((service) => record.services.includes(Number(service.id)))
-    : []
-
-  let recordServicesName = ""
-  let recordServicesPrice = 0
-  for (let i = 0; i < recordServices.length; i++) {
-    recordServicesPrice = recordServicesPrice + recordServices[i].price
-    recordServicesName =
-      recordServicesName +
-      `${recordServices[i].name}${i === recordServices.length - 1 ? "" : "/"}`
-  }
 
   const [data, setData] = useState({
     price: 0,
@@ -102,10 +82,10 @@ const CrmRecordElement = ({ record, lastEl, clients, records, setReset }) => {
           </div>
         </Link>
         <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[10px]">
-          {recordServicesName}
+          {record?.service?.[selectedLanguage]}
         </div>
         <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[10px]">
-          {recordServicesPrice}{" "}
+          {record?.service?.price}{" "}
           {record.status === "completed" ? <b>({record?.price})</b> : null}
         </div>
         <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[10px]">

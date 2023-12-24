@@ -1,6 +1,6 @@
 from sqlalchemy import select, update
 
-from db.models import Comment, Record, RecordsUsers
+from db.models import Comment, Record
 from .schemas import (
     CreateCommentSchema,
     GetClientCommentSchema,
@@ -88,9 +88,7 @@ class CommentDAO(DAO):
             return result
 
     async def get_comments_by_user(self, user_id: int) -> list[GetUserCommentSchema]:
-        record_query = (
-            select(Record).join(RecordsUsers).where(RecordsUsers.user_id == user_id)
-        )
+        record_query = select(Record).where(Record.user_id == user_id)
 
         result = []
         async with self.db.begin():

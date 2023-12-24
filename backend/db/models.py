@@ -16,34 +16,34 @@ from config import IP_SERVER
 Base = declarative_base()
 
 
-class RecordsServices(Base):
-    __tablename__ = "records_services"
+# class RecordsServices(Base):
+#     __tablename__ = "records_services"
 
-    record_id = Column(
-        Integer,
-        ForeignKey("records.id", onupdate="CASCADE", ondelete="CASCADE"),
-        primary_key=True,
-    )
-    service_id = Column(
-        Integer,
-        ForeignKey("services.id", onupdate="CASCADE", ondelete="CASCADE"),
-        primary_key=True,
-    )
+#     record_id = Column(
+#         Integer,
+#         ForeignKey("records.id", onupdate="CASCADE", ondelete="CASCADE"),
+#         primary_key=True,
+#     )
+#     service_id = Column(
+#         Integer,
+#         ForeignKey("services.id", onupdate="CASCADE", ondelete="CASCADE"),
+#         primary_key=True,
+#     )
 
 
-class RecordsUsers(Base):
-    __tablename__ = "records_users"
+# class RecordsUsers(Base):
+#     __tablename__ = "records_users"
 
-    record_id = Column(
-        Integer,
-        ForeignKey("records.id", onupdate="CASCADE", ondelete="CASCADE"),
-        primary_key=True,
-    )
-    user_id = Column(
-        Integer,
-        ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"),
-        primary_key=True,
-    )
+#     record_id = Column(
+#         Integer,
+#         ForeignKey("records.id", onupdate="CASCADE", ondelete="CASCADE"),
+#         primary_key=True,
+#     )
+#     user_id = Column(
+#         Integer,
+#         ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"),
+#         primary_key=True,
+#     )
 
 
 class UserServices(Base):
@@ -113,16 +113,17 @@ class User(Base):
     is_admin = Column(Boolean, default=False, nullable=False)
     is_staff = Column(Boolean, default=False, nullable=False)
 
-    records = relationship(
-        "Record",
-        lazy="selectin",
-        secondary="records_users",
-        back_populates="users",
-        passive_deletes=True,
-    )
+    # records = relationship(
+    #     "Record",
+    #     lazy="selectin",
+    #     secondary="records_users",
+    #     back_populates="users",
+    #     passive_deletes=True,
+    # )
+    records = relationship("Record", back_populates="user", lazy="selectin")
 
     clients = relationship("Client", back_populates="registered_by")
-
+    relationship("Record", back_populates="user", lazy="selectin")
     services = relationship(
         "Service",
         lazy="selectin",
@@ -141,7 +142,6 @@ class Record(Base):
     __tablename__ = "records"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
     date = Column(Date, nullable=False)
     time = Column(Time, nullable=False)
     status = Column(String, default="Created", nullable=False)
@@ -157,40 +157,49 @@ class Record(Base):
         Integer, ForeignKey("clients.id", onupdate="CASCADE", ondelete="CASCADE")
     )
     client = relationship("Client", lazy="selectin", back_populates="records")
-
-    services = relationship(
-        "Service",
-        secondary="records_services",
-        back_populates="records",
-        lazy="selectin",
-        passive_deletes=True,
+    service_id = Column(
+        Integer, ForeignKey("services.id", onupdate="CASCADE", ondelete="CASCADE")
     )
+    service = relationship("Service", lazy="selectin", back_populates="records")
 
-    users = relationship(
-        "User",
-        secondary="records_users",
-        back_populates="records",
-        lazy="selectin",
-        passive_deletes=True,
+    # services = relationship(
+    #     "Service",
+    #     secondary="records_services",
+    #     back_populates="records",
+    #     lazy="selectin",
+    #     passive_deletes=True,
+    # )
+    user_id = Column(
+        Integer, ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE")
     )
+    user = relationship("User", lazy="selectin", back_populates="records")
+    # users = relationship(
+    #     "User",
+    #     secondary="records_users",
+    #     back_populates="records",
+    #     lazy="selectin",
+    #     passive_deletes=True,
+    # )
 
     comments = relationship("Comment", back_populates="record", lazy="selectin")
 
     def __str__(self) -> str:
-        return self.name
+        return self.service.name
 
 
 class Service(Base):
     __tablename__ = "services"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
+    name = Column(String, nullable=True)
+    en_name = Column(String, nullable=True)
+    sr_name = Column(String, nullable=True)
     price = Column(Integer, nullable=False)
     duration = Column(Integer, nullable=False)
 
-    records = relationship(
-        "Record", secondary="records_services", back_populates="services"
-    )
+    # records = relationship(
+    #     "Record", secondary="records_services", back_populates="services"
+    # )
 
     users = relationship(
         "User",
@@ -199,6 +208,8 @@ class Service(Base):
         back_populates="services",
         passive_deletes=True,
     )
+
+    records = relationship("Record", back_populates="service", lazy="selectin")
 
     def __str__(self) -> str:
         return self.name

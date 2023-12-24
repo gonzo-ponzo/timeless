@@ -1,7 +1,7 @@
 import PropTypes from "prop-types"
 import dropdownArrow from "../../assets/imgs/dropdown-arrow.png"
 import React, { useEffect, useState } from "react"
-import { toast, ToastContainer } from "react-toastify"
+import { ToastContainer } from "react-toastify"
 import recordService from "../../services/record.service"
 import localStorageService from "../../services/localStorage.service"
 import TextField from "../textField"
@@ -59,7 +59,9 @@ const AdminRecordEditor = ({
     if (search.length > 0) {
       setDropdownServices(
         services.filter((service) =>
-          service.name.toLowerCase().includes(search.toLowerCase())
+          service?.[selectedLanguage]
+            .toLowerCase()
+            .includes(search.toLowerCase())
         )
       )
     } else {
@@ -67,7 +69,7 @@ const AdminRecordEditor = ({
         services.filter((service) => service !== selectedService)
       )
     }
-  }, [search, selectedService, services])
+  }, [search, selectedService, services, selectedLanguage])
 
   const findClient = async (data) => {
     if (data.phone.length > 1) {
@@ -95,7 +97,7 @@ const AdminRecordEditor = ({
       onClick={() => handleSelect(service)}
       key={service.id}
     >
-      {service.name}
+      {service[selectedLanguage]}
     </div>
   ))
 
@@ -103,9 +105,7 @@ const AdminRecordEditor = ({
     e.preventDefault()
 
     if (
-      ["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
-        selectedService.name
-      )
+      ["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(selectedService.en)
     ) {
       const userId = localStorageService.getUserId()
       const selectedUser = await userService.getUserById(userId)
@@ -218,7 +218,9 @@ const AdminRecordEditor = ({
               className={"w-full flex justify-between items-center"}
               onClick={handleShow}
             >
-              <span className="hover:opacity-80">{selectedService?.name}</span>
+              <span className="hover:opacity-80">
+                {selectedService?.[selectedLanguage]}
+              </span>
               <img
                 className={
                   !show ? "w-[16px] h-[16px]" : "w-[16px] h-[16px] rotate-180"
@@ -291,7 +293,7 @@ const AdminRecordEditor = ({
             className={`py-[12px] ${
               (!phoneError && selectedSlot && data.phone.length > 1) ||
               (["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
-                selectedService?.name
+                selectedService?.en
               ) &&
                 selectedSlot)
                 ? "text-brown bg-cream border-darkBrown"
@@ -300,7 +302,7 @@ const AdminRecordEditor = ({
             disabled={
               (!phoneError && selectedSlot && data.phone.length > 1) ||
               (["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
-                selectedService?.name
+                selectedService?.en
               ) &&
                 selectedSlot)
                 ? false

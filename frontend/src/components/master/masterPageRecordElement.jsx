@@ -23,7 +23,7 @@ const MasterPageRecordElement = ({ record, lastEl, services, clients }) => {
     recordServicesPrice = recordServicesPrice + recordServices[i].price
     recordServicesName =
       recordServicesName +
-      `${recordServices[i].name}${i === recordServices.length - 1 ? "" : "/"}`
+      `${recordServices[i].en}${i === recordServices.length - 1 ? "" : "/"}`
   }
 
   return (

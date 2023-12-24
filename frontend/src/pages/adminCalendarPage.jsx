@@ -82,7 +82,7 @@ const AdminCalendarPage = () => {
               user.isStaff &&
               (user.services.includes(selectedService.id) ||
                 ["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
-                  selectedService.name
+                  selectedService.en
                 ))
           )
         : allUsers.filter((user) => user.isStaff)

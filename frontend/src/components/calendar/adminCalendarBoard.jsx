@@ -115,7 +115,9 @@ const AdminCalendarBoard = ({
     }
   }
 
-  const filteredCalendarBoardDays = Object.values(calendarBoardDays).filter((value) => value != undefined)
+  const filteredCalendarBoardDays = Object.values(calendarBoardDays).filter(
+    (value) => value != undefined
+  )
   const windowWidth = window.innerWidth
   const [calendarStart, setCalendarStart] = useState(0)
   const [calendarEnd, setCalendarEnd] = useState(
@@ -138,11 +140,7 @@ const AdminCalendarBoard = ({
   return (
     <>
       <TimeGraph></TimeGraph>
-      <div
-        className={`grid grid-cols-${
-          numberOfCols
-        } w-full relative`}
-      >
+      <div className={`grid grid-cols-${numberOfCols} w-full relative`}>
         <img
           className={`absolute z-50 w-[15px] h-[20px] left-[5px] top-[18px] -rotate-90 ${
             calendarStart === 0 ? "hidden" : ""
@@ -153,8 +151,7 @@ const AdminCalendarBoard = ({
         />
         <img
           className={`absolute z-50 w-[15px] h-[20px] right-[5px] top-[18px] rotate-90 ${
-            filteredCalendarBoardDays?.length ===
-            numberOfCols + calendarStart
+            filteredCalendarBoardDays?.length === numberOfCols + calendarStart
               ? "hidden"
               : ""
           }`}

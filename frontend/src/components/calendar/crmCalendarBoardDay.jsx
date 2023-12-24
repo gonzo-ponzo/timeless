@@ -54,7 +54,9 @@ const CrmCalendarBoardDay = ({
             ) : (
               <div>
                 <p>
-                  {selectedService ? selectedService.name : "Свободный слот"}
+                  {selectedService
+                    ? selectedService[selectedLanguage]
+                    : dictionary[selectedLanguage].freeSlot}
                 </p>
                 <p>{recordTime}</p>
                 <p>{selectedUser?.name}</p>
@@ -67,7 +69,7 @@ const CrmCalendarBoardDay = ({
               recordTime
             ) : (
               <div>
-                <p>{record.name}</p>
+                <p>{record?.[selectedLanguage]}</p>
                 <p>{recordTime}</p>
                 <p>{clientName}</p>
               </div>
@@ -81,7 +83,7 @@ const CrmCalendarBoardDay = ({
               recordTime
             ) : (
               <div>
-                <p>{record.name}</p>
+                <p>{record?.[selectedLanguage]}</p>
                 <p>{recordTime}</p>
                 <p>{clientName}</p>
               </div>
@@ -229,7 +231,7 @@ const CrmCalendarBoardDay = ({
 CrmCalendarBoardDay.propTypes = {
   recordsToShowElements: PropTypes.array,
   userName: PropTypes.string,
-  selectedService: PropTypes.object,
+  selectedService: PropTypes.number,
   existingRecords: PropTypes.array,
   boardDayDate: PropTypes.string,
   clients: PropTypes.array,

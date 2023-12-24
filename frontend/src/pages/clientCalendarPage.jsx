@@ -83,7 +83,7 @@ const ClientCalendarPage = () => {
     setServices(
       filteredServices.filter(
         (service) =>
-          !["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(service.name)
+          !["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(service.en)
       )
     )
     setUsers(
@@ -93,7 +93,7 @@ const ClientCalendarPage = () => {
               user.isStaff &&
               (user.services.includes(selectedService.id) ||
                 ["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
-                  selectedService.name
+                  selectedService.en
                 ))
           )
         : allUsers.filter((user) => user.isStaff)

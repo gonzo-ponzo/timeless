@@ -30,11 +30,6 @@ class RecordService(Service):
         avatar = await record_dao.upload_record_image(record_id=record_id, image=image)
         return avatar
 
-    async def cancel_record(self, record_id: int):
-        record_dao = RecordDAO(db_session=self.db)
-        avatar = await record_dao.cancel_record(record_id=record_id)
-        return avatar
-
     async def get_available_records(
         self, user_id: int, date: datetime.time
     ) -> list[AvailableRecordSchema]:

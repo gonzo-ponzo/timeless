@@ -59,11 +59,10 @@ const CrmMainPage = () => {
     recordTypeStatus === "all"
       ? recordsByDate
       : recordsByDate.filter((record) => record.status === recordTypeStatus)
-
   const userRecords =
     (user?.isAdmin && user?.isStaff && userTypeStatus) || !user?.isAdmin
-      ? recordsByRecordStatus.filter((record) =>
-          record.users.includes(Number(userId))
+      ? recordsByRecordStatus.filter(
+          (record) => record.userId === Number(userId)
         )
       : recordsByRecordStatus
 

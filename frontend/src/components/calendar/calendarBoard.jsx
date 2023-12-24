@@ -5,8 +5,6 @@ import ClientCalendarBoardDay from "./clientCalendarBoardDay"
 
 const CalendarBoard = ({
   firstDay,
-  records,
-  services,
   selectedService,
   selectedUser,
   selectedSlot,
@@ -16,8 +14,6 @@ const CalendarBoard = ({
   const calendarBoardDays = _.range(daysCount).map((day) => (
     <ClientCalendarBoardDay
       date={new Date(firstDay.getTime() + 1000 * 60 * 60 * 24 * day)}
-      records={records}
-      services={services}
       selectedService={selectedService}
       selectedUser={selectedUser}
       selectedSlot={selectedSlot}
@@ -38,8 +34,6 @@ const CalendarBoard = ({
 
 CalendarBoard.propTypes = {
   date: PropTypes.instanceOf(Date),
-  records: PropTypes.array,
-  services: PropTypes.array,
   selectedService: PropTypes.object,
   selectedUser: PropTypes.object,
   selectedSlot: PropTypes.object,

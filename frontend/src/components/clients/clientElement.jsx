@@ -32,7 +32,7 @@ const ClientElement = ({ client, records, comments, lastEl }) => {
       className=" grid grid-cols-4 cursor-pointer mb-[4px] opacity-70 hover:opacity-100"
       onClick={() => setSelectedRecord(record)}
     >
-      <p className="col-span-2">{record.name}</p>
+      <p className="col-span-2">{record?.service[selectedLanguage]}</p>
       <p className="">{record.date}</p>
       <p className="">{record.time.slice(0, 5)}</p>
     </div>

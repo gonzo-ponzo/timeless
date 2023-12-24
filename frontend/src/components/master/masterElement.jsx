@@ -13,7 +13,7 @@ const MasterElement = ({ user, lastEl }) => {
   const navigate = useNavigate()
   const handleClick = (user) => {
     dispatch(setSelectedMaster(user))
-    navigate("/record")
+    navigate("/client/record")
   }
   return (
     <>

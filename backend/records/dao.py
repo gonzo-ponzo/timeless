@@ -2,7 +2,9 @@ from sqlalchemy import select, update
 import datetime
 from typing import Optional
 
-from db.models import Record, RecordsServices, RecordsUsers, Service, Client, User
+from db.models import Record, Service, Client, User
+from services.schemas import GetServiceSchema
+from users.schemas import GetUserSchema
 from .schemas import (
     GetRecordSchema,
     UpdateRecordSchema,
@@ -26,14 +28,38 @@ class RecordDAO(DAO):
             records = [
                 GetRecordSchema(
                     id=object.id,
-                    name=object.name,
                     date=object.date,
                     time=object.time,
                     status=object.status,
                     clientId=object.client_id,
                     price=object.price,
-                    services=[i.id for i in object.services],
-                    users=[i.id for i in object.users],
+                    ru=object.service.name,
+                    en=object.service.en_name,
+                    sr=object.service.sr_name,
+                    serviceId=object.service_id,
+                    service=GetServiceSchema(
+                        id=object.service.id,
+                        ru=object.service.name,
+                        en=object.service.en_name,
+                        sr=object.service.sr_name,
+                        price=object.service.price,
+                        duration=object.service.duration,
+                    ),
+                    userId=object.user_id,
+                    user=GetUserSchema(
+                        id=object.user.id,
+                        phone=object.user.phone,
+                        name=object.user.name,
+                        birthday=object.user.birthday,
+                        registered_at=object.user.registered_at,
+                        experience=object.user.experience,
+                        rating=5,
+                        position=object.user.position,
+                        image=object.user.image,
+                        services=[service.id for service in object.user.services],
+                        isAdmin=object.user.is_admin,
+                        isStaff=object.user.is_staff,
+                    ),
                     image=object.image,
                     author=object.author,
                 )
@@ -52,82 +78,63 @@ class RecordDAO(DAO):
 
     async def create_new_record(self, body: NewRecordSchema) -> Optional[str]:
         async with self.db.begin():
-            hours = body.time // 60
-            minutes = body.time % 60
-            time = datetime.time(hour=hours, minute=minutes)
-            year, month, day = body.date.split("-")
-            date = datetime.date(year=int(year), month=int(month), day=int(day))
-
-            query = select(Service).where(Service.id == body.serviceId)
-            service = await self.db.scalar(query)
             client_id = body.clientId
+            date, time = self.get_datetime_values_from_schema(schema=body)
+
+            service_query = select(Service).where(Service.id == body.serviceId)
+            service = await self.db.scalar(service_query)
+            if service.en_name.lower() in ["day off", "odmar 1", "odmar 2", "odmar 4"]:
+                client_id = 1
+
             client_query = select(Client).where(Client.id == body.clientId)
             client = await self.db.scalar(client_query)
-            if service.name.lower() in ["day off", "odmar 1", "odmar 2", "odmar 4"]:
-                client_id = 1
 
             master_records_query = (
                 select(Record)
-                .join(RecordsUsers)
-                .where(RecordsUsers.user_id == body.userId)
+                .where(Record.user_id == body.userId)
                 .where(Record.date == datetime.datetime.strptime(body.date, "%Y-%m-%d"))
                 .where(Record.status != "canceled")
             )
-            res = await self.db.scalars(master_records_query)
-            all_records = res.all()
+            master_records = await self.db.scalars(master_records_query)
+            master_records = master_records.all()
 
-            new_start = body.time
-            new_end = new_start + service.duration
-            flag = True
-            for record in all_records:
-                record_duration = sum([service.duration for service in record.services])
-                start = record.time.hour * 60 + record.time.minute
-                end = start + record_duration
-                if start <= new_start < end or start < new_end <= end:
-                    flag = False
-            if not flag:
+            new_record_start = body.time
+            new_record_end = new_record_start + service.duration
+            success = self.check_record_for_datetime_conflict(
+                records=master_records,
+                new_record_start=new_record_start,
+                new_record_end=new_record_end,
+            )
+            if not success:
                 return "Error"
 
             new_record = Record(
-                name=service.name,
                 date=date,
                 time=time,
                 status="created",
                 client_id=client_id,
                 author=body.author,
+                service_id=service.id,
+                user_id=body.userId,
             )
             self.db.add(new_record)
             await self.db.flush()
-            new_record_service = RecordsServices(
-                record_id=new_record.id, service_id=service.id
-            )
-            self.db.add(new_record_service)
-            await self.db.flush()
-            new_record_user = RecordsUsers(record_id=new_record.id, user_id=body.userId)
-            self.db.add(new_record_user)
-            await self.db.flush()
-            query = select(Client).where(Client.id == client_id)
-            client = await self.db.scalar(query)
-            phone = client.phone
             record_id = new_record.id
 
-            record_datetime = f"{new_record.date} {new_record.time}"
-            date = record_datetime.split(" ")[0]
-            time = record_datetime.split(" ")[1]
+            client_query = select(Client).where(Client.id == client_id)
+            client = await self.db.scalar(client_query)
+            phone = client.phone
 
-            year = int(date.split("-")[0])
-            month = int(date.split("-")[1])
-            day = int(date.split("-")[2])
-            hour = int(time.split(":")[0])
-            minute = int(time.split(":")[1])
-            now = datetime.datetime.now() + datetime.timedelta(hours=1)
-            planned_date = datetime.datetime(
-                year=year, month=month, day=day, hour=hour, minute=minute
-            ) - datetime.timedelta(hours=1)
+            date = f"{new_record.date}"
+            time = f"{new_record.time}"
+            seconds_before_sms = self.get_seconds_before_sms(
+                date_string=date, time_string=time
+            )
 
-            seconds = (planned_date - now).total_seconds()
-            if seconds > 0 and phone != "0000" and client.communication:
-                send_sms.apply_async(args=[time, phone, record_id], countdown=seconds)
+            if seconds_before_sms > 0 and phone != "0000" and client.communication:
+                send_sms.apply_async(
+                    args=[time, phone, record_id], countdown=seconds_before_sms
+                )
             return "Success"
 
     async def create_new_record_with_register(
@@ -148,76 +155,54 @@ class RecordDAO(DAO):
                 self.db.add(client)
                 await self.db.flush()
 
-            hours = body.time // 60
-            minutes = body.time % 60
-            time = datetime.time(hour=hours, minute=minutes)
-            year, month, day = body.date.split("-")
-            date = datetime.date(year=int(year), month=int(month), day=int(day))
+            date, time = self.get_datetime_values_from_schema(schema=body)
 
             service_query = select(Service).where(Service.id == body.serviceId)
             service = await self.db.scalar(service_query)
 
             master_records_query = (
                 select(Record)
-                .join(RecordsUsers)
-                .where(RecordsUsers.user_id == body.userId)
+                .where(Record.user_id == body.userId)
                 .where(Record.date == datetime.datetime.strptime(body.date, "%Y-%m-%d"))
                 .where(Record.status != "canceled")
             )
-            res = await self.db.scalars(master_records_query)
-            all_records = res.all()
+            master_records = await self.db.scalars(master_records_query)
+            master_records = master_records.all()
 
-            new_start = body.time
-            new_end = new_start + service.duration
-            flag = True
-            for record in all_records:
-                record_duration = sum([service.duration for service in record.services])
-                start = record.time.hour * 60 + record.time.minute
-                end = start + record_duration
-                if start <= new_start < end or start < new_end <= end:
-                    flag = False
-            if not flag:
+            new_record_start = body.time
+            new_record_end = new_record_start + service.duration
+            success = self.check_record_for_datetime_conflict(
+                records=master_records,
+                new_record_start=new_record_start,
+                new_record_end=new_record_end,
+            )
+            if not success:
                 return "Error"
 
             new_record = Record(
-                name=service.name,
                 date=date,
                 time=time,
                 status="created",
                 client_id=client.id,
                 author=body.author,
+                service_id=service.id,
+                user_id=body.userId,
             )
             self.db.add(new_record)
             await self.db.flush()
-
-            new_record_service = RecordsServices(
-                record_id=new_record.id, service_id=service.id
-            )
-            self.db.add(new_record_service)
-            await self.db.flush()
-
-            new_record_user = RecordsUsers(record_id=new_record.id, user_id=body.userId)
-            self.db.add(new_record_user)
-            await self.db.flush()
+            record_id = new_record.id
 
             phone = client.phone
-            record_id = new_record.id
-            record_datetime = f"{new_record.date} {new_record.time}"
-            date = record_datetime.split(" ")[0]
-            time = record_datetime.split(" ")[1]
-            year = int(date.split("-")[0])
-            month = int(date.split("-")[1])
-            day = int(date.split("-")[2])
-            hour = int(time.split(":")[0])
-            minute = int(time.split(":")[1])
-            now = datetime.datetime.now() + datetime.timedelta(hours=1)
-            planned_date = datetime.datetime(
-                year=year, month=month, day=day, hour=hour, minute=minute
-            ) - datetime.timedelta(hours=1)
 
-            seconds = (planned_date - now).total_seconds()
-            if seconds > 0 and phone != "0000" and client.communication:
-                send_sms.apply_async(args=[time, phone, record_id], countdown=seconds)
+            date = f"{new_record.date}"
+            time = f"{new_record.time}"
+            seconds_before_sms = self.get_seconds_before_sms(
+                date_string=date, time_string=time
+            )
+            if seconds_before_sms > 0 and phone != "0000" and client.communication:
+                send_sms.apply_async(
+                    args=[time, phone, record_id], countdown=seconds_before_sms
+                )
             return "Success"
 
     async def update_record_by_id(
@@ -227,40 +212,39 @@ class RecordDAO(DAO):
             if body.date and body.time:
                 record_for_update_query = select(Record).where(Record.id == record_id)
                 record = await self.db.scalar(record_for_update_query)
-                new_start, new_end = self.get_timing(record=record, body=body)
+                new_record_start, new_record_end = self.get_timing(
+                    record=record, body=body
+                )
 
                 target_master = body.masterId
-                if body.masterId != record.users[0]:
+                if body.masterId != record.user_id:
                     target_master = body.masterId
 
                 target_master_records_query = (
                     select(Record)
-                    .join(RecordsUsers)
-                    .where(RecordsUsers.user_id == target_master)
+                    .where(Record.user_id == target_master)
                     .where(Record.date == body.date)
                     .where(Record.id != record_id)
                     .where(Record.status != "canceled")
                 )
-                res = await self.db.scalars(target_master_records_query)
-                all_records = res.all()
+                target_master_records = await self.db.scalars(
+                    target_master_records_query
+                )
+                target_master_records = target_master_records.all()
 
-                flag = True
                 if body.status != "canceled":
-                    for record in all_records:
-                        record_duration = sum(
-                            [service.duration for service in record.services]
-                        )
-                        start = record.time.hour * 60 + record.time.minute
-                        end = start + record_duration
-                        if start <= new_start < end or start < new_end <= end:
-                            flag = False
-                    if not flag:
+                    success = self.check_record_for_datetime_conflict(
+                        records=target_master_records,
+                        new_record_start=new_record_start,
+                        new_record_end=new_record_end,
+                    )
+                    if not success:
                         return "Error"
 
-                if body.masterId != record.users[0]:
+                if body.masterId != record.user_id:
                     update_record_master_query = (
-                        update(RecordsUsers)
-                        .where(RecordsUsers.record_id == record_id)
+                        update(Record)
+                        .where(Record.id == record_id)
                         .values(user_id=body.masterId)
                     )
                     await self.db.execute(update_record_master_query)
@@ -305,25 +289,23 @@ class RecordDAO(DAO):
         date: datetime.time,
     ) -> list[AvailableRecordSchema]:
         async with self.db.begin():
-            query = (
+            existing_records_query = (
                 select(Record)
-                .join(RecordsUsers)
-                .where(RecordsUsers.user_id == user_id)
+                .where(Record.user_id == user_id)
                 .where(Record.date == date)
                 .where(Record.status != "canceled")
             )
-            existing_records = await self.db.scalars(query)
+            existing_records = await self.db.scalars(existing_records_query)
             records_data = []
             for record in existing_records:
-                record_duration = [service.duration for service in record.services]
                 start = int(record.time.strftime("%H:%M:%S")[:2]) * 60 + int(
                     record.time.strftime("%H:%M:%S")[3:5]
                 )
                 records_data.append(
                     AvailableRecordSchema(
                         start=start,
-                        end=start + sum(record_duration),
-                        duration=sum(record_duration),
+                        end=start + record.service.duration,
+                        duration=record.service.duration,
                         type="pink",
                     )
                 )
@@ -339,8 +321,7 @@ class RecordDAO(DAO):
         async with self.db.begin():
             query = (
                 select(Record)
-                .join(RecordsUsers)
-                .where(RecordsUsers.user_id == master_id)
+                .where(Record.user_id == master_id)
                 .where(Record.date == date)
                 .where(Record.status != "canceled")
             )
@@ -351,9 +332,6 @@ class RecordDAO(DAO):
 
             records_data = []
             for record in existing_records:
-                record_duration = [service.duration for service in record.services]
-                record_name = "/".join([service.name for service in record.services])
-
                 record_type = "pink"
                 if user_id == master_id:
                     record_type = "blue"
@@ -361,7 +339,12 @@ class RecordDAO(DAO):
                     user_id == master_id or user.is_admin == True
                 ):
                     record_type = "yellow"
-                if record_name.lower() in ["day off", "odmar 1", "odmar 2", "odmar 4"]:
+                if record.service.en_name.lower() in [
+                    "day off",
+                    "odmar 1",
+                    "odmar 2",
+                    "odmar 4",
+                ]:
                     record_type = "gray"
 
                 start = int(record.time.strftime("%H:%M:%S")[:2]) * 60 + int(
@@ -370,29 +353,20 @@ class RecordDAO(DAO):
                 records_data.append(
                     AvailableCrmRecordSchema(
                         start=start,
-                        end=start + sum(record_duration),
-                        duration=sum(record_duration),
+                        end=start + record.service.duration,
+                        duration=record.service.duration,
                         type=record_type,
-                        name=record_name,
+                        serviceId=record.service_id,
+                        ru=record.service.name,
+                        en=record.service.en_name,
+                        sr=record.service.sr_name,
                         clientId=record.client_id,
                         recordId=record.id,
-                        userId=record.users[0].id,
+                        userId=record.user_id,
                     )
                 )
 
             return records_data
-
-    async def cancel_record(self, record_id: int) -> None:
-        async with self.db.begin():
-            query_update = (
-                update(Record)
-                .where(Record.id == record_id)
-                .values(
-                    status="canceled",
-                )
-            )
-            await self.db.execute(query_update)
-            await self.db.commit()
 
     async def get_record_time(self, record_id: int) -> str:
         async with self.db.begin():
@@ -405,7 +379,43 @@ class RecordDAO(DAO):
                 return "null"
 
     def get_timing(self, record: Record, body: UpdateRecordSchema) -> list:
-        duration = sum([service.duration for service in record.services])
         new_start = body.time.hour * 60 + body.time.minute
-        new_end = new_start + duration
+        new_end = new_start + record.service.duration
         return [new_start, new_end]
+
+    def get_seconds_before_sms(self, date_string: str, time_string: str) -> int:
+        year = int(date_string.split("-")[0])
+        month = int(date_string.split("-")[1])
+        day = int(date_string.split("-")[2])
+        hour = int(time_string.split(":")[0])
+        minute = int(time_string.split(":")[1])
+
+        now = datetime.datetime.now() + datetime.timedelta(hours=1)
+        planned_date = datetime.datetime(
+            year=year, month=month, day=day, hour=hour, minute=minute
+        ) - datetime.timedelta(hours=1)
+
+        seconds = (planned_date - now).total_seconds()
+        return seconds
+
+    def get_datetime_values_from_schema(self, schema: NewRecordSchema) -> list:
+        hours = schema.time // 60
+        minutes = schema.time % 60
+        time = datetime.time(hour=hours, minute=minutes)
+        year, month, day = schema.date.split("-")
+        date = datetime.date(year=int(year), month=int(month), day=int(day))
+        return [date, time]
+
+    def check_record_for_datetime_conflict(
+        self, records: list[Record], new_record_start: int, new_record_end: int
+    ) -> bool:
+        success = True
+        for record in records:
+            start_in_minutes = record.time.hour * 60 + record.time.minute
+            end_in_minutes = start_in_minutes + record.service.duration
+            if (
+                start_in_minutes <= new_record_start < end_in_minutes
+                or start_in_minutes < new_record_end <= end_in_minutes
+            ):
+                success = False
+        return success

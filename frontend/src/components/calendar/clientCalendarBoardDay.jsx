@@ -7,8 +7,6 @@ import { useSelector } from "react-redux"
 
 const ClientCalendarBoardDay = ({
   date,
-  records,
-  services,
   selectedService,
   selectedUser,
   selectedSlot,
@@ -98,7 +96,7 @@ const ClientCalendarBoardDay = ({
           }`
         ) : (
           <div>
-            <p>{selectedService?.name}</p>
+            <p>{selectedService?.[selectedLanguage]}</p>
             <p>{`${Math.floor(record.start / 60)}:${
               record.start - Math.floor(record.start / 60) * 60 > 9
                 ? record.start - Math.floor(record.start / 60) * 60
@@ -233,8 +231,6 @@ const ClientCalendarBoardDay = ({
 
 ClientCalendarBoardDay.propTypes = {
   date: PropTypes.object,
-  records: PropTypes.array,
-  services: PropTypes.array,
   selectedService: PropTypes.object,
   selectedUser: PropTypes.object,
   onSlotSelect: PropTypes.func,

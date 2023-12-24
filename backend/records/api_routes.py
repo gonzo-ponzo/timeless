@@ -10,7 +10,6 @@ from .schemas import (
     AvailableCrmRecordSchema,
     AvailableRecordSchema,
     NewRecordSchema,
-    RecordIdSchema,
     NewRecordWithRegisterSchema,
 )
 from .services import RecordService
@@ -39,16 +38,6 @@ async def register_and_record(
     """Register new user and create record for him"""
     record_service = RecordService(db=db)
     return await record_service.create_new_record_with_register(body=body)
-
-
-@records_api_router.post("/cancel")
-async def cancel_record(
-    body: RecordIdSchema,
-    db: AsyncSession = Depends(get_async_session),
-) -> None:
-    """Cancel existing record"""
-    record_service = RecordService(db=db)
-    await record_service.cancel_record(record_id=body.recordId)
 
 
 @records_api_router.get("/get-available/{service_id}/{user_id}/{date}/")

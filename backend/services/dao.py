@@ -15,7 +15,9 @@ class ServiceDAO(DAO):
             records = [
                 GetServiceSchema(
                     id=object.id,
-                    name=object.name,
+                    ru=object.name,
+                    en=object.en_name,
+                    sr=object.sr_name,
                     price=object.price,
                     duration=object.duration,
                 )

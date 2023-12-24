@@ -2,29 +2,27 @@ from typing import Optional
 import datetime
 from pydantic import BaseModel
 
+from services.schemas import GetServiceSchema
+from users.schemas import GetUserSchema
+
 
 class GetRecordSchema(BaseModel):
     id: int
-    name: str
     date: datetime.date
     time: datetime.time
     clientId: int
     status: str
     price: Optional[int]
+    ru: Optional[str]
+    en: Optional[str]
+    sr: Optional[str]
     comment: Optional[str]
     image: Optional[str]
-    services: list[int]
-    users: list[int]
+    serviceId: int
+    service: GetServiceSchema
+    userId: int
+    user: GetUserSchema
     author: Optional[str]
-
-
-class RecordIdSchema(BaseModel):
-    recordId: int
-
-
-class RecordsByDateScheme(BaseModel):
-    client_id: int
-    date: datetime.date
 
 
 class UpdateRecordSchema(BaseModel):
@@ -36,12 +34,6 @@ class UpdateRecordSchema(BaseModel):
     userId: Optional[int]
     masterId: Optional[int]
     cameFrom: Optional[str]
-
-
-class AvailableRecordsDataScheme(BaseModel):
-    date: datetime.date
-    serviceId: int
-    userId: int
 
 
 class AvailableRecordSchema(BaseModel):
@@ -56,7 +48,10 @@ class AvailableCrmRecordSchema(BaseModel):
     end: int
     duration: int
     type: str
-    name: str
+    serviceId: int
+    ru: Optional[str]
+    en: Optional[str]
+    sr: Optional[str]
     clientId: int
     recordId: int
 

@@ -9,7 +9,6 @@ import { setDate } from "../store/dateSlice"
 import { useNavigate } from "react-router-dom"
 import localStorageService from "../services/localStorage.service"
 import AdminCalendarPage from "./adminCalendarPage"
-import recordService from "../services/record.service"
 import userService from "../services/user.service"
 import clientService from "../services/client.service"
 import serviceService from "../services/service.service"
@@ -59,7 +58,7 @@ const CrmCalendarPage = () => {
               user.isStaff &&
               (user.services.includes(selectedService.id) ||
                 ["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
-                  selectedService.name
+                  selectedService.en
                 ))
           )
         : allUsers.filter((user) => user.isStaff)

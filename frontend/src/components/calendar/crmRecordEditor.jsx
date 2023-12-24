@@ -65,12 +65,12 @@ const CrmRecordEditor = ({
         services
           .filter(
             (service) =>
-              !["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
-                service.name
-              )
+              !["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(service.en)
           )
           .filter((service) =>
-            service.name.toLowerCase().includes(search.toLowerCase())
+            service[selectedLanguage]
+              .toLowerCase()
+              .includes(search.toLowerCase())
           )
       )
     } else {
@@ -79,9 +79,7 @@ const CrmRecordEditor = ({
           .filter((service) => service !== selectedService)
           .filter(
             (service) =>
-              !["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
-                service.name
-              )
+              !["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(service.en)
           )
       )
     }
@@ -114,7 +112,7 @@ const CrmRecordEditor = ({
       onClick={() => handleSelect(service)}
       key={service.id}
     >
-      {service.name}
+      {service[selectedLanguage]}
     </div>
   ))
 
@@ -221,7 +219,9 @@ const CrmRecordEditor = ({
               className={"w-full flex justify-between items-center"}
               onClick={handleShow}
             >
-              <span className="hover:opacity-80">{selectedService?.name}</span>
+              <span className="hover:opacity-80">
+                {selectedService?.[selectedLanguage]}
+              </span>
               <img
                 className={
                   !show ? "w-[16px] h-[16px]" : "w-[16px] h-[16px] rotate-180"
@@ -296,7 +296,7 @@ const CrmRecordEditor = ({
             className={`py-[12px] ${
               (!phoneError && selectedSlot && data.phone.length > 1) ||
               (["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
-                selectedService?.name
+                selectedService?.en
               ) &&
                 selectedSlot)
                 ? "text-brown bg-cream border-darkBrown"
@@ -308,7 +308,7 @@ const CrmRecordEditor = ({
                 data.phone.length > 1 &&
                 phoneValid) ||
               (["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
-                selectedService?.name
+                selectedService?.en
               ) &&
                 selectedSlot)
                 ? false

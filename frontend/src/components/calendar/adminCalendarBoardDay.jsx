@@ -50,7 +50,11 @@ const AdminCalendarBoardDay = ({
             recordTime
           ) : (
             <div>
-              <p>{selectedService ? selectedService.name : "Свободный слот"}</p>
+              <p>
+                {selectedService
+                  ? selectedService[selectedLanguage]
+                  : dictionary[selectedLanguage].freeSlot}
+              </p>
               <p>{recordTime}</p>
               <p>{user?.name}</p>
             </div>
@@ -62,7 +66,7 @@ const AdminCalendarBoardDay = ({
             recordTime
           ) : (
             <div>
-              <p>{record.name}</p>
+              <p>{record?.[selectedLanguage]}</p>
               <p>{recordTime}</p>
               <p>{clientName}</p>
             </div>
@@ -76,7 +80,7 @@ const AdminCalendarBoardDay = ({
             recordTime
           ) : (
             <div>
-              <p>{record.name}</p>
+              <p>{record?.[selectedLanguage]}</p>
               <p>{recordTime}</p>
               <p>{clientName}</p>
             </div>

@@ -27,7 +27,7 @@ const RecordEditor = ({
     if (data.length > 0) {
       setDropdownServices(
         services.filter((service) =>
-          service.name.toLowerCase().includes(data.toLowerCase())
+          service[selectedLanguage].toLowerCase().includes(data.toLowerCase())
         )
       )
     } else {
@@ -35,7 +35,7 @@ const RecordEditor = ({
         services.filter((service) => service !== selectedService)
       )
     }
-  }, [data, selectedService, services])
+  }, [data, selectedService, services, selectedLanguage])
 
   const handleSelect = (service) => {
     handleClick(service)
@@ -48,7 +48,7 @@ const RecordEditor = ({
           onClick={() => handleSelect(service)}
           key={service.id}
         >
-          {service.name}
+          {service[selectedLanguage]}
         </div>
       ))
     : null
@@ -80,7 +80,9 @@ const RecordEditor = ({
           className={"w-full flex justify-between items-center"}
           onClick={handleShow}
         >
-          <span className="hover:opacity-80">{selectedService?.name}</span>
+          <span className="hover:opacity-80">
+            {selectedService?.[selectedLanguage]}
+          </span>
           <img
             className={
               !show ? "w-[16px] h-[16px]" : "w-[16px] h-[16px] rotate-180"

@@ -8,8 +8,8 @@ import { useSelector } from "react-redux"
 const ClientsList = ({ clients, records, comments }) => {
   const selectedLanguage = useSelector((state) => state.lang.lang)
   const userId = localStorageService.getUserId()
-  const userRecords = records?.filter((record) =>
-    record.users.includes(Number(userId))
+  const userRecords = records?.filter(
+    (record) => record.userId === Number(userId)
   )
   const userClientsIndex = userRecords?.map((record) => record.clientId)
   const userClients = clients.filter((client) =>

@@ -125,23 +125,21 @@ class ServiceAdmin(ModelView, model=Service):
 class RecordAdmin(ModelView, model=Record):
     column_list = [
         Record.id,
-        Record.name,
+        Record.service,
         Record.date,
         Record.time,
         Record.client,
         Record.author,
-        Record.users,
+        Record.user,
         Record.price,
         Record.status,
         Record.created_at,
     ]
     column_searchable_list = [
-        Record.name,
         Record.date,
         Record.client,
     ]
     column_sortable_list = [
-        Record.name,
         Record.date,
         Record.client,
     ]
@@ -154,15 +152,14 @@ class RecordAdmin(ModelView, model=Record):
         Record.client_id,
     ]
     column_labels = {
-        Record.name: "Название",
         Record.date: "Дата",
         Record.time: "Время",
         Record.status: "Статус",
         Record.price: "Итоговая стоимость",
         Record.comment: "Комментарий",
         Record.author: "Автор записи",
-        Record.services: "Услуги",
-        Record.users: "Мастера",
+        Record.service: "Услуга",
+        Record.user: "Мастер",
         Record.client: "Клиент",
         Record.created_at: "Дата создания",
         Record.author: "Автор",

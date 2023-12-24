@@ -59,10 +59,10 @@ const DetailedRecordInfo = ({
       setSelectedDate(record.date)
       setSelectedTime(record.time)
       setSelectedStatus(record.status)
-      setSelectedMaster(users?.find((user) => user.id === record.users[0]).name)
-      setSelectedMasterId(record.users[0])
+      setSelectedMaster(users?.find((user) => user.id === record.userId).name)
+      setSelectedMasterId(record.userId)
     }
-  }, [record, recordId])
+  }, [record, recordId, users])
 
   const client = clients?.find((client) => client.id === record.clientId)
 
@@ -80,7 +80,7 @@ const DetailedRecordInfo = ({
 
   const masterDropdown = users
     ?.filter((user) => user.isStaff)
-    .filter((user) => user.services.includes(record.services[0]))
+    .filter((user) => user.services.includes(record.servicesId))
     .map((master) => (
       <div
         className="border-b border-gray px-[16px] py-[7px] bg-white text-brown cursor-pointer hover:text-lightBrown last:border-none last:rounded-b-lg first:rounded-t-lg"
@@ -90,7 +90,7 @@ const DetailedRecordInfo = ({
         {master.name}
       </div>
     ))
-  const user = users?.find((user) => record.users.includes(user.id))
+  const user = users?.find((user) => record.userId === user.id)
 
   const handleChange = (target) => {
     setData((prevState) => ({
@@ -298,9 +298,8 @@ const DetailedRecordInfo = ({
       ) : users ? (
         <p className="text-darkBrown mb-[4px]">
           {
-            Object.values(users).filter(
-              (user) => user.id === record.users[0]
-            )[0].name
+            Object.values(users).filter((user) => user.id === record.userId)[0]
+              .name
           }
         </p>
       ) : null}
@@ -321,7 +320,8 @@ const DetailedRecordInfo = ({
         className="bg-cream text-brown border border-darkBrown px-[12px] py-[10px] mb-[8px] items-end rounded-lg hover:opacity-80"
         onClick={handleSubmit}
         disabled={
-          (!data.price || !data.cameFrom) && selectedStatus === "completed"
+          (!data.price || (!data.cameFrom && !client?.cameFrom)) &&
+          selectedStatus === "completed"
             ? true
             : false
         }
