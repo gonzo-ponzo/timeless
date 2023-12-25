@@ -131,7 +131,11 @@ class RecordDAO(DAO):
                 date_string=date, time_string=time
             )
 
-            if seconds_before_sms > 0 and phone != "0000" and client.communication:
+            if (
+                seconds_before_sms > 0
+                and client.name != "SERVICE"
+                and client.communication
+            ):
                 send_sms.apply_async(
                     args=[time, phone, record_id], countdown=seconds_before_sms
                 )
@@ -199,7 +203,11 @@ class RecordDAO(DAO):
             seconds_before_sms = self.get_seconds_before_sms(
                 date_string=date, time_string=time
             )
-            if seconds_before_sms > 0 and phone != "0000" and client.communication:
+            if (
+                seconds_before_sms > 0
+                and client.name != "SERVICE"
+                and client.communication
+            ):
                 send_sms.apply_async(
                     args=[time, phone, record_id], countdown=seconds_before_sms
                 )
