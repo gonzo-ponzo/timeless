@@ -85,7 +85,13 @@ class RecordDAO(DAO):
 
             service_query = select(Service).where(Service.id == body.serviceId)
             service = await self.db.scalar(service_query)
-            if service.en_name.lower() in ["day off", "odmar 1", "odmar 2", "odmar 4"]:
+            if service.en_name.lower() in [
+                "day off",
+                "odmar 1",
+                "odmar 2",
+                "odmar 4",
+                "odmar 0.5",
+            ]:
                 client_id = 1
 
             client_query = select(Client).where(Client.id == body.clientId)
@@ -482,6 +488,7 @@ class RecordDAO(DAO):
                     "odmar 1",
                     "odmar 2",
                     "odmar 4",
+                    "odmar 0.5",
                 ]:
                     record_type = "gray"
 

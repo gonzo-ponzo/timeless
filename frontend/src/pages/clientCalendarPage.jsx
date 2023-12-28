@@ -56,7 +56,9 @@ const ClientCalendarPage = () => {
     setServices(
       filteredServices.filter(
         (service) =>
-          !["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(service.en)
+          !["Day off", "Odmar 1", "Odmar 2", "Odmar 4", "Odmar 0.5"].includes(
+            service.en
+          )
       )
     )
     setComplexes(await serviceService.getComplexes())
@@ -66,9 +68,13 @@ const ClientCalendarPage = () => {
             (user) =>
               user.isStaff &&
               (user.services.includes(selectedService.id) ||
-                ["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
-                  selectedService.en
-                ))
+                [
+                  "Day off",
+                  "Odmar 1",
+                  "Odmar 2",
+                  "Odmar 4",
+                  "Odmar 0.5",
+                ].includes(selectedService.en))
           )
         : allUsers.filter((user) => user.isStaff)
     )

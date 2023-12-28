@@ -24,7 +24,9 @@ const ClientElement = ({ client, records, comments, lastEl }) => {
   const recordsWithoutComment = records.filter(
     (record) =>
       !recordIndexesWithComment.includes(record.id) &&
-      !["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(record.name) &&
+      !["Day off", "Odmar 1", "Odmar 2", "Odmar 4", "Odmar 0.5"].includes(
+        record?.service?.en
+      ) &&
       record.clientId === client.id
   )
   const recordsElements = recordsWithoutComment.map((record) => (

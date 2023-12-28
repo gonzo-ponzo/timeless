@@ -140,7 +140,9 @@ const AdminRecordEditor = ({
     e.preventDefault()
 
     if (
-      ["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(selectedService.en)
+      ["Day off", "Odmar 1", "Odmar 2", "Odmar 4", "Odmar 0.5"].includes(
+        selectedService.en
+      )
     ) {
       const userId = localStorageService.getUserId()
       const selectedUser = await userService.getUserById(userId)
@@ -400,18 +402,26 @@ const AdminRecordEditor = ({
           <button
             className={`py-[12px] ${
               (!phoneError && selectedSlot && data.phone.length > 1) ||
-              (["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
-                selectedService?.en
-              ) &&
+              ([
+                "Day off",
+                "Odmar 1",
+                "Odmar 2",
+                "Odmar 4",
+                "Odmar 0.5",
+              ].includes(selectedService?.en) &&
                 selectedSlot)
                 ? "text-brown bg-cream border-darkBrown"
                 : "bg-white text-black border-gray"
             } border text-center rounded-lg w-full mt-[20px] hover:opacity-80`}
             disabled={
               (!phoneError && selectedSlot && data.phone.length > 1) ||
-              ["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
-                selectedService?.en
-              ) ||
+              [
+                "Day off",
+                "Odmar 1",
+                "Odmar 2",
+                "Odmar 4",
+                "Odmar 0.5",
+              ].includes(selectedService?.en) ||
               (!phoneError &&
                 selectedSlots?.length === selectedComplex?.services?.length &&
                 data.phone.length > 1 &&

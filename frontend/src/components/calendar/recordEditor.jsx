@@ -37,9 +37,13 @@ const RecordEditor = ({
           services
             .filter(
               (service) =>
-                !["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
-                  service.en
-                )
+                ![
+                  "Day off",
+                  "Odmar 1",
+                  "Odmar 2",
+                  "Odmar 4",
+                  "Odmar 0.5",
+                ].includes(service.en)
             )
             .filter((service) =>
               service[selectedLanguage]
@@ -53,9 +57,13 @@ const RecordEditor = ({
             .filter((service) => service !== selectedService)
             .filter(
               (service) =>
-                !["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
-                  service.en
-                )
+                ![
+                  "Day off",
+                  "Odmar 1",
+                  "Odmar 2",
+                  "Odmar 4",
+                  "Odmar 0.5",
+                ].includes(service.en)
             )
         )
       }

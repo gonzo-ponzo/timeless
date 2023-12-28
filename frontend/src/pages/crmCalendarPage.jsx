@@ -62,9 +62,13 @@ const CrmCalendarPage = () => {
             (user) =>
               user.isStaff &&
               (user.services.includes(selectedService.id) ||
-                ["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
-                  selectedService.en
-                ))
+                [
+                  "Day off",
+                  "Odmar 1",
+                  "Odmar 2",
+                  "Odmar 4",
+                  "Odmar 0.5",
+                ].includes(selectedService.en))
           )
         : allUsers.filter((user) => user.isStaff)
     )

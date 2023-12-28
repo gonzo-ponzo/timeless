@@ -72,9 +72,13 @@ const CrmRecordEditor = ({
           services
             .filter(
               (service) =>
-                !["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
-                  service.en
-                )
+                ![
+                  "Day off",
+                  "Odmar 1",
+                  "Odmar 2",
+                  "Odmar 4",
+                  "Odmar 0.5",
+                ].includes(service.en)
             )
             .filter((service) =>
               service[selectedLanguage]
@@ -88,9 +92,13 @@ const CrmRecordEditor = ({
             .filter((service) => service !== selectedService)
             .filter(
               (service) =>
-                !["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
-                  service.en
-                )
+                ![
+                  "Day off",
+                  "Odmar 1",
+                  "Odmar 2",
+                  "Odmar 4",
+                  "Odmar 0.5",
+                ].includes(service.en)
             )
         )
       }
@@ -406,9 +414,13 @@ const CrmRecordEditor = ({
           <button
             className={`py-[12px] ${
               (!phoneError && selectedSlot && data.phone.length > 1) ||
-              (["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
-                selectedService?.en
-              ) &&
+              ([
+                "Day off",
+                "Odmar 1",
+                "Odmar 2",
+                "Odmar 4",
+                "Odmar 0.5",
+              ].includes(selectedService?.en) &&
                 selectedSlot)
                 ? "text-brown bg-cream border-darkBrown"
                 : "bg-white text-black border-gray"
@@ -418,9 +430,13 @@ const CrmRecordEditor = ({
                 selectedSlot &&
                 data.phone.length > 1 &&
                 phoneValid) ||
-              ["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
-                selectedService?.en
-              ) ||
+              [
+                "Day off",
+                "Odmar 1",
+                "Odmar 2",
+                "Odmar 4",
+                "Odmar 0.5",
+              ].includes(selectedService?.en) ||
               (!phoneError &&
                 selectedSlots?.length === selectedComplex?.services?.length &&
                 data.phone.length > 1 &&
