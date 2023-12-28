@@ -16,6 +16,21 @@ from config import IP_SERVER
 Base = declarative_base()
 
 
+class ComplexServices(Base):
+    __tablename__ = "complex_services"
+
+    complex_id = Column(
+        Integer,
+        ForeignKey("complexes.id", onupdate="CASCADE", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    service_id = Column(
+        Integer,
+        ForeignKey("services.id", onupdate="CASCADE", ondelete="CASCADE"),
+        primary_key=True,
+    )
+
+
 # class RecordsServices(Base):
 #     __tablename__ = "records_services"
 
@@ -187,6 +202,25 @@ class Record(Base):
         return self.service.name
 
 
+class Complex(Base):
+    __tablename__ = "complexes"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=True)
+    en_name = Column(String, nullable=True)
+    sr_name = Column(String, nullable=True)
+    services = relationship(
+        "Service",
+        secondary="complex_services",
+        lazy="selectin",
+        backref="complex",
+        passive_deletes=True,
+    )
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class Service(Base):
     __tablename__ = "services"
 
@@ -210,6 +244,9 @@ class Service(Base):
     )
 
     records = relationship("Record", back_populates="service", lazy="selectin")
+    complexes = relationship(
+        "Complex", secondary="complex_services", back_populates="services"
+    )
 
     def __str__(self) -> str:
         return self.name

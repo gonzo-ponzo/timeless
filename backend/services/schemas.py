@@ -9,3 +9,11 @@ class GetServiceSchema(BaseModel):
     sr: Optional[str]
     price: int
     duration: int
+
+
+class GetComplexSchema(BaseModel):
+    id: int
+    ru: Optional[str]
+    en: Optional[str]
+    sr: Optional[str]
+    services: list[GetServiceSchema]

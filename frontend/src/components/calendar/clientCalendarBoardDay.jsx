@@ -9,142 +9,137 @@ const ClientCalendarBoardDay = ({
   date,
   selectedService,
   selectedUser,
+  existingRecords,
   selectedSlot,
-  onSlotSelect,
+  handleSelectSlot,
+  handleSelectSlots,
+  complex,
 }) => {
   const selectedLanguage = useSelector((state) => state.lang.lang)
-  const [recordsToShow, setRecordsToShow] = useState(null)
   const boardDayDate = transformDate(date)
   const weekDays = dictionary[selectedLanguage].weekdays
-  const loadData = async (selectedServiceId, selectedUserId, boardDayDate) => {
-    setRecordsToShow(
-      await recordService.getAvailableRecords(
-        selectedServiceId,
-        selectedUserId,
-        boardDayDate
-      )
-    )
-  }
-  useEffect(() => {
-    if (selectedUser && selectedService && boardDayDate) {
-      loadData(selectedService.id, selectedUser.id, boardDayDate)
-    }
-  }, [selectedUser, selectedService, boardDayDate])
 
-  const newRecords = []
-  recordsToShow?.forEach((record) => {
-    newRecords.push(record)
-  })
-  for (
-    let start = 540;
-    start + selectedService?.duration <= 1320;
-    start += 10
-  ) {
-    let conflict = false
-    newRecords?.forEach((record) => {
-      if (record.start <= start && start < record.end) {
-        conflict = true
-      } else if (
-        record.start < start + selectedService?.duration &&
-        start + selectedService?.duration < record.end
-      ) {
-        conflict = true
-      } else if (
-        start < record.start &&
-        record.start < start + selectedService?.duration
-      ) {
-        conflict = true
+  function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1)
+  }
+
+  const recordsToShowElements = existingRecords?.map((record) => {
+    if (record.type) {
+      let content = null
+      let styleName = `absolute flex justify-center left-[3px] w-[calc(100%-6px)] items-center rounded-lg p-[3px] border text-xs text-center hover:opacity-100 bg-${
+        record.type
+      } text-dark${capitalize(record.type)} border-dark${capitalize(
+        record.type
+      )} hover:bg-opacity-100 `
+      let elementStyleName = `absolute left-0 top-[8px] ml-auto mr-auto rounded-r-lg w-[12px] bg-dark${capitalize(
+        record.type
+      )}`
+      let recordTime = `${Math.floor(record.start / 60)}:${
+        record.start - Math.floor(record.start / 60) * 60 > 9
+          ? record.start - Math.floor(record.start / 60) * 60
+          : `0${record.start - Math.floor(record.start / 60) * 60}`
+      }`
+
+      switch (record.type) {
+        case "pink":
+          content = dictionary[selectedLanguage].booked
+
+          break
+        case "green":
+          styleName += " opacity-0 "
+          content =
+            record.duration <= 30 ? (
+              recordTime
+            ) : (
+              <div>
+                <p>
+                  {selectedService
+                    ? selectedService[selectedLanguage]
+                    : dictionary[selectedLanguage].freeSlot}
+                </p>
+                <p>{recordTime}</p>
+                <p>{selectedUser?.name}</p>
+              </div>
+            )
+          break
+        case "blue":
+          content =
+            record.duration <= 30 ? (
+              recordTime
+            ) : (
+              <div>
+                <p>{record?.[selectedLanguage]}</p>
+                <p>{recordTime}</p>
+                <p>{selectedUser?.name}</p>
+              </div>
+            )
+          break
+        case "gray":
+          styleName += "bg-white text-black border-gray"
+          elementStyleName += "bg-gray"
+          content = dictionary[selectedLanguage].dayOff
+
+          break
+        default:
+          break
       }
-    })
-    if (!conflict) {
-      newRecords.push({
-        start: start,
-        end: start + selectedService?.duration,
-        duration: selectedService?.duration,
-        type: "green",
-        date: boardDayDate,
-        top: start - 480,
-      })
-    }
-  }
 
-  const recordsToShowElements = newRecords?.map((record) => {
-    let styleName =
-      "absolute flex justify-center left-[3px] w-[calc(100%-6px)] items-center rounded-lg p-[3px] border text-xs text-center hover:opacity-70 "
-    let elementStyleName =
-      "absolute left-0 top-[8px] ml-auto mr-auto rounded-r-lg w-[12px] "
-    switch (record.type) {
-      case "pink":
-        styleName += "bg-pink text-darkPink border-darkPink"
-        elementStyleName += "bg-darkPink"
-        break
-      case "green":
-        styleName += "bg-green text-darkGreen border-darkGreen"
-        elementStyleName += "bg-darkGreen"
-        break
-      default:
-        break
-    }
-
-    const content =
-      record.type === "green" ? (
-        record.duration <= 30 ? (
-          `${Math.floor(record.start / 60)}:${
-            record.start - Math.floor(record.start / 60) * 60 > 9
-              ? record.start - Math.floor(record.start / 60) * 60
-              : `0${record.start - Math.floor(record.start / 60) * 60}`
-          }`
-        ) : (
-          <div>
-            <p>{selectedService?.[selectedLanguage]}</p>
-            <p>{`${Math.floor(record.start / 60)}:${
-              record.start - Math.floor(record.start / 60) * 60 > 9
-                ? record.start - Math.floor(record.start / 60) * 60
-                : `0${record.start - Math.floor(record.start / 60) * 60}`
-            }`}</p>
-            <p>{selectedUser?.name}</p>
-          </div>
-        )
-      ) : (
-        dictionary[selectedLanguage].booked
-      )
-
-    return (
-      <div
-        onClick={
-          record.type === "green"
-            ? () =>
-                onSlotSelect({
-                  slotId: date + record.start,
-                  start: record.start,
-                  end: record.end,
-                  duration: record.duration,
-                  type: record.type,
-                  date: boardDayDate,
-                  top: record.top,
-                })
-            : null
-        }
-        className={
-          selectedSlot !== null && selectedSlot.slotId !== date + record.start
-            ? "absolute flex justify-center left-[3px] w-[calc(100%-6px)] items-center rounded-lg p-[3px] border text-xs text-center hover:opacity-70 text-gray border-gray"
-            : styleName
-        }
-        style={{
-          top: `${record.start + 2 - 480}px`,
-          height: `${record.duration - 4}px`,
-        }}
-        key={date + record.start}
-      >
-        <span
-          className={elementStyleName}
+      return (
+        <div
+          onClick={
+            record.type === "green"
+              ? () =>
+                  complex
+                    ? handleSelectSlots({
+                        slotId: date + record.start + selectedUser.name,
+                        start: record.start,
+                        end: record.end,
+                        duration: record.duration,
+                        type: record.type,
+                        date: boardDayDate,
+                        top: record.top,
+                        recordId: record.recordId,
+                        clientId: record.clientId,
+                        userId: selectedUser.id,
+                      })
+                    : handleSelectSlot({
+                        slotId: date + record.start + selectedUser.name,
+                        start: record.start,
+                        end: record.end,
+                        duration: record.duration,
+                        type: record.type,
+                        date: boardDayDate,
+                        top: record.top,
+                        recordId: record.recordId,
+                        clientId: record.clientId,
+                        userId: selectedUser.id,
+                      })
+              : null
+          }
+          className={
+            selectedSlot &&
+            selectedSlot.slotId === date + record.start + selectedUser.name
+              ? styleName + "opacity-100"
+              : record?.type === "green"
+              ? styleName
+              : styleName + "opacity-100"
+          }
           style={{
-            height: `${record.duration - 24}px`,
+            top: `${record.start + 2 - 480}px`,
+            height: `${record.duration - 4}px`,
           }}
-        ></span>
-        {content}
-      </div>
-    )
+          key={date + record.start}
+        >
+          <span
+            className={elementStyleName}
+            style={{
+              height: `${record.duration - 24}px`,
+            }}
+          ></span>
+          {content}
+        </div>
+      )
+    }
   })
   let currentDate = new Date()
   let currentHour = currentDate.getHours()
@@ -233,8 +228,11 @@ ClientCalendarBoardDay.propTypes = {
   date: PropTypes.object,
   selectedService: PropTypes.object,
   selectedUser: PropTypes.object,
-  onSlotSelect: PropTypes.func,
+  handleSelectedSlot: PropTypes.func,
+  handleSelectSlots: PropTypes.func,
   selectedSlot: PropTypes.object,
+  selectedSlots: PropTypes.array,
+  complex: PropTypes.bool,
 }
 
 export default ClientCalendarBoardDay

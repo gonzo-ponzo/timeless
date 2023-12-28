@@ -25,7 +25,7 @@ const MasterPageRecords = ({ userId, date }) => {
 
   const userRecords = records
     ? records
-        .filter((record) => record.users.includes(userId))
+        .filter((record) => record.user.id === userId)
         .filter((record) => record.date === date)
     : null
 

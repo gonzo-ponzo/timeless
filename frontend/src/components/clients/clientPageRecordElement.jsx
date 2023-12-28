@@ -3,27 +3,8 @@ import PropTypes from "prop-types"
 import dictionary from "../../utils/dictionary"
 import { useSelector } from "react-redux"
 
-const ClientPageRecordElement = ({ record, lastEl, services, users }) => {
+const ClientPageRecordElement = ({ record, lastEl }) => {
   const selectedLanguage = useSelector((state) => state.lang.lang)
-  const recordServices = services
-    ? services.filter((service) => record.services.includes(Number(service.id)))
-    : []
-  let recordServicesMaster = ""
-  for (let i = 0; i < record.users.length; i++) {
-    const user = users?.find((user) => user.id === record.users[i])
-    recordServicesMaster =
-      recordServicesMaster +
-      `${user.name}${i === record.users.length - 1 ? "" : "/"}`
-  }
-
-  let recordServicesName = ""
-  let recordServicesPrice = 0
-  for (let i = 0; i < recordServices.length; i++) {
-    recordServicesPrice = recordServicesPrice + recordServices[i].price
-    recordServicesName =
-      recordServicesName +
-      `${recordServices[i].name}${i === recordServices.length - 1 ? "" : "/"}`
-  }
 
   return (
     <>
@@ -35,14 +16,14 @@ const ClientPageRecordElement = ({ record, lastEl, services, users }) => {
         }
       >
         <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[6px] max-md:col-span-2">
-          {recordServicesMaster}
+          {record?.user?.name}
         </div>
         <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[6px]">{`${record.id}`}</div>
         <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[6px] max-md:col-span-2">
-          {recordServicesName}
+          {record?.service[selectedLanguage]}
         </div>
         <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[6px] max-md:col-span-3 max-md:text-center">
-          {recordServicesPrice}
+          {record?.service?.price}
           {record.status === "completed" ? (
             <div>
               <b>{record?.price}</b>
@@ -67,8 +48,6 @@ const ClientPageRecordElement = ({ record, lastEl, services, users }) => {
 ClientPageRecordElement.propTypes = {
   record: PropTypes.object.isRequired,
   lastEl: PropTypes.bool,
-  services: PropTypes.array,
-  users: PropTypes.array,
 }
 
 export default ClientPageRecordElement

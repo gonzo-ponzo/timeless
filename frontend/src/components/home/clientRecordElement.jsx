@@ -51,7 +51,6 @@ const ClientRecordElement = ({ record, lastEl, services }) => {
     setSelectedPreview(url)
     setSelectedImage(file)
   }
-  console.log(record)
 
   return (
     <>

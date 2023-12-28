@@ -12,6 +12,8 @@ from .schemas import (
     AvailableCrmRecordSchema,
     NewRecordSchema,
     NewRecordWithRegisterSchema,
+    NewComplexWithRegisterSchema,
+    NewComplexSchema,
 )
 from config import IP_SERVER
 from tasks.tasks import send_sms
@@ -119,26 +121,22 @@ class RecordDAO(DAO):
             )
             self.db.add(new_record)
             await self.db.flush()
-            record_id = new_record.id
 
-            client_query = select(Client).where(Client.id == client_id)
-            client = await self.db.scalar(client_query)
-            phone = client.phone
-
-            date = f"{new_record.date}"
-            time = f"{new_record.time}"
-            seconds_before_sms = self.get_seconds_before_sms(
-                date_string=date, time_string=time
-            )
-
-            if (
-                seconds_before_sms > 0
-                and client.name != "SERVICE"
-                and client.communication
-            ):
-                send_sms.apply_async(
-                    args=[time, phone, record_id], countdown=seconds_before_sms
-                )
+            # record_id = new_record.id
+            # phone = client.phone
+            # date = f"{new_record.date}"
+            # time = f"{new_record.time}"
+            # seconds_before_sms = self.get_seconds_before_sms(
+            #     date_string=date, time_string=time
+            # )
+            # if (
+            #     seconds_before_sms > 0
+            #     and client.name != "SERVICE"
+            #     and client.communication
+            # ):
+            #     send_sms.apply_async(
+            #         args=[time, phone, record_id], countdown=seconds_before_sms
+            #     )
             return "Success"
 
     async def create_new_record_with_register(
@@ -194,23 +192,155 @@ class RecordDAO(DAO):
             )
             self.db.add(new_record)
             await self.db.flush()
-            record_id = new_record.id
 
+            # record_id = new_record.id
+            # phone = client.phone
+            # date = f"{new_record.date}"
+            # time = f"{new_record.time}"
+            # seconds_before_sms = self.get_seconds_before_sms(
+            #     date_string=date, time_string=time
+            # )
+            # if (
+            #     seconds_before_sms > 0
+            #     and client.name != "SERVICE"
+            #     and client.communication
+            # ):
+            #     send_sms.apply_async(
+            #         args=[time, phone, record_id], countdown=seconds_before_sms
+            #     )
+            return "Success"
+
+    async def create_new_complex(self, body: NewComplexSchema) -> Optional[str]:
+        async with self.db.begin():
+            client_query = select(Client).where(Client.id == body.clientId)
+            client = await self.db.scalar(client_query)
             phone = client.phone
+            new_records = []
 
-            date = f"{new_record.date}"
-            time = f"{new_record.time}"
-            seconds_before_sms = self.get_seconds_before_sms(
-                date_string=date, time_string=time
-            )
-            if (
-                seconds_before_sms > 0
-                and client.name != "SERVICE"
-                and client.communication
-            ):
-                send_sms.apply_async(
-                    args=[time, phone, record_id], countdown=seconds_before_sms
+            for slot in body.records:
+                date, time = self.get_datetime_values_from_schema(schema=slot)
+
+                service_query = select(Service).where(Service.id == slot.serviceId)
+                service = await self.db.scalar(service_query)
+
+                master_records_query = (
+                    select(Record)
+                    .where(Record.user_id == slot.userId)
+                    .where(
+                        Record.date == datetime.datetime.strptime(slot.date, "%Y-%m-%d")
+                    )
+                    .where(Record.status != "canceled")
                 )
+                master_records = await self.db.scalars(master_records_query)
+                master_records = master_records.all()
+
+                new_record_start = slot.time
+                new_record_end = new_record_start + service.duration
+                success = self.check_record_for_datetime_conflict(
+                    records=master_records,
+                    new_record_start=new_record_start,
+                    new_record_end=new_record_end,
+                )
+                if not success:
+                    return "Error"
+
+                new_record = Record(
+                    date=date,
+                    time=time,
+                    status="created",
+                    client_id=body.clientId,
+                    author=body.author,
+                    service_id=service.id,
+                    user_id=slot.userId,
+                )
+                new_records.append(new_record)
+
+            for new_record in new_records:
+                self.db.add(new_record)
+            await self.db.flush()
+
+            # for new_record in new_records:
+            #     record_id = new_record.id
+            #     date = f"{new_record.date}"
+            #     time = f"{new_record.time}"
+            #     seconds_before_sms = self.get_seconds_before_sms(
+            #         date_string=date, time_string=time
+            #     )
+            #     if seconds_before_sms > 0 and client.communication:
+            #         send_sms.apply_async(
+            #             args=[time, phone, record_id], countdown=seconds_before_sms
+            #         )
+            return "Success"
+
+    async def create_new_complex_with_register(
+        self, body: NewComplexWithRegisterSchema
+    ) -> Optional[str]:
+        async with self.db.begin():
+            client_query = select(Client).where(Client.phone == body.phone)
+            client = await self.db.scalar(client_query)
+            if not client:
+                client = Client(
+                    phone=body.phone,
+                    auth_code="00000",
+                    user_id=body.authorId,
+                    name=body.name,
+                    telegram=body.telegram,
+                    instagram=body.instagram,
+                )
+                self.db.add(client)
+                await self.db.flush()
+
+            date, time = self.get_datetime_values_from_schema(schema=body)
+
+            service_query = select(Service).where(Service.id == body.serviceId)
+            service = await self.db.scalar(service_query)
+
+            master_records_query = (
+                select(Record)
+                .where(Record.user_id == body.userId)
+                .where(Record.date == datetime.datetime.strptime(body.date, "%Y-%m-%d"))
+                .where(Record.status != "canceled")
+            )
+            master_records = await self.db.scalars(master_records_query)
+            master_records = master_records.all()
+
+            new_record_start = body.time
+            new_record_end = new_record_start + service.duration
+            success = self.check_record_for_datetime_conflict(
+                records=master_records,
+                new_record_start=new_record_start,
+                new_record_end=new_record_end,
+            )
+            if not success:
+                return "Error"
+
+            new_record = Record(
+                date=date,
+                time=time,
+                status="created",
+                client_id=client.id,
+                author=body.author,
+                service_id=service.id,
+                user_id=body.userId,
+            )
+            self.db.add(new_record)
+            await self.db.flush()
+
+            # record_id = new_record.id
+            # phone = client.phone
+            # date = f"{new_record.date}"
+            # time = f"{new_record.time}"
+            # seconds_before_sms = self.get_seconds_before_sms(
+            #     date_string=date, time_string=time
+            # )
+            # if (
+            #     seconds_before_sms > 0
+            #     and client.name != "SERVICE"
+            #     and client.communication
+            # ):
+            #     send_sms.apply_async(
+            #         args=[time, phone, record_id], countdown=seconds_before_sms
+            #     )
             return "Success"
 
     async def update_record_by_id(
@@ -380,7 +510,7 @@ class RecordDAO(DAO):
         async with self.db.begin():
             query = select(Record).where(Record.id == int(record_id))
             record = await self.db.scalar(query)
-            if record.status == "created":
+            if record and record.status == "created":
                 result = f"{record.date} {record.time}"
                 return result
             else:

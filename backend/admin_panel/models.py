@@ -5,6 +5,7 @@ from db.models import (
     Service,
     Comment,
     Record,
+    Complex,
 )
 
 
@@ -58,12 +59,13 @@ class ClientAdmin(ModelView, model=Client):
         Client.communication,
     ]
     column_searchable_list = [
+        Client.phone,
         Client.name,
         Client.telegram,
         Client.instagram,
-        Client.phone,
     ]
     column_sortable_list = [
+        Client.id,
         Client.name,
     ]
     column_details_exclude_list = [
@@ -103,12 +105,14 @@ class ServiceAdmin(ModelView, model=Service):
         Service.name,
     ]
     column_sortable_list = [
+        Service.id,
         Service.name,
         Service.price,
         Service.duration,
     ]
     column_details_exclude_list = [
         Service.records,
+        Service.complexes,
         Service.users,
     ]
     form_excluded_columns = [
@@ -117,8 +121,27 @@ class ServiceAdmin(ModelView, model=Service):
     ]
     column_labels = {
         Service.name: "Название",
+        Service.en_name: "Название (Английский)",
+        Service.sr_name: "Название (Сербский)",
         Service.price: "Стоимость",
         Service.duration: "Продолжительность (мин)",
+    }
+
+
+class ComplexAdmin(ModelView, model=Complex):
+    column_list = [Service.id, Service.name]
+    column_searchable_list = [
+        Complex.name,
+    ]
+    column_sortable_list = [
+        Complex.id,
+        Complex.name,
+    ]
+    column_labels = {
+        Complex.name: "Название",
+        Complex.en_name: "Название (Английский)",
+        Complex.sr_name: "Название (Сербский)",
+        Complex.services: "Сервисы",
     }
 
 

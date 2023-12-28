@@ -47,7 +47,7 @@ const RecordsList = ({ filteredRecords, pageType, setReset }) => {
       : null
   return recordsElements ? (
     pageType === "client" ? (
-      <div className="text-darkBrown pt-[32px] max-md:text-xs">
+      <div className="text-darkBrown pt-[32px] max-md:text-xs overflow-y-scroll max-h-[800px]">
         <div className="grid grid-cols-4 bg-lightGray border border-gray rounded-t-lg font-bold">
           <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[10px]">
             {dictionary[selectedLanguage].master}
@@ -65,7 +65,7 @@ const RecordsList = ({ filteredRecords, pageType, setReset }) => {
         {recordsElements}
       </div>
     ) : (
-      <div className="text-darkBrown pt-[32px] max-md:text-xs">
+      <div className="text-darkBrown pt-[32px] max-md:text-xs overflow-y-scroll max-h-[800px]">
         <div className="grid grid-cols-5 bg-lightGray border border-gray rounded-t-lg font-bold">
           <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[10px]">
             {dictionary[selectedLanguage].client}

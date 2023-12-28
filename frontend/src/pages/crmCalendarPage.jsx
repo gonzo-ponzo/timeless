@@ -36,8 +36,10 @@ const CrmCalendarPage = () => {
   const selectedMaster = useSelector((state) => state.user.selectedMaster)
   const [reset, setReset] = useState(1)
   const [selectedSlot, setSelectedSlot] = useState(null)
+  const [selectedSlots, setSelectedSlots] = useState([])
   const [selectedUser, setSelectedUser] = useState(selectedMaster)
   const [selectedService, setSelectedService] = useState(null)
+  const [selectedComplex, setSelectedComplex] = useState(null)
   const [slotForChange, setSlotForChange] = useState(null)
   const [showUserDropdown, setShowUserDropdown] = useState(false)
   const [showServiceDropdown, setShowServiceDropdown] = useState(false)
@@ -45,7 +47,10 @@ const CrmCalendarPage = () => {
   const [clients, setClients] = useState(null)
   const [users, setUsers] = useState([])
   const [services, setServices] = useState([])
+  const [complexes, setComplexes] = useState([])
   const [recordAdded, setRecordAdded] = useState(false)
+  const complex = selectedComplex ? true : false
+  const [complexNumber, setComplexNumber] = useState(0)
 
   const loadData = async (userId) => {
     setUser(await userService.getUserById(userId))
@@ -64,10 +69,11 @@ const CrmCalendarPage = () => {
         : allUsers.filter((user) => user.isStaff)
     )
     setServices(await serviceService.getServices())
+    setComplexes(await serviceService.getComplexes())
   }
   useEffect(() => {
     loadData(userId)
-  }, [userId, recordAdded, selectedService])
+  }, [userId, recordAdded, selectedService, selectedComplex])
 
   const handleShowUserDropdown = () => {
     setShowUserDropdown(!showUserDropdown)
@@ -89,17 +95,51 @@ const CrmCalendarPage = () => {
     setSlotForChange(null)
   }
 
+  const handleSelectSlots = (slot) => {
+    slot.serviceId = selectedService?.id
+    if (selectedComplex && selectedSlots) {
+      setSelectedSlots((prevState) => [...prevState, slot])
+      setComplexNumber((prevState) => prevState + 1)
+    }
+    setSlotForChange(null)
+  }
+  useEffect(() => {
+    if (selectedComplex) {
+      setSelectedService(selectedComplex?.services[complexNumber])
+    }
+  }, [selectedSlots, selectedComplex, selectedService])
+
   const handleShowServiceDropdown = () => {
     setShowServiceDropdown(!showServiceDropdown)
   }
   const handleSelectService = (service) => {
+    setSelectedComplex(null)
     setSelectedService(service)
     setShowServiceDropdown(!showServiceDropdown)
-    setSelectedSlot(null)
+    setSelectedSlot()
+    setSelectedSlots([])
+  }
+
+  const handleSelectComplex = (complex) => {
+    setComplexNumber(0)
+    setSelectedComplex(complex)
+    setSelectedService(complex?.services[complexNumber])
+    setShowServiceDropdown(!showServiceDropdown)
+    setSelectedSlot()
+    setSelectedSlots([])
   }
 
   const handleAddRecord = () => {
     setRecordAdded(!recordAdded)
+  }
+
+  const handleMassAddRecord = () => {
+    handleAddRecord()
+    setSelectedComplex(null)
+    setSelectedService(null)
+    setSelectedSlots([])
+    setSelectedSlot(null)
+    setComplexNumber(0)
   }
 
   useEffect(() => {
@@ -160,8 +200,11 @@ const CrmCalendarPage = () => {
                   selectedService={selectedService}
                   selectedUser={selectedUser}
                   selectedSlot={selectedSlot}
+                  selectedSlots={selectedSlots}
                   clients={clients}
                   handleSelectedSlot={handleSelectSlot}
+                  handleSelectSlots={handleSelectSlots}
+                  complex={complex}
                   setSlotForChange={setSlotForChange}
                 ></CrmCalendarBoard>
               </div>
@@ -175,13 +218,18 @@ const CrmCalendarPage = () => {
                 ></UserEditor>
                 <CrmRecordEditor
                   services={services}
+                  complexes={complexes}
                   selectedService={selectedService}
+                  selectedComplex={selectedComplex}
                   show={showServiceDropdown}
-                  handleClick={handleSelectService}
+                  handleSelectService={handleSelectService}
+                  handleSelectComplex={handleSelectComplex}
+                  handleMassAddRecord={handleMassAddRecord}
                   handleShow={handleShowServiceDropdown}
                   handleAddRecord={handleAddRecord}
                   selectedUser={selectedUser}
                   selectedSlot={selectedSlot}
+                  selectedSlots={selectedSlots}
                   handleSelectedSlot={handleSelectSlot}
                   slotForChange={slotForChange}
                   successNotify={successNotify}

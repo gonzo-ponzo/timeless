@@ -1,7 +1,7 @@
 import PropTypes from "prop-types"
 import dropdownArrow from "../../assets/imgs/dropdown-arrow.png"
 import React, { useEffect, useState } from "react"
-import { toast, ToastContainer } from "react-toastify"
+import { ToastContainer } from "react-toastify"
 import recordService from "../../services/record.service"
 import localStorageService from "../../services/localStorage.service"
 import TextField from "../textField"
@@ -13,11 +13,16 @@ import { useSelector } from "react-redux"
 
 const CrmRecordEditor = ({
   selectedService,
+  selectedComplex,
   services,
+  complexes,
   show,
-  handleClick,
+  handleSelectService,
+  handleSelectComplex,
+  handleMassAddRecord,
   handleShow,
   selectedSlot,
+  selectedSlots,
   selectedUser,
   handleSelectedSlot,
   handleAddRecord,
@@ -29,6 +34,7 @@ const CrmRecordEditor = ({
   const selectedLanguage = useSelector((state) => state.lang.lang)
   const [client, setClient] = useState(null)
   const [search, setSearch] = useState("")
+  const [serviceType, setServiceType] = useState(true)
   const [dropdownServices, setDropdownServices] = useState()
   const [data, setData] = useState({
     phone: "+",
@@ -60,30 +66,57 @@ const CrmRecordEditor = ({
   }
 
   useEffect(() => {
-    if (search.length > 0) {
-      setDropdownServices(
-        services
-          .filter(
-            (service) =>
-              !["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(service.en)
-          )
-          .filter((service) =>
-            service[selectedLanguage]
+    if (serviceType) {
+      if (search.length > 0) {
+        setDropdownServices(
+          services
+            .filter(
+              (service) =>
+                !["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
+                  service.en
+                )
+            )
+            .filter((service) =>
+              service[selectedLanguage]
+                .toLowerCase()
+                .includes(search.toLowerCase())
+            )
+        )
+      } else {
+        setDropdownServices(
+          services
+            .filter((service) => service !== selectedService)
+            .filter(
+              (service) =>
+                !["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
+                  service.en
+                )
+            )
+        )
+      }
+    } else {
+      if (search.length > 0) {
+        setDropdownServices(
+          complexes.filter((complex) =>
+            complex?.[selectedLanguage]
               .toLowerCase()
               .includes(search.toLowerCase())
           )
-      )
-    } else {
-      setDropdownServices(
-        services
-          .filter((service) => service !== selectedService)
-          .filter(
-            (service) =>
-              !["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(service.en)
-          )
-      )
+        )
+      } else {
+        setDropdownServices(
+          complexes.filter((complex) => complex?.id !== selectedComplex?.id)
+        )
+      }
     }
-  }, [search, selectedService, services])
+  }, [
+    search,
+    selectedService,
+    selectedComplex,
+    services,
+    complexes,
+    serviceType,
+  ])
 
   const findClient = async (data) => {
     if (data.phone.length > 1) {
@@ -101,15 +134,20 @@ const CrmRecordEditor = ({
     findClient(data)
   }, [data])
 
-  const handleSelect = (service) => {
-    handleClick(service)
+  const onSelectService = (service) => {
+    if (service?.services) {
+      handleSelectComplex(service)
+    } else {
+      handleSelectComplex(null)
+      handleSelectService(service)
+    }
     setSearch("")
   }
 
   const servicesDropdown = dropdownServices?.map((service) => (
     <div
       className="border-b border-gray px-[16px] py-[7px] bg-white text-brown cursor-pointer hover:text-lightBrown last:border-none last:rounded-b-lg first:rounded-t-lg"
-      onClick={() => handleSelect(service)}
+      onClick={() => onSelectService(service)}
       key={service.id}
     >
       {service[selectedLanguage]}
@@ -196,6 +234,55 @@ const CrmRecordEditor = ({
     }
   }
 
+  const handleMassSubmit = async (e) => {
+    e.preventDefault()
+    const userId = localStorageService.getUserId()
+    const selectedUser = await userService.getUserById(userId)
+    const records = selectedSlots?.map((slot) => {
+      return {
+        userId: slot.userId,
+        serviceId: slot.serviceId,
+        date: slot.date,
+        time: slot.start,
+      }
+    })
+    if (client) {
+      const response = await recordService.createNewComplex({
+        author: selectedUser?.name,
+        clientId: client?.id,
+        records: records,
+      })
+      if (response === "Success") {
+        successNotify()
+      } else {
+        errorNotify()
+      }
+    } else {
+      const response = await recordService.createNewComplexWithRegister({
+        records: records,
+        author: selectedUser?.name,
+        phone: data.phone,
+        instagram: data.instagram,
+        telegram: data.telegram,
+        name: data.name,
+        authorId: userId,
+      })
+      if (response === "Success") {
+        successNotify()
+      } else {
+        errorNotify()
+      }
+    }
+    handleMassAddRecord()
+    setData({
+      phone: "+",
+      instagram: "",
+      telegram: "",
+      name: "",
+    })
+    setClient(null)
+  }
+
   return (
     <div className="h-full mt-[32px] rounded-lg border border-gray text-darkBrown px-[16px] py-[12px] max-md:mt-[10px]">
       {slotForChange ? (
@@ -211,6 +298,13 @@ const CrmRecordEditor = ({
           <h3 className="font-bold mb-[20px]">
             {dictionary[selectedLanguage].editBooking}
           </h3>
+          <p>
+            {selectedComplex
+              ? selectedSlots?.length !== selectedComplex?.services?.length
+                ? `${dictionary[selectedLanguage]?.currentSelection} "${selectedService?.[selectedLanguage]}"`
+                : `${dictionary[selectedLanguage].confirmComplex}`
+              : null}
+          </p>
           <p className="font-thin mb-[16px]">
             {dictionary[selectedLanguage].service}
           </p>
@@ -220,7 +314,9 @@ const CrmRecordEditor = ({
               onClick={handleShow}
             >
               <span className="hover:opacity-80">
-                {selectedService?.[selectedLanguage]}
+                {selectedComplex
+                  ? selectedComplex?.[selectedLanguage]
+                  : selectedService?.[selectedLanguage]}
               </span>
               <img
                 className={
@@ -240,6 +336,21 @@ const CrmRecordEditor = ({
                     onChange={(e) => setSearch(e.target.value)}
                     className="w-full border-b border-gray px-[16px] py-[7px] bg-white text-brown cursor-pointer hover:text-lightBrown rounded-t-lg"
                   />
+                  <div
+                    className=" flex justify-between border-b border-gray px-[16px] py-[7px] bg-white text-brown cursor-pointer hover:text-lightBrown last:border-none last:rounded-b-lg first:rounded-t-lg"
+                    onClick={() => setServiceType(!serviceType)}
+                  >
+                    <span className={`${serviceType ? "order-last" : ""}`}>
+                      {serviceType
+                        ? dictionary[selectedLanguage].complex
+                        : dictionary[selectedLanguage].service}
+                    </span>
+                    <img
+                      className={`${serviceType ? "-rotate-90" : "rotate-90"}`}
+                      src={dropdownArrow}
+                      alt=""
+                    />
+                  </div>
                   {servicesDropdown}
                 </div>
               </>
@@ -307,14 +418,17 @@ const CrmRecordEditor = ({
                 selectedSlot &&
                 data.phone.length > 1 &&
                 phoneValid) ||
-              (["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
+              ["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(
                 selectedService?.en
-              ) &&
-                selectedSlot)
+              ) ||
+              (!phoneError &&
+                selectedSlots?.length === selectedComplex?.services?.length &&
+                data.phone.length > 1 &&
+                selectedSlots)
                 ? false
                 : true
             }
-            onClick={handleSubmit}
+            onClick={selectedComplex ? handleMassSubmit : handleSubmit}
           >
             {dictionary[selectedLanguage].confirmRecord}
           </button>
@@ -340,15 +454,19 @@ CrmRecordEditor.propTypes = {
   selectedService: PropTypes.object,
   selectedUser: PropTypes.object,
   services: PropTypes.array,
+  complexes: PropTypes.array,
   records: PropTypes.array,
   clients: PropTypes.array,
   show: PropTypes.bool,
-  handleClick: PropTypes.func,
+  handleSelectService: PropTypes.func,
   handleCancel: PropTypes.func,
   handleShow: PropTypes.func,
   handleSelectedSlot: PropTypes.func,
+  handleSelectSlots: PropTypes.func,
   handleAddRecord: PropTypes.func,
+  handleMassAddRecord: PropTypes.func,
   selectedSlot: PropTypes.object,
+  selectedSlots: PropTypes.array,
   slotForChange: PropTypes.number,
   successNotify: PropTypes.func,
   errorNotify: PropTypes.func,

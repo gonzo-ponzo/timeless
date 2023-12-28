@@ -14,7 +14,10 @@ const AdminCalendarBoard = ({
   users,
   selectedService,
   selectedSlot,
+  selectedSlots,
   handleSelectedSlot,
+  handleSelectSlots,
+  complex,
   setSlotForChange,
 }) => {
   let calendarBoardDays
@@ -65,7 +68,9 @@ const AdminCalendarBoard = ({
         const existingRecordsWithSlots = fillDayWithAvailableSlots(
           selectedService,
           userRecords,
-          boardDayDate
+          boardDayDate,
+          selectedSlots,
+          user.id
         )
         const slotsForRecord = existingRecordsWithSlots.filter(
           (record) => record.type === "green"
@@ -80,9 +85,12 @@ const AdminCalendarBoard = ({
               boardDayDate={boardDayDate}
               clients={clients}
               handleSelectSlot={handleSelectedSlot}
+              handleSelectSlots={handleSelectSlots}
+              selectedSlots={selectedSlots}
               onSlotChange={onSlotChange}
               selectedSlot={selectedSlot}
               date={date}
+              complex={complex}
             />
           )
         }
@@ -95,10 +103,13 @@ const AdminCalendarBoard = ({
             existingRecords={userRecords}
             boardDayDate={boardDayDate}
             clients={clients}
+            selectedSlots={selectedSlots}
             handleSelectSlot={handleSelectedSlot}
+            handleSelectSlots={handleSelectSlots}
             onSlotChange={onSlotChange}
             selectedSlot={selectedSlot}
             date={date}
+            complex={complex}
           />
         )
       }
@@ -116,7 +127,7 @@ const AdminCalendarBoard = ({
   }
 
   const filteredCalendarBoardDays = Object.values(calendarBoardDays).filter(
-    (value) => value != undefined
+    (value) => value !== undefined
   )
   const windowWidth = window.innerWidth
   const [calendarStart, setCalendarStart] = useState(0)
@@ -172,10 +183,13 @@ AdminCalendarBoard.propTypes = {
   selectedService: PropTypes.object,
   selectedUser: PropTypes.object,
   selectedSlot: PropTypes.object,
+  selectedSlots: PropTypes.array,
   handleSelectedSlot: PropTypes.func,
+  handleSelectSlots: PropTypes.func,
   handleSetDate: PropTypes.func,
   setSlotForChange: PropTypes.func,
   pageType: PropTypes.string,
+  complex: PropTypes.bool,
 }
 
 export default AdminCalendarBoard

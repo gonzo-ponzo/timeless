@@ -45,6 +45,14 @@ const recordService = {
     const { data } = await httpRecord.post("register-and-record", recordData)
     return data
   },
+  createNewComplex: async (recordData) => {
+    const { data } = await httpRecord.post("complex", recordData)
+    return data
+  },
+  createNewComplexWithRegister: async (recordData) => {
+    const { data } = await httpRecord.post("complex-with-register", recordData)
+    return data
+  },
   UploadRecordImage: async (recordId, data) => {
     await httpRecord.patch("image/" + recordId, data)
   },

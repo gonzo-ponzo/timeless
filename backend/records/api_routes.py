@@ -11,6 +11,8 @@ from .schemas import (
     AvailableRecordSchema,
     NewRecordSchema,
     NewRecordWithRegisterSchema,
+    NewComplexWithRegisterSchema,
+    NewComplexSchema,
 )
 from .services import RecordService
 
@@ -38,6 +40,26 @@ async def register_and_record(
     """Register new user and create record for him"""
     record_service = RecordService(db=db)
     return await record_service.create_new_record_with_register(body=body)
+
+
+@records_api_router.post("/complex")
+async def create_new_complex(
+    body: NewComplexSchema,
+    db: AsyncSession = Depends(get_async_session),
+) -> Optional[str]:
+    """Create new complex"""
+    record_service = RecordService(db=db)
+    return await record_service.create_new_complex(body=body)
+
+
+@records_api_router.post("/complex-with-register")
+async def create_new_complex_with_register(
+    body: NewComplexWithRegisterSchema,
+    db: AsyncSession = Depends(get_async_session),
+) -> Optional[str]:
+    """Register new user and create complex for him"""
+    record_service = RecordService(db=db)
+    return await record_service.create_new_complex_with_register(body=body)
 
 
 @records_api_router.get("/get-available/{service_id}/{user_id}/{date}/")

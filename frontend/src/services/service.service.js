@@ -10,6 +10,11 @@ const serviceService = {
     const { data } = await httpService.get("")
     return data
   },
+
+  getComplexes: async () => {
+    const { data } = await httpService.get("complexes")
+    return data
+  },
 }
 
 export default serviceService

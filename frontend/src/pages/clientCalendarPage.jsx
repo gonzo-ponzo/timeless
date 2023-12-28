@@ -13,6 +13,7 @@ import recordService from "../services/record.service"
 import serviceService from "../services/service.service"
 import dictionary from "../utils/dictionary"
 import brownTriangle from "../assets/imgs/brownTriangle.png"
+import { toast, ToastContainer } from "react-toastify"
 
 const ClientCalendarPage = () => {
   const selectedLanguage = useSelector((state) => state.lang.lang)
@@ -24,6 +25,9 @@ const ClientCalendarPage = () => {
   const dispatch = useDispatch()
   const [calendarDate, setCalendarDate] = useState(new Date())
   const firstDay = new Date(calendarDate)
+  const successNotify = () =>
+    toast.success(dictionary[selectedLanguage].success)
+  const errorNotify = () => toast.error(dictionary[selectedLanguage].error)
 
   const handleSetDate = (date) => {
     setCalendarDate(date)
@@ -31,49 +35,18 @@ const ClientCalendarPage = () => {
   const [users, setUsers] = useState([])
   const [services, setServices] = useState([])
   const [records, setRecords] = useState([])
-
+  const [complexes, setComplexes] = useState([])
   const [selectedSlot, setSelectedSlot] = useState(null)
+  const [selectedSlots, setSelectedSlots] = useState([])
   const selectedMaster = useSelector((state) => state.user.selectedMaster)
   const [selectedUser, setSelectedUser] = useState(selectedMaster)
   const [selectedService, setSelectedService] = useState(null)
-
+  const [selectedComplex, setSelectedComplex] = useState(null)
   const [recordAdded, setRecordAdded] = useState(false)
   const [showUserDropdown, setShowUserDropdown] = useState(false)
   const [showServiceDropdown, setShowServiceDropdown] = useState(false)
-
-  const handleShowUserDropdown = () => {
-    setShowUserDropdown(!showUserDropdown)
-  }
-
-  const handleDateSelect = async (date) => {
-    setCalendarDate(new Date(date.year, date.month - 1, date.day))
-    const dateStore = `${date.day}.${date.month}.${date.year}`
-    await dispatch(setDate(dateStore))
-  }
-
-  const handleAddRecord = () => {
-    setRecordAdded(!recordAdded)
-  }
-
-  const handleSelectUser = (user) => {
-    setSelectedUser(user)
-    setShowUserDropdown(!showUserDropdown)
-    setSelectedSlot(null)
-  }
-
-  const handleSelectSlot = (slot) => {
-    setSelectedSlot(slot)
-  }
-
-  const handleShowServiceDropdown = (e) => {
-    setShowServiceDropdown(!showServiceDropdown)
-  }
-
-  const handleSelectService = (service) => {
-    setSelectedService(service)
-    setShowServiceDropdown(!showServiceDropdown)
-    setSelectedSlot(null)
-  }
+  const complex = selectedComplex ? true : false
+  const [complexNumber, setComplexNumber] = useState(0)
 
   const loadData = async () => {
     const allUsers = await userService.getUsers()
@@ -86,6 +59,7 @@ const ClientCalendarPage = () => {
           !["Day off", "Odmar 1", "Odmar 2", "Odmar 4"].includes(service.en)
       )
     )
+    setComplexes(await serviceService.getComplexes())
     setUsers(
       selectedService
         ? allUsers.filter(
@@ -99,13 +73,87 @@ const ClientCalendarPage = () => {
         : allUsers.filter((user) => user.isStaff)
     )
     setSelectedUser(
-      users.filter((user) => user.services.includes(selectedService.id))[0]
+      users.filter((user) => user.services.includes(selectedService?.id))[0]
     )
   }
 
   useEffect(() => {
     loadData()
-  }, [recordAdded, selectedService])
+  }, [recordAdded, selectedService, selectedComplex])
+
+  const handleShowUserDropdown = () => {
+    setShowUserDropdown(!showUserDropdown)
+  }
+
+  const handleDateSelect = async (date) => {
+    setCalendarDate(new Date(date.year, date.month - 1, date.day))
+    const dateStore = `${date.day}.${date.month}.${date.year}`
+    await dispatch(setDate(dateStore))
+  }
+
+  const handleSelectUser = (user) => {
+    setSelectedUser(user)
+    setShowUserDropdown(!showUserDropdown)
+    setSelectedSlot(null)
+  }
+
+  const handleSelectSlot = (slot) => {
+    setSelectedSlot(slot)
+  }
+
+  const handleSelectSlots = (slot) => {
+    slot.serviceId = selectedService?.id
+    if (selectedComplex && selectedSlots) {
+      setSelectedSlots((prevState) => [...prevState, slot])
+      setComplexNumber((prevState) => prevState + 1)
+    }
+  }
+  useEffect(() => {
+    if (selectedComplex) {
+      setSelectedService(selectedComplex?.services[complexNumber])
+    }
+  }, [selectedSlots, selectedComplex, selectedService])
+
+  const handleShowServiceDropdown = (e) => {
+    setShowServiceDropdown(!showServiceDropdown)
+  }
+
+  const handleSelectService = (service) => {
+    setSelectedComplex(null)
+    setSelectedService(service)
+    setShowServiceDropdown(!showServiceDropdown)
+    setSelectedSlot(null)
+    setSelectedSlots([])
+  }
+
+  const handleAddRecord = () => {
+    setRecordAdded(!recordAdded)
+  }
+
+  const handleMassAddRecord = () => {
+    handleAddRecord()
+    setSelectedComplex(null)
+    setSelectedService(null)
+    setSelectedSlots([])
+    setSelectedSlot(null)
+    setComplexNumber(0)
+  }
+
+  const handleSelectComplex = (complex) => {
+    setComplexNumber(0)
+    setSelectedComplex(complex)
+    setSelectedService(complex?.services[complexNumber])
+    setShowServiceDropdown(!showServiceDropdown)
+    setSelectedSlot()
+    setSelectedSlots([])
+  }
+
+  useEffect(() => {
+    if (users && !selectedMaster) {
+      setSelectedUser(users[0])
+    }
+  }, [users, selectedMaster])
+
   return (
     <div className="container-fluid relative mx-auto h-[calc(100vh-252px)] text-lightBrown flex justify-center items-start bg-cream max-md:text-sm">
       <ContainerBox>
@@ -143,7 +191,10 @@ const ClientCalendarPage = () => {
               selectedService={selectedService}
               selectedUser={selectedUser}
               selectedSlot={selectedSlot}
+              selectedSlots={selectedSlots}
               handleSelectedSlot={handleSelectSlot}
+              handleSelectSlots={handleSelectSlots}
+              complex={complex}
             ></CalendarBoard>
           </div>
           <div className="flex flex-col w-full relative max-md:-order-1 max-md:mb-[10px]">
@@ -156,14 +207,21 @@ const ClientCalendarPage = () => {
             ></UserEditor>
             <RecordEditor
               services={services}
+              complexes={complexes}
               selectedService={selectedService}
+              selectedComplex={selectedComplex}
               show={showServiceDropdown}
-              handleClick={handleSelectService}
+              handleSelectService={handleSelectService}
+              handleSelectComplex={handleSelectComplex}
+              handleMassAddRecord={handleMassAddRecord}
               handleShow={handleShowServiceDropdown}
               selectedUser={selectedUser}
               selectedSlot={selectedSlot}
+              selectedSlots={selectedSlots}
               handleAddRecord={handleAddRecord}
               handleSelectedSlot={handleSelectSlot}
+              successNotify={successNotify}
+              errorNotify={errorNotify}
             ></RecordEditor>
           </div>
         </div>

@@ -10,6 +10,8 @@ from .schemas import (
     AvailableCrmRecordSchema,
     NewRecordSchema,
     NewRecordWithRegisterSchema,
+    NewComplexSchema,
+    NewComplexWithRegisterSchema,
 )
 
 
@@ -55,6 +57,16 @@ class RecordService(Service):
     ) -> Optional[str]:
         record_dao = RecordDAO(db_session=self.db)
         return await record_dao.create_new_record_with_register(body=body)
+
+    async def create_new_complex(self, body: NewComplexSchema) -> Optional[str]:
+        record_dao = RecordDAO(db_session=self.db)
+        return await record_dao.create_new_complex(body=body)
+
+    async def create_new_complex_with_register(
+        self, body: NewComplexWithRegisterSchema
+    ) -> Optional[str]:
+        record_dao = RecordDAO(db_session=self.db)
+        return await record_dao.create_new_complex_with_register(body=body)
 
     async def get_record_datetime(self, record_id: int) -> str:
         record_dao = RecordDAO(db_session=self.db)

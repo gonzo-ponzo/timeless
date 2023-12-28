@@ -76,3 +76,26 @@ class NewRecordWithRegisterSchema(BaseModel):
     instagram: str
     name: str
     authorId: int
+
+
+class ComplexRecordsSchema(BaseModel):
+    userId: int
+    serviceId: int
+    time: int
+    date: str
+
+
+class NewComplexSchema(BaseModel):
+    clientId: int
+    author: Optional[str]
+    records: list[ComplexRecordsSchema]
+
+
+class NewComplexWithRegisterSchema(BaseModel):
+    author: Optional[str]
+    records: list[ComplexRecordsSchema]
+    phone: str
+    telegram: str
+    instagram: str
+    name: str
+    authorId: int

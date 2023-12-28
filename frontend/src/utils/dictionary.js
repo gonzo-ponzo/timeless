@@ -133,6 +133,9 @@ const dictionary = {
     canceled: "Отмененные",
     error: "Неудача",
     cameFrom: "Откуда узнали",
+    complex: "Комплекс",
+    currentSelection: "Текущий выбор",
+    confirmComplex: "Подтвердите запись",
   },
   en: {
     home: "Home",
@@ -273,6 +276,9 @@ const dictionary = {
     canceled: "Canceled",
     error: "Error",
     cameFrom: "Came from",
+    complex: "Complex",
+    currentSelection: "Current selection",
+    confirmComplex: "Confirm complex",
   },
   sr: {
     home: "Glavna",
@@ -413,6 +419,9 @@ const dictionary = {
     canceled: "Otkazani",
     error: "Greška",
     cameFrom: "Kako ste čuli za nas",
+    complex: "Raspon",
+    currentSelection: "Trenutni izbor",
+    confirmComplex: "Potvrda respon",
   },
 }
 export default dictionary

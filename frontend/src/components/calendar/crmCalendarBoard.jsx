@@ -14,7 +14,10 @@ const CrmCalendarBoard = ({
   selectedService,
   selectedUser,
   selectedSlot,
+  selectedSlots,
   handleSelectedSlot,
+  handleSelectSlots,
+  complex,
   setSlotForChange,
 }) => {
   const userId = localStorageService.getUserId()
@@ -38,7 +41,13 @@ const CrmCalendarBoard = ({
           setExistingRecords((prevState) => ({
             ...prevState,
             [boardDayDate]: selectedService
-              ? fillDayWithAvailableSlots(selectedService, result, boardDayDate)
+              ? fillDayWithAvailableSlots(
+                  selectedService,
+                  result,
+                  boardDayDate,
+                  selectedSlots,
+                  selectedUser.id
+                )
               : result,
           }))
         })
@@ -63,9 +72,11 @@ const CrmCalendarBoard = ({
           )
         ]
       }
+      handleSelectSlots={handleSelectSlots}
       selectedSlot={selectedSlot}
       handleSelectSlot={handleSelectedSlot}
       onSlotChange={onSlotChange}
+      complex={complex}
       key={day}
     />
   ))
@@ -87,9 +98,12 @@ CrmCalendarBoard.propTypes = {
   selectedService: PropTypes.object,
   selectedUser: PropTypes.object,
   selectedSlot: PropTypes.object,
+  selectedSlots: PropTypes.array,
   handleSelectedSlot: PropTypes.func,
+  handleSelectSlots: PropTypes.func,
   handleSetDate: PropTypes.func,
   setSlotForChange: PropTypes.func,
+  complex: PropTypes.bool,
 }
 
 export default CrmCalendarBoard

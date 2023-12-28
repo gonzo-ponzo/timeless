@@ -1,4 +1,3 @@
-import { property } from "lodash"
 import dictionary from "../../utils/dictionary"
 import PropTypes from "prop-types"
 import { useSelector } from "react-redux"
@@ -11,9 +10,11 @@ const AdminCalendarBoardDay = ({
   boardDayDate,
   clients,
   handleSelectSlot,
+  handleSelectSlots,
   onSlotChange,
   selectedSlot,
   date,
+  complex,
 }) => {
   const selectedLanguage = useSelector((state) => state.lang.lang)
   function capitalize(str) {
@@ -101,24 +102,37 @@ const AdminCalendarBoardDay = ({
         onClick={
           record.type === "green"
             ? () =>
-                handleSelectSlot({
-                  slotId: date + record.start + user.name,
-                  start: record.start,
-                  end: record.end,
-                  duration: record.duration,
-                  type: record.type,
-                  date: boardDayDate,
-                  top: record.top,
-                  recordId: record.recordId,
-                  clientId: record.clientId,
-                  userId: user.id,
-                })
+                complex
+                  ? handleSelectSlots({
+                      slotId: date + record.start + user.name,
+                      start: record.start,
+                      end: record.end,
+                      duration: record.duration,
+                      type: record.type,
+                      date: boardDayDate,
+                      top: record.top,
+                      recordId: record.recordId,
+                      clientId: record.clientId,
+                      userId: user.id,
+                    })
+                  : handleSelectSlot({
+                      slotId: date + record.start + user.name,
+                      start: record.start,
+                      end: record.end,
+                      duration: record.duration,
+                      type: record.type,
+                      date: boardDayDate,
+                      top: record.top,
+                      recordId: record.recordId,
+                      clientId: record.clientId,
+                      userId: user.id,
+                    })
             : record.type === "blue" || record.type === "yellow"
             ? () => onSlotChange(record.recordId)
             : null
         }
         className={
-          selectedSlot !== null &&
+          selectedSlot &&
           selectedSlot.slotId === date + record.start + user.name
             ? styleName + "opacity-100"
             : record?.type === "green"
@@ -231,9 +245,11 @@ AdminCalendarBoardDay.propTypes = {
   boardDayDate: PropTypes.string,
   clients: PropTypes.array,
   handleSelectSlot: PropTypes.func,
+  handleSelectSlots: PropTypes.func,
   onSlotChange: PropTypes.func,
   selectedSlot: PropTypes.object,
   date: PropTypes.object,
+  complex: PropTypes.bool,
 }
 
 export default AdminCalendarBoardDay

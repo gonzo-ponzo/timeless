@@ -1,13 +1,23 @@
 export default function fillDayWithAvailableSlots(
   selectedService,
   existingRecords,
-  boardDayDate
+  boardDayDate,
+  selectedSlots,
+  userId
 ) {
   const existingRecordsWithSlots = []
 
   existingRecords?.forEach((record) => {
     existingRecordsWithSlots.push(record)
   })
+  if (selectedSlots) {
+    selectedSlots.forEach((slot) => {
+      if (slot?.date === boardDayDate && slot.userId === userId) {
+        slot.type = "pink"
+        existingRecordsWithSlots.push(slot)
+      }
+    })
+  }
 
   for (
     let start = 540;

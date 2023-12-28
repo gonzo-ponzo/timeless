@@ -6,9 +6,6 @@ import dictionary from "../../utils/dictionary"
 
 const MasterPageRecordElement = ({ record, lastEl, services, clients }) => {
   const selectedLanguage = useSelector((state) => state.lang.lang)
-  const recordServices = services
-    ? services.filter((service) => record.services.includes(Number(service.id)))
-    : []
   const [client, setClient] = useState()
   const loadData = async (clientId) => {
     setClient(await clientService.getClientById(clientId))
@@ -16,15 +13,6 @@ const MasterPageRecordElement = ({ record, lastEl, services, clients }) => {
   useEffect(() => {
     loadData(record.clientId)
   }, [record])
-
-  let recordServicesName = ""
-  let recordServicesPrice = 0
-  for (let i = 0; i < recordServices.length; i++) {
-    recordServicesPrice = recordServicesPrice + recordServices[i].price
-    recordServicesName =
-      recordServicesName +
-      `${recordServices[i].en}${i === recordServices.length - 1 ? "" : "/"}`
-  }
 
   return (
     <>
@@ -40,10 +28,15 @@ const MasterPageRecordElement = ({ record, lastEl, services, clients }) => {
         </div>
         <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[6px] max-md:text-start">{`${record.id}`}</div>
         <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[6px] max-md:text-start max-md:col-span-3">
-          {recordServicesName}
+          {record?.service?.name}
         </div>
         <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[6px] max-md:text-start max-md:col-span-2">
-          {recordServicesPrice}
+          {record?.service?.price}
+          {record.status === "completed" ? (
+            <div>
+              <b>{record?.price}</b>
+            </div>
+          ) : null}
         </div>
         <div className="py-[12px] px-[20px] max-md:py-[6px] max-md:px-[6px] max-md:text-start max-md:col-span-2">
           {record.time.slice(0, 5)}
