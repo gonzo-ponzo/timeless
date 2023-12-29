@@ -31,36 +31,6 @@ class ComplexServices(Base):
     )
 
 
-# class RecordsServices(Base):
-#     __tablename__ = "records_services"
-
-#     record_id = Column(
-#         Integer,
-#         ForeignKey("records.id", onupdate="CASCADE", ondelete="CASCADE"),
-#         primary_key=True,
-#     )
-#     service_id = Column(
-#         Integer,
-#         ForeignKey("services.id", onupdate="CASCADE", ondelete="CASCADE"),
-#         primary_key=True,
-#     )
-
-
-# class RecordsUsers(Base):
-#     __tablename__ = "records_users"
-
-#     record_id = Column(
-#         Integer,
-#         ForeignKey("records.id", onupdate="CASCADE", ondelete="CASCADE"),
-#         primary_key=True,
-#     )
-#     user_id = Column(
-#         Integer,
-#         ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"),
-#         primary_key=True,
-#     )
-
-
 class UserServices(Base):
     __tablename__ = "user_services"
 
@@ -93,7 +63,7 @@ class Client(Base):
     communication = Column(Boolean, server_default="True", nullable=False)
     came_from = Column(String, nullable=True)
     image = Column(
-        String, default=f"http://{IP_SERVER}:8000/static/defaultLogo.jpg", nullable=True
+        String, default=f"http://localhost:8000/static/defaultLogo.jpg", nullable=True
     )
 
     user_id = Column(
@@ -123,18 +93,11 @@ class User(Base):
     experience = Column(Integer, nullable=False, default=0)
     position = Column(String, nullable=True)
     image = Column(
-        String, default=f"http://{IP_SERVER}:8000/static/defaultLogo.jpg", nullable=True
+        String, default=f"http://localhost:8000/static/defaultLogo.jpg", nullable=True
     )
     is_admin = Column(Boolean, default=False, nullable=False)
     is_staff = Column(Boolean, default=False, nullable=False)
 
-    # records = relationship(
-    #     "Record",
-    #     lazy="selectin",
-    #     secondary="records_users",
-    #     back_populates="users",
-    #     passive_deletes=True,
-    # )
     records = relationship("Record", back_populates="user", lazy="selectin")
 
     clients = relationship("Client", back_populates="registered_by")
@@ -177,24 +140,10 @@ class Record(Base):
     )
     service = relationship("Service", lazy="selectin", back_populates="records")
 
-    # services = relationship(
-    #     "Service",
-    #     secondary="records_services",
-    #     back_populates="records",
-    #     lazy="selectin",
-    #     passive_deletes=True,
-    # )
     user_id = Column(
         Integer, ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE")
     )
     user = relationship("User", lazy="selectin", back_populates="records")
-    # users = relationship(
-    #     "User",
-    #     secondary="records_users",
-    #     back_populates="records",
-    #     lazy="selectin",
-    #     passive_deletes=True,
-    # )
 
     comments = relationship("Comment", back_populates="record", lazy="selectin")
 
@@ -231,10 +180,6 @@ class Service(Base):
     price = Column(Integer, nullable=False)
     duration = Column(Integer, nullable=False)
 
-    # records = relationship(
-    #     "Record", secondary="records_services", back_populates="services"
-    # )
-
     users = relationship(
         "User",
         lazy="selectin",
@@ -262,7 +207,7 @@ class Comment(Base):
     )
     rating = Column(Integer, nullable=False)
     image = Column(
-        String, default=f"http://{IP_SERVER}:8000/static/defaultLogo.jpg", nullable=True
+        String, default=f"http://localhost:8000/static/defaultLogo.jpg", nullable=True
     )
 
     client_id = Column(

@@ -129,7 +129,7 @@ class CommentDAO(DAO):
 
     async def upload_comment_image(self, comment_id: int, image: str):
         async with self.db.begin():
-            image_path = f"http://{IP_SERVER}:8000/static{image[6:]}"
+            image_path = f"http://localhost:8000/static{image[6:]}"
             query = (
                 update(Comment).where(Comment.id == comment_id).values(image=image_path)
             )
