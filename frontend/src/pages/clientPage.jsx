@@ -53,7 +53,7 @@ const ClientPage = () => {
   if (user) {
     if (user.isStaff || user.isAdmin) {
       return (
-        <div className="container-fluid relative mx-auto h-full pb-[32px] text-lightBrown flex justify-center items-start bg-cream max-md:text-sm">
+        <div className="container-fluid relative mx-auto min-h-screen pb-[32px] text-lightBrown flex justify-center items-start bg-cream max-md:text-sm">
           <ContainerBox>
             <div className="my-[10px]">
               <div className="flex items-center">

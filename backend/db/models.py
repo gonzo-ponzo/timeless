@@ -63,7 +63,7 @@ class Client(Base):
     communication = Column(Boolean, server_default="True", nullable=False)
     came_from = Column(String, nullable=True)
     image = Column(
-        String, default=f"http://localhost:8000/static/defaultLogo.jpg", nullable=True
+        String, default=f"http://{IP_SERVER}:8000/static/defaultLogo.jpg", nullable=True
     )
 
     user_id = Column(
@@ -93,7 +93,7 @@ class User(Base):
     experience = Column(Integer, nullable=False, default=0)
     position = Column(String, nullable=True)
     image = Column(
-        String, default=f"http://localhost:8000/static/defaultLogo.jpg", nullable=True
+        String, default=f"http://{IP_SERVER}:8000/static/defaultLogo.jpg", nullable=True
     )
     is_admin = Column(Boolean, default=False, nullable=False)
     is_staff = Column(Boolean, default=False, nullable=False)
@@ -207,7 +207,7 @@ class Comment(Base):
     )
     rating = Column(Integer, nullable=False)
     image = Column(
-        String, default=f"http://localhost:8000/static/defaultLogo.jpg", nullable=True
+        String, default=f"http://{IP_SERVER}:8000/static/defaultLogo.jpg", nullable=True
     )
 
     client_id = Column(

@@ -40,6 +40,7 @@ class UpdateClientSchema(BaseModel):
     email: Optional[str]
     instagram: Optional[str]
     telegram: Optional[str]
+    communication: Optional[bool]
 
 
 class UpdateUserSchema(BaseModel):

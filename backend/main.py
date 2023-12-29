@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.routing import APIRouter
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from sqladmin import Admin
 
 from config import APP_PORT, SECRET, IP_SERVER, DOMAIN
@@ -46,6 +47,7 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"],
 )
+# app.add_middleware(HTTPSRedirectMiddleware)
 
 
 # add django-like admin panel to the app

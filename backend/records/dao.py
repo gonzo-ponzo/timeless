@@ -71,7 +71,7 @@ class RecordDAO(DAO):
 
     async def upload_record_image(self, record_id: int, image: str):
         async with self.db.begin():
-            image_path = f"http://localhost:8000/static{image[6:]}"
+            image_path = f"http://{IP_SERVER}:8000/static{image[6:]}"
             query = (
                 update(Record).where(Record.id == record_id).values(image=image_path)
             )

@@ -18,6 +18,7 @@ const ClientPageHeader = ({ client, user }) => {
     telegram: client ? client.telegram : "",
     instagram: client ? client.instagram : "",
     birthday: client ? client.birthdate : null,
+    communication: client ? client.communication : true,
   })
 
   useEffect(() => {
@@ -27,6 +28,7 @@ const ClientPageHeader = ({ client, user }) => {
       telegram: client?.telegram,
       instagram: client?.instagram,
       birthday: client?.birthday,
+      communication: client?.communication,
     })
   }, [client])
 
@@ -45,6 +47,7 @@ const ClientPageHeader = ({ client, user }) => {
       telegram: data.telegram,
       instagram: data.instagram,
       birthday: data.birthday,
+      communication: data.communication,
     })
     notify()
   }
@@ -155,6 +158,13 @@ const ClientPageHeader = ({ client, user }) => {
                       value={data.email}
                       onChange={handleChange}
                     ></TextField>
+                    <div className="mt-[8px]">
+                    <label className="mr-[6px] text-lg text-darkBrown" for="communication">{dictionary[selectedLanguage].communication}</label>
+                    <input className="border-lightBrown border border-radius-xl" type="checkbox" name="communication" checked={data.communication} onChange={() => setData((prevState) => ({
+      ...prevState,
+      communication: !data.communication,
+    }))}/>
+                    </div>
                     <button
                       className="bg-brown rounded-lg text-white text-center mx-auto w-full py-[8px] mt-[30px] hover:opacity-80 max-md:mt-[22px] md:hidden"
                       onClick={handleSubmit}
