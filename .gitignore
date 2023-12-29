@@ -30,3 +30,5 @@ frontend/src/services/config.js
 ### OS
 .DS_Store
 frontend/.env
+backend/cert.pem
+backend/key.pem

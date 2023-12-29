@@ -3,7 +3,7 @@ import aiohttp
 import requests
 import datetime
 
-from config import MESSAGGIO_API_KEY, MESSAGGION_FROM, MESSAGGION_LOGIN, IP_SERVER
+from config import MESSAGGIO_API_KEY, MESSAGGION_FROM, MESSAGGION_LOGIN, IP_SERVER, DOMAIN
 
 
 class SmsService:
@@ -29,7 +29,7 @@ class SmsService:
         content = f"Dobar dan,\nČekamo Vas danas u {text[:-3]}.\nVaš Timeless"
         data = self.get_data(client_phone=client_phone, content=content)
         record_datetime = requests.get(
-            f"http://{IP_SERVER}:8000/api/records/record-time/{record_id}"
+            f"https://{DOMAIN}:8000/api/records/record-time/{record_id}"
         ).text[1:-1]
         if record_datetime == "null":
             return "Error with datetime"

@@ -13,7 +13,7 @@ from .schemas import (
     UpdateUserSchema,
     NewClientSchema,
 )
-from config import IP_SERVER
+from config import IP_SERVER, DOMAIN
 from utils.abstract.dao import DAO
 
 
@@ -96,7 +96,7 @@ class UserDAO(DAO):
 
     async def upload_user_image(self, user_id: int, image: str):
         async with self.db.begin():
-            image_path = f"http://{IP_SERVER}:8000/static{image[6:]}"
+            image_path = f"https://{DOMAIN}:8000/static{image[6:]}"
             query = update(User).where(User.id == user_id).values(image=image_path)
             await self.db.execute(query)
             await self.db.commit()
@@ -321,7 +321,7 @@ class ClientDAO(DAO):
 
     async def upload_client_image(self, client_id: int, image: str):
         async with self.db.begin():
-            image_path = f"http://{IP_SERVER}:8000/static{image[6:]}"
+            image_path = f"https://{DOMAIN}:8000/static{image[6:]}"
             query = (
                 update(Client).where(Client.id == client_id).values(image=image_path)
             )
