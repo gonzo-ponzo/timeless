@@ -80,14 +80,14 @@ const DetailedRecordInfo = ({
 
   const masterDropdown = users
     ?.filter((user) => user.isStaff)
-    .filter((user) => user.services.includes(record.servicesId))
+    .filter((user) => user?.services.includes(record?.serviceId))
     .map((master) => (
       <div
         className="border-b border-gray px-[16px] py-[7px] bg-white text-brown cursor-pointer hover:text-lightBrown last:border-none last:rounded-b-lg first:rounded-t-lg"
         onClick={() => handleSelectMaster(master)}
         key={master}
       >
-        {master.name}
+        {master?.name}
       </div>
     ))
   const user = users?.find((user) => record.userId === user.id)
