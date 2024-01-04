@@ -10,6 +10,7 @@ import dictionary from "../utils/dictionary"
 import { useSelector } from "react-redux"
 
 const ClientProfilePage = () => {
+  const windowWidth = window.innerWidth
   const selectedLanguage = useSelector((state) => state.lang.lang)
   const notify = () => toast.success("Сохранено")
   const navigate = useNavigate()
@@ -173,8 +174,7 @@ const ClientProfilePage = () => {
                   id={"file"}
                   name={"file"}
                   type={"file"}
-                  accept="image/*"
-                  capture
+                  accept={windowWidth < 800 ? "image/*, file/*" : "image/*"}
                   placeholder={""}
                   onChange={handleImageChange}
                 />

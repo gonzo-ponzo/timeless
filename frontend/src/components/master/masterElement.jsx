@@ -25,7 +25,7 @@ const MasterElement = ({ user, lastEl }) => {
         }
         key={user.id}
       >
-        <Link to={`/master/${user.id}`}>
+        <Link to={`/client/master/${user.id}`}>
           <div className="py-[12px] px-[20px] flex max-md:py-[6px] max-md:px-[10px]">
             <img
               className="h-[26px] w-[26px] mr-[5px] rounded-full max-md:h-[15px] max-md:w-[15px] max-md:mr-[2px] max-md:hidden"

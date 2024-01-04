@@ -111,7 +111,7 @@ const FeedbackPage = () => {
           <div className="p-[20px] h-full">
             <iframe
               title={"googleMaps"}
-              src="http://maps.google.com/maps?q=45.25878370498284, 19.81603151844797&z=14&output=embed"
+              src="https://maps.google.com/maps?q=45.25878370498284, 19.81603151844797&z=14&output=embed"
               className="w-full h-[calc(50%)] rounded-2xl mb-[20px] max-md:h-[320px]"
             ></iframe>
             <p className="mb-[20px]">

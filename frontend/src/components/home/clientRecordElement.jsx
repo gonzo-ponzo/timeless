@@ -18,6 +18,7 @@ const ClientRecordElement = ({ record, lastEl, services }) => {
   const [selectedRating, setSelectedRating] = useState()
   const [comment, setComment] = useState("")
   const [blur, setBlur] = useState(false)
+  const windowWidth = window.innerWidth
 
   const onRatingSelected = (selectedValue) => {
     setSelectedRating(selectedValue)
@@ -102,8 +103,7 @@ const ClientRecordElement = ({ record, lastEl, services }) => {
             className="py-2 px-3 mb-[16px] block w-full text-sm text-lightBrown placeholder-lightBrown border border-lightBrown rounded-lg cursor-pointer bg-white focus:outline-none file:text-brown file:bg-cream file:rounded-lg file:border-lightBrown file:outline-none file:border file:hover:opacity-80 file:cursor-pointer"
             id={"file"}
             name={"file"}
-            accept="image/*"
-            capture
+            accept={windowWidth < 800 ? "image/*, file/*" : "image/*"}
             type={"file"}
             placeholder={""}
             onChange={handleImageChange}

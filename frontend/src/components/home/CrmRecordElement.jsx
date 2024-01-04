@@ -16,6 +16,7 @@ const CrmRecordElement = ({ record, lastEl, clients, records, setReset }) => {
   const [selectedPreview, setSelectedPreview] = useState(null)
   const [blur, setBlur] = useState(false)
   const client = clients?.find((client) => client.id === record.clientId)
+  const windowWidth = window.innerWidth
 
   const [data, setData] = useState({
     price: 0,
@@ -152,8 +153,7 @@ const CrmRecordElement = ({ record, lastEl, clients, records, setReset }) => {
             className="py-2 px-3 mb-[16px] block w-full text-sm text-lightBrown placeholder-lightBrown border border-lightBrown rounded-lg cursor-pointer bg-white focus:outline-none file:text-brown file:bg-cream file:rounded-lg file:border-lightBrown file:outline-none file:border file:hover:opacity-80 file:cursor-pointer"
             id={"file"}
             name={"file"}
-            accept="image/*"
-            capture
+            accept={windowWidth < 800 ? "image/*, file/*" : "image/*"}
             type={"file"}
             placeholder={""}
             onChange={handleImageChange}

@@ -17,6 +17,7 @@ const CrmProfilePage = () => {
   if (!userId) {
     navigate("/crm/login")
   }
+  const windowWidth = window.innerWidth
 
   const [user, setUser] = useState(null)
   const [selectedImage, setSelectedImage] = useState()
@@ -175,8 +176,7 @@ const CrmProfilePage = () => {
                       id={"file"}
                       name={"file"}
                       type={"file"}
-                      accept="image/*"
-                      capture
+                      accept={windowWidth < 800 ? "image/*, file/*" : "image/*"}
                       placeholder={""}
                       onChange={handleImageChange}
                     />
