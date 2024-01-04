@@ -137,6 +137,7 @@ const dictionary = {
     currentSelection: "Текущий выбор",
     confirmComplex: "Подтвердите запись",
     communication: "Коммуникация",
+    notFound: "Ой... Страница не найдена",
   },
   en: {
     home: "Home",
@@ -281,6 +282,7 @@ const dictionary = {
     currentSelection: "Current selection",
     confirmComplex: "Confirm complex",
     communication: "Communication",
+    notFound: "Oops... Page not found",
   },
   sr: {
     home: "Glavna",
@@ -425,6 +427,7 @@ const dictionary = {
     currentSelection: "Trenutni izbor",
     confirmComplex: "Potvrda respon",
     communication: "Communication",
+    notFound: "Упс... Страница није пронађена",
   },
 }
 export default dictionary

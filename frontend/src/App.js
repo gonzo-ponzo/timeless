@@ -21,6 +21,7 @@ import ClientCalendarPage from "./pages/clientCalendarPage"
 import CrmCalendarPage from "./pages/crmCalendarPage"
 import StartPage from "./pages/startPage"
 import CrmPasswordRecoveryPage from "./pages/crmPasswordRecoveryPage"
+import NotFoundPage from "./pages/notFoundPage"
 
 function App() {
   return (
@@ -56,6 +57,8 @@ function App() {
 
               <Route path="/crm" element={<CrmMainPage />} />
               <Route path="/client" element={<ClientMainPage />} />
+
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </BrowserRouter>
         </AppLoader>
