@@ -100,6 +100,7 @@ class ServiceAdmin(ModelView, model=Service):
         Service.name,
         Service.price,
         Service.duration,
+        Service.active,
     ]
     column_searchable_list = [
         Service.name,
@@ -109,6 +110,7 @@ class ServiceAdmin(ModelView, model=Service):
         Service.name,
         Service.price,
         Service.duration,
+        Service.active,
     ]
     column_details_exclude_list = [
         Service.records,
@@ -125,6 +127,7 @@ class ServiceAdmin(ModelView, model=Service):
         Service.sr_name: "Название (Сербский)",
         Service.price: "Стоимость",
         Service.duration: "Продолжительность (мин)",
+        Service.active: "Активна",
     }
 
 

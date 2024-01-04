@@ -9,6 +9,7 @@ class GetServiceSchema(BaseModel):
     sr: Optional[str]
     price: int
     duration: int
+    active: bool
 
 
 class GetComplexSchema(BaseModel):

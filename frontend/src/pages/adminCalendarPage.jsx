@@ -195,7 +195,7 @@ const AdminCalendarPage = () => {
                 <AdminRecordEditor
                   currentUser={user}
                   show={showServiceDropdown}
-                  services={services}
+                  services={services.filter((service) => service.active)}
                   complexes={complexes}
                   selectedService={selectedService}
                   selectedComplex={selectedComplex}

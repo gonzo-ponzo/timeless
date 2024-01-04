@@ -221,7 +221,7 @@ const CrmCalendarPage = () => {
                   users={users}
                 ></UserEditor>
                 <CrmRecordEditor
-                  services={services}
+                  services={services.filter((service) => service.active)}
                   complexes={complexes}
                   selectedService={selectedService}
                   selectedComplex={selectedComplex}

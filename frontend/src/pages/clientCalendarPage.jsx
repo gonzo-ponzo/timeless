@@ -212,7 +212,7 @@ const ClientCalendarPage = () => {
               users={users}
             ></UserEditor>
             <RecordEditor
-              services={services}
+              services={services.filter((service) => service.active)}
               complexes={complexes}
               selectedService={selectedService}
               selectedComplex={selectedComplex}

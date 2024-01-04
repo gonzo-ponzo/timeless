@@ -12,7 +12,7 @@ class ServiceDAO(DAO):
         query = select(Service)
         async with self.db.begin():
             data = await self.db.scalars(query)
-            records = [
+            services = [
                 GetServiceSchema(
                     id=object.id,
                     ru=object.name,
@@ -20,10 +20,11 @@ class ServiceDAO(DAO):
                     sr=object.sr_name,
                     price=object.price,
                     duration=object.duration,
+                    active=object.active,
                 )
                 for object in data
             ]
-            return records
+            return services
 
     async def get_complexes(self) -> list[GetComplexSchema]:
         query = select(Complex)
@@ -43,6 +44,7 @@ class ServiceDAO(DAO):
                             sr=service.sr_name,
                             price=service.price,
                             duration=service.duration,
+                            active=service.active,
                         )
                         for service in object.services
                     ],

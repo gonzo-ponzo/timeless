@@ -179,6 +179,7 @@ class Service(Base):
     sr_name = Column(String, nullable=True)
     price = Column(Integer, nullable=False)
     duration = Column(Integer, nullable=False)
+    active = Column(Boolean, nullable=False, server_default="True")
 
     users = relationship(
         "User",
