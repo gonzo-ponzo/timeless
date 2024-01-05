@@ -4,7 +4,7 @@ from typing import Optional
 
 from db.models import Record, Service, Client, User
 from services.schemas import GetServiceSchema
-from users.schemas import GetUserSchema
+from users.schemas import GetUserSchema, GetClientSchema
 from .schemas import (
     GetRecordSchema,
     UpdateRecordSchema,
@@ -14,6 +14,7 @@ from .schemas import (
     NewRecordWithRegisterSchema,
     NewComplexWithRegisterSchema,
     NewComplexSchema,
+    GetRecordByTelegramSchema,
 )
 from config import IP_SERVER, DOMAIN
 from tasks.tasks import send_sms
@@ -52,6 +53,7 @@ class RecordDAO(DAO):
                         id=object.user.id,
                         phone=object.user.phone,
                         name=object.user.name,
+                        telegram=object.user.telegram,
                         birthday=object.user.birthday,
                         registered_at=object.user.registered_at,
                         experience=object.user.experience,
@@ -564,3 +566,48 @@ class RecordDAO(DAO):
             ):
                 success = False
         return success
+
+    async def get_records_by_telegram(
+        self, user_telegram: str
+    ) -> list[GetRecordByTelegramSchema]:
+        user_query = select(User).where(User.telegram == user_telegram)
+        date = datetime.date.today()
+        user_records = []
+
+        async with self.db.begin():
+            user = await self.db.scalar(user_query)
+            if not user:
+                return {"Error": "User not found"}
+
+            records_query = (
+                select(Record)
+                .where(Record.date == date)
+                .where(Record.user == user)
+                .order_by(Record.time)
+            )
+            records = await self.db.scalars(records_query)
+            all_records = records.all()
+            for record in all_records:
+                user_records.append(
+                    GetRecordByTelegramSchema(
+                        id=record.id + 100,
+                        date=record.date,
+                        time=record.time,
+                        client=GetClientSchema(
+                            id=record.client.id,
+                            phone=record.client.phone,
+                            name=record.client.name,
+                            registered_at=record.client.registered_at,
+                            communication=record.client.communication,
+                        ),
+                        service=GetServiceSchema(
+                            id=record.service.id,
+                            en=record.service.en_name,
+                            duration=record.service.duration,
+                            price=record.service.price,
+                            active=record.service.active,
+                        ),
+                    )
+                )
+
+            return user_records

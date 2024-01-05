@@ -19,7 +19,6 @@ from .schemas import (
     UpdateUserSchema,
     NewClientSchema,
 )
-
 from .services import ClientService, UserService
 from sms.services import SmsService
 from config import ALGORITHM, SECRET, ACCESS_TOKEN_LIFETIME

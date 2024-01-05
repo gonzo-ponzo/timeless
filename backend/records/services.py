@@ -12,6 +12,7 @@ from .schemas import (
     NewRecordWithRegisterSchema,
     NewComplexSchema,
     NewComplexWithRegisterSchema,
+    GetRecordByTelegramSchema,
 )
 
 
@@ -72,3 +73,12 @@ class RecordService(Service):
         record_dao = RecordDAO(db_session=self.db)
         result = await record_dao.get_record_time(record_id=record_id)
         return result
+
+    async def get_records_by_telegram(
+        self, user_telegram: int
+    ) -> list[GetRecordByTelegramSchema]:
+        record_dao = RecordDAO(db_session=self.db)
+        records: list[
+            GetRecordByTelegramSchema
+        ] = await record_dao.get_records_by_telegram(user_telegram=user_telegram)
+        return records

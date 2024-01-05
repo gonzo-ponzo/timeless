@@ -84,6 +84,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     phone = Column(String, nullable=False)
+    telegram = Column(String, nullable=True)
     hashed_password = Column(String, nullable=False)
     name = Column(String, nullable=True)
     birthday = Column(Date, nullable=True)

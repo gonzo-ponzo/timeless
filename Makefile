@@ -9,6 +9,9 @@ revision:
 
 back:
 	cd backend && alembic upgrade heads && gunicorn main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --certfile=cert.pem --keyfile=key.pem --bind 191.96.1.245:8000 --daemon
+
+local:
+	cd backend && alembic upgrade heads && gunicorn main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
 	
 front:
 	cd frontend && npm run start
@@ -18,3 +21,6 @@ flower:
 
 worker:
 	cd backend && celery -A tasks.celery worker
+
+telegram:
+	cd telegram && python3 bot.py

@@ -48,6 +48,7 @@ class UpdateUserSchema(BaseModel):
     birthday: Optional[datetime.date]
     experience: Optional[int]
     position: Optional[str]
+    telegram: Optional[str]
     password: Optional[str]
 
 
@@ -60,6 +61,7 @@ class GetUserSchema(BaseModel):
     id: int
     phone: str
     name: Optional[str]
+    telegram: Optional[str]
     birthdate: Optional[datetime.date]
     registered_at: datetime.datetime
     experience: Optional[int]

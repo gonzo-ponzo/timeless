@@ -32,3 +32,4 @@ frontend/src/services/config.js
 frontend/.env
 backend/cert.pem
 backend/key.pem
+telegram/.env

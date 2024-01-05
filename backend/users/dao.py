@@ -1,7 +1,5 @@
-import datetime
 from typing import Union, Optional
-from sqlalchemy import and_, select, update
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, update
 
 
 from db.models import Client, User
@@ -42,6 +40,7 @@ class UserDAO(DAO):
                         id=user.id,
                         phone=user.phone,
                         name=user.name,
+                        telegram=user.telegram,
                         birthdate=user.birthday,
                         registered_at=user.registered_at,
                         experience=user.experience,
@@ -61,7 +60,7 @@ class UserDAO(DAO):
             user = await self.db.scalar(query)
             return user
 
-    async def get_user_by_id(self, user_id) -> GetUserSchema:
+    async def get_user_by_id(self, user_id: int) -> GetUserSchema:
         query = select(User).where(User.id == user_id)
         async with self.db.begin():
             user = await self.db.scalar(query)
@@ -82,6 +81,7 @@ class UserDAO(DAO):
                 id=user.id,
                 phone=user.phone,
                 name=user.name,
+                telegram=user.telegram,
                 birthdate=user.birthday,
                 registered_at=user.registered_at,
                 experience=user.experience,
@@ -103,7 +103,7 @@ class UserDAO(DAO):
 
     async def update_user_by_id(self, user_id: int, body: UpdateUserSchema) -> None:
         async with self.db.begin():
-            if len(body.password) > 0:
+            if body.password and len(body.password) > 0:
                 query_update = (
                     update(User)
                     .where(User.id == user_id)
@@ -112,6 +112,7 @@ class UserDAO(DAO):
                         experience=body.experience,
                         position=body.position,
                         birthday=body.birthday,
+                        telegram=body.telegram,
                         hashed_password=Hasher.get_password_hash(body.password),
                     )
                 )
@@ -124,6 +125,7 @@ class UserDAO(DAO):
                         experience=body.experience,
                         position=body.position,
                         birthday=body.birthday,
+                        telegram=body.telegram,
                     )
                 )
             await self.db.execute(query_update)

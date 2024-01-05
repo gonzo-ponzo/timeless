@@ -35,6 +35,7 @@ class UserAdmin(ModelView, model=User):
     column_labels = {
         User.name: "Имя",
         User.phone: "Телефон",
+        User.telegram: "Телеграм",
         User.position: "Должность",
         User.experience: "Опыт работы",
         User.birthday: "Дата рождения",

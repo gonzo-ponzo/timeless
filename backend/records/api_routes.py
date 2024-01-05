@@ -13,6 +13,7 @@ from .schemas import (
     NewRecordWithRegisterSchema,
     NewComplexWithRegisterSchema,
     NewComplexSchema,
+    GetRecordByTelegramSchema,
 )
 from .services import RecordService
 
@@ -133,3 +134,15 @@ async def get_record_time(
     record_service = RecordService(db=db)
     record_datetime = await record_service.get_record_datetime(record_id=recordId)
     return record_datetime
+
+
+@records_api_router.get("/telegram/{user_telegram}/")
+async def get_user_by_telegram(
+    user_telegram: str, db: AsyncSession = Depends(get_async_session)
+) -> list[GetRecordByTelegramSchema]:
+    """Get user by telegram"""
+    record_service = RecordService(db=db)
+    user_records_by_telegram = await record_service.get_records_by_telegram(
+        user_telegram=user_telegram
+    )
+    return user_records_by_telegram

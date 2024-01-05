@@ -3,7 +3,7 @@ import datetime
 from pydantic import BaseModel
 
 from services.schemas import GetServiceSchema
-from users.schemas import GetUserSchema
+from users.schemas import GetUserSchema, GetClientSchema
 
 
 class GetRecordSchema(BaseModel):
@@ -23,6 +23,14 @@ class GetRecordSchema(BaseModel):
     userId: int
     user: GetUserSchema
     author: Optional[str]
+
+
+class GetRecordByTelegramSchema(BaseModel):
+    id: int
+    date: datetime.date
+    time: datetime.time
+    service: GetServiceSchema
+    client: GetClientSchema
 
 
 class UpdateRecordSchema(BaseModel):

@@ -28,6 +28,7 @@ const CrmProfilePage = () => {
     position: user ? user.email : "",
     experience: user ? user.telegram : "",
     birthday: user ? user.birthdate : null,
+    telegram: user ? user.telegram : null,
   })
 
   const loadData = async (userId, user) => {
@@ -44,6 +45,7 @@ const CrmProfilePage = () => {
       position: user?.position,
       experience: user?.experience,
       birthday: user?.birthdate,
+      telegram: user?.telegram,
     })
   }, [user])
 
@@ -70,6 +72,7 @@ const CrmProfilePage = () => {
       experience: data.experience,
       birthday: data.birthday,
       password: password,
+      telegram: data.telegram,
     })
     if (selectedImage) {
       const formData = new FormData()
@@ -126,7 +129,7 @@ const CrmProfilePage = () => {
                           birthday: e.target.value,
                         }))
                       }
-                      className="border border-lightBrown text-lightBrown rounded-lg w-full px-[8px] py-[7px] mb-[8px]"
+                      className="border border-lightBrown text-lightBrown rounded-lg w-full px-[8px] py-[7px]"
                     />
                     <label
                       className="block text-brown text-lg mb-[8px] max-md:text-sm"
@@ -156,6 +159,14 @@ const CrmProfilePage = () => {
                       placeholder={"1"}
                       label={dictionary[selectedLanguage].experience}
                       value={data.experience}
+                      onChange={handleChange}
+                    ></TextField>
+                    <TextField
+                      name={"telegram"}
+                      type={"text"}
+                      placeholder={""}
+                      label="Telegram"
+                      value={data.telegram}
                       onChange={handleChange}
                     ></TextField>
                   </div>

@@ -46,13 +46,6 @@ class ClientService(Service):
         )
         return client
 
-    async def get_client_by_telegram(self, client_telegram: int) -> GetClientSchema:
-        client_dao = ClientDAO(db_session=self.db)
-        client: Union[Client, None] = await client_dao.get_client_by_telegram(
-            client_telegram=client_telegram
-        )
-        return client
-
     async def update_client_by_id(
         self, client_id: int, body: UpdateClientSchema
     ) -> None:
@@ -105,14 +98,16 @@ class UserService(Service):
         user: Union[User, None] = await user_dao.get_user_by_id(user_id=user_id)
         return user
 
-    async def register_new_user(self, user_phone: str, user_password: str):
+    async def register_new_user(
+        self, user_phone: str, user_password: str
+    ) -> GetUserSchema:
         user_dao = UserDAO(db_session=self.db)
         user = await user_dao.register_new_user(
             user_phone=user_phone, user_password=user_password
         )
         return user
 
-    async def recover_password(self, user_phone: str, hashed_password: str):
+    async def recover_password(self, user_phone: str, hashed_password: str) -> None:
         user_dao = UserDAO(db_session=self.db)
         await user_dao.recover_password(
             user_phone=user_phone, hashed_password=hashed_password
