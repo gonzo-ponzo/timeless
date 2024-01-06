@@ -33,3 +33,4 @@ frontend/.env
 backend/cert.pem
 backend/key.pem
 telegram/.env
+.env

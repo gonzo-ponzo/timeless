@@ -36,8 +36,8 @@ async def alarm(context: ContextTypes.DEFAULT_TYPE) -> None:
         )
         job.schedule_removal()
 
-    elif (current_hour == 8 and current_minute >= 55) or (
-        current_hour == 9 and current_minute <= 5
+    elif (current_hour == 8 and current_minute >= 53) or (
+        current_hour == 9 and current_minute <= 8
     ):
         text = ""
         for record in data:
@@ -50,8 +50,8 @@ async def alarm(context: ContextTypes.DEFAULT_TYPE) -> None:
             hour, minute = int(record["time"].split(":")[0]), int(
                 record["time"].split(":")[1]
             )
-            new_hour = (minute + 20) // 60 + hour
-            new_minute = (minute + 20) % 60
+            new_hour = (minute + 15) // 60 + hour
+            new_minute = (minute + 15) % 60
             if (
                 datetime.time(hour=current_hour, minute=current_minute)
                 < datetime.time(hour=hour, minute=minute)
@@ -69,7 +69,7 @@ async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     chat_id = update.effective_message.chat_id
     try:
         context.job_queue.run_repeating(
-            alarm, 5, chat_id=chat_id, name=str(chat_id), data=5
+            alarm, 1800, chat_id=chat_id, name=str(chat_id), data=1800
         )
     except (IndexError, ValueError):
         await update.effective_message.reply_text("Usage: /notify")
