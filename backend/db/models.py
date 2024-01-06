@@ -8,6 +8,7 @@ from sqlalchemy import (
     DateTime,
     Date,
     Time,
+    JSON,
 )
 from sqlalchemy.orm import declarative_base, relationship
 from config import IP_SERVER, DOMAIN
@@ -131,6 +132,7 @@ class Record(Base):
     created_at = Column(
         DateTime(timezone=True), default=datetime.datetime.now, nullable=True
     )
+    history = Column(JSON, nullable=False, server_default="{}")
 
     client_id = Column(
         Integer, ForeignKey("clients.id", onupdate="CASCADE", ondelete="CASCADE")

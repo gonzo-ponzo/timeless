@@ -191,6 +191,7 @@ class RecordAdmin(ModelView, model=Record):
         Record.created_at: "Дата создания",
         Record.author: "Автор",
         Record.comments: "Комментарии",
+        Record.history: "История",
     }
 
 

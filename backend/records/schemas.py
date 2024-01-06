@@ -20,6 +20,7 @@ class GetRecordSchema(BaseModel):
     image: Optional[str]
     serviceId: int
     service: GetServiceSchema
+    history: dict
     userId: int
     user: GetUserSchema
     author: Optional[str]

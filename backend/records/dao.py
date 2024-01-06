@@ -1,6 +1,7 @@
 from sqlalchemy import select, update
 import datetime
 from typing import Optional
+import pytz
 
 from db.models import Record, Service, Client, User
 from services.schemas import GetServiceSchema
@@ -19,6 +20,9 @@ from .schemas import (
 from config import IP_SERVER, DOMAIN
 from tasks.tasks import send_sms
 from utils.abstract.dao import DAO
+
+
+tz = pytz.timezone("Europe/Belgrade")
 
 
 class RecordDAO(DAO):
@@ -40,6 +44,7 @@ class RecordDAO(DAO):
                     en=object.service.en_name,
                     sr=object.service.sr_name,
                     serviceId=object.service_id,
+                    history=object.history,
                     service=GetServiceSchema(
                         id=object.service.id,
                         ru=object.service.name,
@@ -47,6 +52,7 @@ class RecordDAO(DAO):
                         sr=object.service.sr_name,
                         price=object.service.price,
                         duration=object.service.duration,
+                        active=object.service.active,
                     ),
                     userId=object.user_id,
                     user=GetUserSchema(
@@ -81,6 +87,8 @@ class RecordDAO(DAO):
             await self.db.commit()
 
     async def create_new_record(self, body: NewRecordSchema) -> Optional[str]:
+        now = datetime.datetime.now(tz)
+        formatted_time = now.strftime("%Y-%m-%d %H:%M:%S")
         async with self.db.begin():
             client_id = body.clientId
             date, time = self.get_datetime_values_from_schema(schema=body)
@@ -126,6 +134,7 @@ class RecordDAO(DAO):
                 author=body.author,
                 service_id=service.id,
                 user_id=body.userId,
+                history={formatted_time: "Record created"},
             )
             self.db.add(new_record)
             await self.db.flush()
@@ -150,6 +159,8 @@ class RecordDAO(DAO):
     async def create_new_record_with_register(
         self, body: NewRecordWithRegisterSchema
     ) -> Optional[str]:
+        now = datetime.datetime.now(tz)
+        formatted_time = now.strftime("%Y-%m-%d %H:%M:%S")
         async with self.db.begin():
             client_query = select(Client).where(Client.phone == body.phone)
             client = await self.db.scalar(client_query)
@@ -197,6 +208,7 @@ class RecordDAO(DAO):
                 author=body.author,
                 service_id=service.id,
                 user_id=body.userId,
+                history={formatted_time: "Record created"},
             )
             self.db.add(new_record)
             await self.db.flush()
@@ -219,6 +231,8 @@ class RecordDAO(DAO):
             return "Success"
 
     async def create_new_complex(self, body: NewComplexSchema) -> Optional[str]:
+        now = datetime.datetime.now(tz)
+        formatted_time = now.strftime("%Y-%m-%d %H:%M:%S")
         async with self.db.begin():
             client_query = select(Client).where(Client.id == body.clientId)
             client = await self.db.scalar(client_query)
@@ -260,6 +274,7 @@ class RecordDAO(DAO):
                     author=body.author,
                     service_id=service.id,
                     user_id=slot.userId,
+                    history={formatted_time: "Record created"},
                 )
                 new_records.append(new_record)
 
@@ -283,6 +298,8 @@ class RecordDAO(DAO):
     async def create_new_complex_with_register(
         self, body: NewComplexWithRegisterSchema
     ) -> Optional[str]:
+        now = datetime.datetime.now(tz)
+        formatted_time = now.strftime("%Y-%m-%d %H:%M:%S")
         async with self.db.begin():
             client_query = select(Client).where(Client.phone == body.phone)
             client = await self.db.scalar(client_query)
@@ -330,6 +347,7 @@ class RecordDAO(DAO):
                 author=body.author,
                 service_id=service.id,
                 user_id=body.userId,
+                history={formatted_time: "Record created"},
             )
             self.db.add(new_record)
             await self.db.flush()
@@ -355,12 +373,25 @@ class RecordDAO(DAO):
         self, record_id: int, body: UpdateRecordSchema
     ) -> Optional[str]:
         async with self.db.begin():
+            now = datetime.datetime.now(tz)
+            formatted_time = now.strftime("%Y-%m-%d %H:%M:%S")
+            user_query = select(User).where(User.id == body.userId)
+            user = await self.db.scalar(user_query)
+            history = [
+                f"Updated by: {user.name}",
+            ]
+            record_for_update_query = select(Record).where(Record.id == record_id)
+            record = await self.db.scalar(record_for_update_query)
             if body.date and body.time:
-                record_for_update_query = select(Record).where(Record.id == record_id)
-                record = await self.db.scalar(record_for_update_query)
                 new_record_start, new_record_end = self.get_timing(
                     record=record, body=body
                 )
+                if record.date != body.date:
+                    history.append(f"Date changed: {record.date} > {body.date}")
+                if record.time != body.time:
+                    history.append(
+                        f"Time changed: {str(record.time)[:5]} > {str(body.time)[:5]}"
+                    )
 
                 target_master = body.masterId
                 if body.masterId != record.user_id:
@@ -388,13 +419,24 @@ class RecordDAO(DAO):
                         return "Error"
 
                 if body.masterId != record.user_id:
+                    history.append(
+                        f"Master changed: {record.user_id} > {body.masterId}"
+                    )
                     update_record_master_query = (
                         update(Record)
                         .where(Record.id == record_id)
                         .values(user_id=body.masterId)
                     )
                     await self.db.execute(update_record_master_query)
-
+                if record.status != body.status and body.status:
+                    history.append(f"Status changed: {record.status} > {body.status}")
+                if record.price != body.price and body.price:
+                    history.append(f"Price changed: {record.price} > {body.price}")
+                if record.comment != body.comment and body.comment:
+                    history.append(
+                        f"Comment changed: {record.comment} > {body.comment}"
+                    )
+                history = {formatted_time: ", ".join(history)}
                 update_record_query = (
                     update(Record)
                     .where(Record.id == record_id)
@@ -404,9 +446,19 @@ class RecordDAO(DAO):
                         comment=body.comment,
                         date=body.date,
                         time=body.time,
+                        history={**record.history, **history},
                     )
                 )
             else:
+                if record.status != body.status and body.status:
+                    history.append(f"Status changed: {record.status} > {body.status}")
+                if record.price != body.price and body.price:
+                    history.append(f"Price changed: {record.price} > {body.price}")
+                if record.comment != body.comment and body.comment:
+                    history.append(
+                        f"Comment changed: {record.comment} > {body.comment}"
+                    )
+                history = {formatted_time: ", ".join(history)}
                 update_record_query = (
                     update(Record)
                     .where(Record.id == record_id)
@@ -414,6 +466,7 @@ class RecordDAO(DAO):
                         status=body.status,
                         price=body.price,
                         comment=body.comment,
+                        history={**record.history, **history},
                     )
                 )
             await self.db.execute(update_record_query)

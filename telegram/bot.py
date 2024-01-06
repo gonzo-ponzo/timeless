@@ -4,6 +4,7 @@ import aiohttp
 import datetime
 from dotenv import load_dotenv
 import os
+import pytz
 
 load_dotenv()
 TOKEN = os.environ.get("TOKEN")
@@ -17,7 +18,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def alarm(context: ContextTypes.DEFAULT_TYPE) -> None:
     """Start notifications."""
-    current_time = datetime.datetime.now()
+    belgrade_tz = pytz.timezone("Europe/Belgrade")
+    current_time = datetime.datetime.now(belgrade_tz)
     current_hour, current_minute = current_time.hour, current_time.minute
 
     job = context.job

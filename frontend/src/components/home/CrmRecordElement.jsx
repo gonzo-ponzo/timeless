@@ -8,6 +8,7 @@ import "react-toastify/dist/ReactToastify.css"
 import { Link } from "react-router-dom"
 import dictionary from "../../utils/dictionary"
 import { useSelector } from "react-redux"
+import localStorageService from "../../services/localStorage.service"
 
 const CrmRecordElement = ({ record, lastEl, clients, records, setReset }) => {
   const selectedLanguage = useSelector((state) => state.lang.lang)
@@ -17,6 +18,7 @@ const CrmRecordElement = ({ record, lastEl, clients, records, setReset }) => {
   const [blur, setBlur] = useState(false)
   const client = clients?.find((client) => client.id === record.clientId)
   const windowWidth = window.innerWidth
+  const userId = localStorageService.getUserId()
 
   const [data, setData] = useState({
     price: 0,
@@ -37,6 +39,7 @@ const CrmRecordElement = ({ record, lastEl, clients, records, setReset }) => {
       status: data.status,
       comment: data.comment,
       cameFrom: data.cameFrom,
+      userId: userId,
     })
     if (selectedImage) {
       const formData = new FormData()

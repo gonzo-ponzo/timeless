@@ -138,6 +138,8 @@ const dictionary = {
     confirmComplex: "Подтвердите запись",
     communication: "Коммуникация",
     notFound: "Ой... Страница не найдена",
+    history: "История",
+    info: "Детали",
   },
   en: {
     home: "Home",
@@ -283,6 +285,8 @@ const dictionary = {
     confirmComplex: "Confirm complex",
     communication: "Communication",
     notFound: "Oops... Page not found",
+    history: "History",
+    info: "Info",
   },
   sr: {
     home: "Glavna",
@@ -428,6 +432,8 @@ const dictionary = {
     confirmComplex: "Potvrda respon",
     communication: "Communication",
     notFound: "Упс... Страница није пронађена",
+    history: "History",
+    info: "Info",
   },
 }
 export default dictionary
