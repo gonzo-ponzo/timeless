@@ -24,13 +24,13 @@ async def alarm(context: ContextTypes.DEFAULT_TYPE) -> None:
 
     job = context.job
     user = await context.bot.getChat(job.chat_id)
-    username = user.username.lower()
+    username = user.username
 
     async with aiohttp.ClientSession() as session:
         response = await session.get(
             url=f"https://{IP_SERVER}:8000/api/records/telegram/{username}"
         )
-    data = await response.json()
+        data = await response.json()
     if type(data) == dict:
         await context.bot.send_message(
             job.chat_id,
@@ -70,9 +70,20 @@ async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Add a job to the queue."""
     chat_id = update.effective_message.chat_id
     try:
-        context.job_queue.run_repeating(
-            alarm, 1800, chat_id=chat_id, name=str(chat_id), data=1800
-        )
+        user = await context.bot.getChat(context._chat_id)
+        username = user.username
+        async with aiohttp.ClientSession() as session:
+            response = await session.get(
+                url=f"https://{IP_SERVER}:8000/api/users/user/telegram/{username}"
+            )
+            text = await response.text()
+        if text == "false":
+            await update.effective_message.reply_text("Please check your telegram on Salonium profile and run /notify again.")
+        else:
+            await update.effective_message.reply_text("Notifications starts succesfully")
+            context.job_queue.run_repeating(
+                alarm, 5, chat_id=chat_id, name=str(chat_id), data=5
+            )
     except (IndexError, ValueError):
         await update.effective_message.reply_text("Usage: /notify")
 

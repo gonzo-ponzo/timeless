@@ -89,6 +89,13 @@ class UserService(Service):
             user_phone=user_phone
         )
         return user
+    
+    async def check_user_by_telegram(self, telegram: str) -> bool:
+        user_dao = UserDAO(db_session=self.db)
+        user_exists = await user_dao.check_user_by_telegram(
+            telegram=telegram
+        )
+        return user_exists
 
     async def update_user_by_id(self, user_id: int, body: UpdateUserSchema) -> None:
         user_dao = UserDAO(db_session=self.db)

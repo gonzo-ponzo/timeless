@@ -251,6 +251,15 @@ async def get_user_by_id(
     user = await user_service.get_user_by_id(user_id=user_id)
     return user
 
+@users_api_router.get("/user/telegram/{telegram}/")
+async def check_user_by_telegram(
+    telegram: str, db: AsyncSession = Depends(get_async_session)
+) -> GetUserSchema:
+    """Get user by telegram"""
+    user_service = UserService(db=db)
+    user_exists = await user_service.check_user_by_telegram(telegram=telegram)
+    return user_exists
+
 
 @users_api_router.patch("/image/{userId}/")
 async def update_user_image(

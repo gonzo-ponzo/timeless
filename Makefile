@@ -22,5 +22,5 @@ flower:
 worker:
 	cd backend && celery -A tasks.celery worker
 
-telegram:
+bot:
 	cd telegram && python3 bot.py

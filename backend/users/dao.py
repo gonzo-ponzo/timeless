@@ -61,11 +61,19 @@ class UserDAO(DAO):
                 )
             return result
 
-    async def get_user_by_phone(self, user_phone) -> Union[User, None]:
+    async def get_user_by_phone(self, user_phone: str) -> Union[User, None]:
         query = select(User).where(User.phone == user_phone)
         async with self.db.begin():
             user = await self.db.scalar(query)
             return user
+    
+    async def check_user_by_telegram(self, telegram: str) -> bool:
+        query = select(User).where(User.telegram == telegram)
+        async with self.db.begin():
+            user = await self.db.scalar(query)
+            if user:
+                return True
+            return False
 
     async def get_user_by_id(self, user_id: int) -> GetUserSchema:
         query = select(User).where(User.id == user_id)
