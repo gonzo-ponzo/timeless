@@ -1,8 +1,11 @@
 from typing import Union, Optional
 from sqlalchemy import select, update
+import datetime
+import pytz
+import json
 
 
-from db.models import Client, User
+from db.models import Client, User, ClientsHistory
 from auth.hashing import Hasher
 from .schemas import (
     GetUserSchema,
@@ -10,9 +13,13 @@ from .schemas import (
     UpdateClientSchema,
     UpdateUserSchema,
     NewClientSchema,
+    GetClientsHistorySchema,
 )
 from config import IP_SERVER, DOMAIN
 from utils.abstract.dao import DAO
+
+
+tz = pytz.timezone("Europe/Belgrade")
 
 
 class UserDAO(DAO):
@@ -185,21 +192,52 @@ class ClientDAO(DAO):
                         rating=rating,
                         cameFrom=client.came_from,
                         communication=client.communication,
+                        history=json.dumps(client.history),
                     )
                 )
             return result
 
     async def register_new_client(self, client_phone: str) -> Client:
-        client = Client(phone=client_phone, auth_code="00000")
+        now = datetime.datetime.now(tz)
+        formatted_time = now.strftime("%Y-%m-%d %H:%M:%S")
+        client = Client(
+            phone=client_phone,
+            auth_code="00000",
+            history={formatted_time: "Client registered"},
+        )
         async with self.db.begin():
             self.db.add(client)
             await self.db.flush()
+
+            clients_history = ClientsHistory(
+                name=f"{now.month}.{now.year}",
+                client_id=client.id,
+                history={formatted_time: "Client registered"},
+            )
+            self.db.add(clients_history)
+            await self.db.flush()
+
             return client
 
     async def create_new_client(self, body: NewClientSchema) -> None:
-        client = Client(phone=body.phone, auth_code="00000", user_id=body.userId)
+        now = datetime.datetime.now(tz)
+        formatted_time = now.strftime("%Y-%m-%d %H:%M:%S")
+        client = Client(
+            phone=body.phone,
+            auth_code="00000",
+            user_id=body.userId,
+            history={formatted_time: "Client registered"},
+        )
         async with self.db.begin():
             self.db.add(client)
+            await self.db.flush()
+
+            clients_history = ClientsHistory(
+                name=f"{now.month}.{now.year}",
+                client_id=client.id,
+                history={formatted_time: "Client registered"},
+            )
+            self.db.add(clients_history)
             await self.db.flush()
 
     async def get_client_auth(self, client_phone: str) -> Optional[GetClientSchema]:
@@ -221,6 +259,7 @@ class ClientDAO(DAO):
                     image=client.image,
                     cameFrom=client.came_from,
                     communication=client.communication,
+                    history=json.dumps(client.history),
                 )
                 return data
             else:
@@ -244,6 +283,7 @@ class ClientDAO(DAO):
                     image=client.image,
                     cameFrom=client.came_from,
                     communication=client.communication,
+                    history=json.dumps(client.history),
                 )
                 return data
             else:
@@ -269,6 +309,7 @@ class ClientDAO(DAO):
                     image=client.image,
                     cameFrom=client.came_from,
                     communication=client.communication,
+                    history=json.dumps(client.history),
                 )
                 return data
             else:
@@ -294,6 +335,7 @@ class ClientDAO(DAO):
                     image=client.image,
                     cameFrom=client.came_from,
                     communication=client.communication,
+                    history=json.dumps(client.history),
                 )
                 return data
             else:
@@ -318,6 +360,7 @@ class ClientDAO(DAO):
                 image=client.image,
                 cameFrom=client.came_from,
                 communication=client.communication,
+                history=json.dumps(client.history),
             )
             return data
 
@@ -333,7 +376,39 @@ class ClientDAO(DAO):
     async def update_client_by_id(
         self, client_id: int, body: UpdateClientSchema
     ) -> None:
+        now = datetime.datetime.now(tz)
+        formatted_date = now.strftime("%Y-%m-%d %H:%M:%S")
+        new_history_year, new_history_month, new_history_day = formatted_date.split(
+            " "
+        )[0].split("-")
+        client_history = {}
+        history = []
         async with self.db.begin():
+            client_query = select(Client).where(Client.id == client_id)
+            client = await self.db.scalar(client_query)
+            for key, value in client.history.items():
+                if key:
+                    year, month, day = key.split(" ")[0].split("-")
+                    if (
+                        new_history_month == month
+                        or abs(int(new_history_month) - int(month)) in [1, 11]
+                        and int(new_history_day) > int(day)
+                    ):
+                        client_history[key] = value
+
+            if client.name != body.name:
+                history.append(f"Name changed: {client.name} > {body.name}")
+            if client.email != body.email:
+                history.append(f"Email changed: {client.email} > {body.email}")
+            if client.telegram != body.telegram:
+                history.append(f"Telegram changed: {client.telegram} > {body.telegram}")
+            if client.instagram != body.instagram:
+                history.append(
+                    f"Instagram changed: {client.instagram} > {body.instagram}"
+                )
+            if client.birthday != body.birthday:
+                history.append(f"Birthday changed: {client.birthday} > {body.birthday}")
+            history = {formatted_date: ", ".join(history)}
             query_update = (
                 update(Client)
                 .where(Client.id == client_id)
@@ -343,13 +418,84 @@ class ClientDAO(DAO):
                     telegram=body.telegram,
                     instagram=body.instagram,
                     birthday=body.birthday,
-                    communication=body.communication,
+                    history={**client_history, **history},
                 )
             )
             await self.db.execute(query_update)
+
+            clients_history_query = (
+                select(ClientsHistory)
+                .where(ClientsHistory.client_id == client_id)
+                .where(ClientsHistory.name == f"{now.month}.{now.year}")
+            )
+            clients_history = await self.db.scalar(clients_history_query)
+            if not clients_history:
+                clients_history = ClientsHistory(
+                    name=f"{now.month}.{now.year}",
+                    client_id=client.id,
+                    history=history,
+                )
+                self.db.add(clients_history)
+                await self.db.flush()
+            else:
+                update_clients_history_query = (
+                    update(ClientsHistory)
+                    .where(ClientsHistory.client_id == client_id)
+                    .where(ClientsHistory.name == f"{now.month}.{now.year}")
+                    .values(history={**clients_history.history, **history})
+                )
+                await self.db.execute(update_clients_history_query)
             await self.db.commit()
 
     async def set_client_auth_code(self, client_id: int, auth_code: str) -> None:
+        now = datetime.datetime.now(tz)
+        formatted_date = now.strftime("%Y-%m-%d %H:%M:%S")
         query = update(Client).where(Client.id == client_id).values(auth_code=auth_code)
         async with self.db.begin():
             await self.db.execute(query)
+            client_query = select(Client).where(Client.id == client_id)
+            client = await self.db.scalar(client_query)
+            client_history = {}
+            new_history_year, new_history_month, new_history_day = formatted_date.split(
+                " "
+            )[0].split("-")
+            for key, value in client.history.items():
+                if key:
+                    year, month, day = key.split(" ")[0].split("-")
+                    if (
+                        new_history_month == month
+                        or abs(int(new_history_month) - int(month)) in [1, 11]
+                        and int(new_history_day) > int(day)
+                    ):
+                        client_history[key] = value
+            update_client_query = (
+                update(Client)
+                .where(Client.id == client.id)
+                .values(
+                    history={
+                        **client_history,
+                        **{formatted_date: f"SMS code requested"},
+                    }
+                )
+            )
+            await self.db.execute(update_client_query)
+
+    async def get_full_history(self, client_id: int) -> list[GetClientsHistorySchema]:
+        async with self.db.begin():
+            full_history_query = (
+                select(ClientsHistory)
+                .where(ClientsHistory.client_id == client_id)
+                .order_by(ClientsHistory.id.desc())
+            )
+            data = await self.db.scalars(full_history_query)
+            full_history_list = data.all()
+            result = [
+                GetClientsHistorySchema(
+                    id=history.id,
+                    name=history.name,
+                    client_id=history.client_id,
+                    history=json.dumps(history.history),
+                )
+                for history in full_history_list
+            ]
+            return result

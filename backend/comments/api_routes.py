@@ -20,12 +20,12 @@ comments_api_router = APIRouter(prefix="/comments")
 
 @comments_api_router.post("/")
 async def create_comment(
-    data: CreateCommentSchema,
+    body: CreateCommentSchema,
     db: AsyncSession = Depends(get_async_session),
 ) -> int:
     """Create new comment"""
     comment_service = CommentService(db=db)
-    comment_id = await comment_service.create_comment(data=data)
+    comment_id = await comment_service.create_comment(body=body)
     return {"commentId": comment_id}
 
 

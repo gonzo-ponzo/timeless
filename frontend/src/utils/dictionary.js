@@ -140,6 +140,8 @@ const dictionary = {
     notFound: "Ой... Страница не найдена",
     history: "История",
     info: "Детали",
+    fullHistory: "Вся история",
+    monthHistory: "История за месяц",
   },
   en: {
     home: "Home",
@@ -287,6 +289,8 @@ const dictionary = {
     notFound: "Oops... Page not found",
     history: "History",
     info: "Info",
+    fullHistory: "Full History",
+    monthHistory: "Month History",
   },
   sr: {
     home: "Glavna",
@@ -434,6 +438,8 @@ const dictionary = {
     notFound: "Упс... Страница није пронађена",
     history: "History",
     info: "Info",
+    fullHistory: "Full History",
+    monthHistory: "Month History",
   },
 }
 export default dictionary

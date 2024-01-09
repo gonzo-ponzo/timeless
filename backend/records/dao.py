@@ -3,7 +3,7 @@ import datetime
 from typing import Optional
 import pytz
 
-from db.models import Record, Service, Client, User
+from db.models import Record, Service, Client, User, ClientsHistory
 from services.schemas import GetServiceSchema
 from users.schemas import GetUserSchema, GetClientSchema
 from .schemas import (
@@ -88,7 +88,7 @@ class RecordDAO(DAO):
 
     async def create_new_record(self, body: NewRecordSchema) -> Optional[str]:
         now = datetime.datetime.now(tz)
-        formatted_time = now.strftime("%Y-%m-%d %H:%M:%S")
+        formatted_date = now.strftime("%Y-%m-%d %H:%M:%S")
         async with self.db.begin():
             client_id = body.clientId
             date, time = self.get_datetime_values_from_schema(schema=body)
@@ -134,10 +134,71 @@ class RecordDAO(DAO):
                 author=body.author,
                 service_id=service.id,
                 user_id=body.userId,
-                history={formatted_time: "Record created"},
+                history={formatted_date: "Record created"},
             )
             self.db.add(new_record)
             await self.db.flush()
+
+            if client_id and client_id != 1:
+                client_history = {}
+                (
+                    new_history_year,
+                    new_history_month,
+                    new_history_day,
+                ) = formatted_date.split(" ")[0].split("-")
+                for key, value in client.history.items():
+                    if key:
+                        year, month, day = key.split(" ")[0].split("-")
+                        if (
+                            new_history_month == month
+                            or abs(int(new_history_month) - int(month)) in [1, 11]
+                            and int(new_history_day) > int(day)
+                        ):
+                            client_history[key] = value
+                update_client_query = (
+                    update(Client)
+                    .where(Client.id == client_id)
+                    .values(
+                        history={
+                            **client_history,
+                            **{formatted_date: f"New record #{new_record.id} created"},
+                        }
+                    )
+                )
+                await self.db.execute(update_client_query)
+
+                clients_history_query = (
+                    select(ClientsHistory)
+                    .where(ClientsHistory.client_id == client_id)
+                    .where(ClientsHistory.name == f"{now.month}.{now.year}")
+                )
+                clients_history = await self.db.scalar(clients_history_query)
+                if not clients_history:
+                    clients_history = ClientsHistory(
+                        name=f"{now.month}.{now.year}",
+                        client_id=client.id,
+                        history={
+                            formatted_date: f"New record #{new_record.id} created"
+                        },
+                    )
+                    self.db.add(clients_history)
+                    await self.db.flush()
+                else:
+                    update_clients_history_query = (
+                        update(ClientsHistory)
+                        .where(ClientsHistory.client_id == client_id)
+                        .where(ClientsHistory.name == f"{now.month}.{now.year}")
+                        .values(
+                            history={
+                                **clients_history.history,
+                                **{
+                                    formatted_date: f"New record #{new_record.id} created"
+                                },
+                            }
+                        )
+                    )
+                    await self.db.execute(update_clients_history_query)
+            await self.db.commit()
 
             # record_id = new_record.id
             # phone = client.phone
@@ -160,7 +221,7 @@ class RecordDAO(DAO):
         self, body: NewRecordWithRegisterSchema
     ) -> Optional[str]:
         now = datetime.datetime.now(tz)
-        formatted_time = now.strftime("%Y-%m-%d %H:%M:%S")
+        formatted_date = now.strftime("%Y-%m-%d %H:%M:%S")
         async with self.db.begin():
             client_query = select(Client).where(Client.phone == body.phone)
             client = await self.db.scalar(client_query)
@@ -172,8 +233,16 @@ class RecordDAO(DAO):
                     name=body.name,
                     telegram=body.telegram,
                     instagram=body.instagram,
+                    history={formatted_date: "Client registered with new record"},
                 )
                 self.db.add(client)
+                await self.db.flush()
+                clients_history = ClientsHistory(
+                    name=f"{now.month}.{now.year}",
+                    client_id=client.id,
+                    history={formatted_date: f"Client registered with new record"},
+                )
+                self.db.add(clients_history)
                 await self.db.flush()
 
             date, time = self.get_datetime_values_from_schema(schema=body)
@@ -208,7 +277,7 @@ class RecordDAO(DAO):
                 author=body.author,
                 service_id=service.id,
                 user_id=body.userId,
-                history={formatted_time: "Record created"},
+                history={formatted_date: "Record created"},
             )
             self.db.add(new_record)
             await self.db.flush()
@@ -232,7 +301,7 @@ class RecordDAO(DAO):
 
     async def create_new_complex(self, body: NewComplexSchema) -> Optional[str]:
         now = datetime.datetime.now(tz)
-        formatted_time = now.strftime("%Y-%m-%d %H:%M:%S")
+        formatted_date = now.strftime("%Y-%m-%d %H:%M:%S")
         async with self.db.begin():
             client_query = select(Client).where(Client.id == body.clientId)
             client = await self.db.scalar(client_query)
@@ -274,13 +343,105 @@ class RecordDAO(DAO):
                     author=body.author,
                     service_id=service.id,
                     user_id=slot.userId,
-                    history={formatted_time: "Record created"},
+                    history={formatted_date: "Record created"},
                 )
                 new_records.append(new_record)
 
             for new_record in new_records:
                 self.db.add(new_record)
             await self.db.flush()
+
+            client_history = {}
+            new_history_year, new_history_month, new_history_day = formatted_date.split(
+                " "
+            )[0].split("-")
+            for key, value in client.history.items():
+                if key:
+                    year, month, day = key.split(" ")[0].split("-")
+                    if (
+                        new_history_month == month
+                        or abs(int(new_history_month) - int(month)) in [1, 11]
+                        and int(new_history_day) > int(day)
+                    ):
+                        client_history[key] = value
+            update_client_query = (
+                update(Client)
+                .where(Client.id == client.id)
+                .values(
+                    history={
+                        **client_history,
+                        **{
+                            formatted_date: f"New records #{[new_record.id for new_record in new_records]} created with complex"
+                        },
+                    }
+                )
+            )
+            clients_history_query = (
+                select(ClientsHistory)
+                .where(ClientsHistory.client_id == client.id)
+                .where(ClientsHistory.name == f"{now.month}.{now.year}")
+            )
+            clients_history = await self.db.scalar(clients_history_query)
+            if not clients_history:
+                clients_history = ClientsHistory(
+                    name=f"{now.month}.{now.year}",
+                    client_id=client.id,
+                    history={
+                        formatted_date: f"New records #{[new_record.id for new_record in new_records]} created with complex"
+                    },
+                )
+                self.db.add(clients_history)
+                await self.db.flush()
+            else:
+                update_clients_history_query = (
+                    update(ClientsHistory)
+                    .where(ClientsHistory.client_id == client.id)
+                    .where(ClientsHistory.name == f"{now.month}.{now.year}")
+                    .values(
+                        history={
+                            **clients_history.history,
+                            **{
+                                formatted_date: f"New records #{[new_record.id for new_record in new_records]} created with complex"
+                            },
+                        }
+                    )
+                )
+                await self.db.execute(update_clients_history_query)
+            await self.db.execute(update_client_query)
+
+            clients_history_query = (
+                select(ClientsHistory)
+                .where(ClientsHistory.client_id == client.id)
+                .where(ClientsHistory.name == f"{now.month}.{now.year}")
+            )
+            clients_history = await self.db.scalar(clients_history_query)
+            if not clients_history:
+                clients_history = ClientsHistory(
+                    name=f"{now.month}.{now.year}",
+                    client_id=client.id,
+                    history={
+                        formatted_date: f"New records #{[new_record.id for new_record in new_records]} created with complex"
+                    },
+                )
+                self.db.add(clients_history)
+                await self.db.flush()
+            else:
+                update_clients_history_query = (
+                    update(ClientsHistory)
+                    .where(ClientsHistory.client_id == client.id)
+                    .where(ClientsHistory.name == f"{now.month}.{now.year}")
+                    .values(
+                        history={
+                            **clients_history.history,
+                            **{
+                                formatted_date: f"New records #{[new_record.id for new_record in new_records]} created with complex"
+                            },
+                        }
+                    )
+                )
+                await self.db.execute(update_clients_history_query)
+
+            await self.db.commit()
 
             # for new_record in new_records:
             #     record_id = new_record.id
@@ -299,7 +460,7 @@ class RecordDAO(DAO):
         self, body: NewComplexWithRegisterSchema
     ) -> Optional[str]:
         now = datetime.datetime.now(tz)
-        formatted_time = now.strftime("%Y-%m-%d %H:%M:%S")
+        formatted_date = now.strftime("%Y-%m-%d %H:%M:%S")
         async with self.db.begin():
             client_query = select(Client).where(Client.phone == body.phone)
             client = await self.db.scalar(client_query)
@@ -311,8 +472,17 @@ class RecordDAO(DAO):
                     name=body.name,
                     telegram=body.telegram,
                     instagram=body.instagram,
+                    history={formatted_date: "Client registered with new complex"},
                 )
                 self.db.add(client)
+                await self.db.flush()
+
+                clients_history = ClientsHistory(
+                    name=f"{now.month}.{now.year}",
+                    client_id=client.id,
+                    history={formatted_date: f"Client registered with new complex"},
+                )
+                self.db.add(clients_history)
                 await self.db.flush()
 
             date, time = self.get_datetime_values_from_schema(schema=body)
@@ -347,7 +517,7 @@ class RecordDAO(DAO):
                 author=body.author,
                 service_id=service.id,
                 user_id=body.userId,
-                history={formatted_time: "Record created"},
+                history={formatted_date: "Record created"},
             )
             self.db.add(new_record)
             await self.db.flush()
@@ -374,7 +544,7 @@ class RecordDAO(DAO):
     ) -> Optional[str]:
         async with self.db.begin():
             now = datetime.datetime.now(tz)
-            formatted_time = now.strftime("%Y-%m-%d %H:%M:%S")
+            formatted_date = now.strftime("%Y-%m-%d %H:%M:%S")
             user_query = select(User).where(User.id == body.userId)
             user = await self.db.scalar(user_query)
             history = [
@@ -436,7 +606,7 @@ class RecordDAO(DAO):
                     history.append(
                         f"Comment changed: {record.comment} > {body.comment}"
                     )
-                history = {formatted_time: ", ".join(history)}
+                history = {formatted_date: ", ".join(history)}
                 update_record_query = (
                     update(Record)
                     .where(Record.id == record_id)
@@ -458,7 +628,7 @@ class RecordDAO(DAO):
                     history.append(
                         f"Comment changed: {record.comment} > {body.comment}"
                     )
-                history = {formatted_time: ", ".join(history)}
+                history = {formatted_date: ", ".join(history)}
                 update_record_query = (
                     update(Record)
                     .where(Record.id == record_id)
@@ -479,6 +649,64 @@ class RecordDAO(DAO):
                     .values(came_from=body.cameFrom)
                 )
                 await self.db.execute(update_client_came_from_query)
+
+            client_query = select(Client).where(Client.id == record.client.id)
+            client = await self.db.scalar(client_query)
+            client_history = {}
+            history = {
+                formatted_date: f"Record #{record.id}. {history[formatted_date]}"
+            }
+            new_history_year, new_history_month, new_history_day = formatted_date.split(
+                " "
+            )[0].split("-")
+            for key, value in client.history.items():
+                if key:
+                    year, month, day = key.split(" ")[0].split("-")
+                    if (
+                        new_history_month == month
+                        or abs(int(new_history_month) - int(month)) in [1, 11]
+                        and int(new_history_day) > int(day)
+                    ):
+                        client_history[key] = value
+            update_client_query = (
+                update(Client)
+                .where(Client.id == client.id)
+                .values(
+                    history={
+                        **client_history,
+                        **history,
+                    }
+                )
+            )
+            await self.db.execute(update_client_query)
+
+            clients_history_query = (
+                select(ClientsHistory)
+                .where(ClientsHistory.client_id == client.id)
+                .where(ClientsHistory.name == f"{now.month}.{now.year}")
+            )
+            clients_history = await self.db.scalar(clients_history_query)
+            if not clients_history:
+                clients_history = ClientsHistory(
+                    name=f"{now.month}.{now.year}",
+                    client_id=client.id,
+                    history=history,
+                )
+                self.db.add(clients_history)
+                await self.db.flush()
+            else:
+                update_clients_history_query = (
+                    update(ClientsHistory)
+                    .where(ClientsHistory.client_id == client.id)
+                    .where(ClientsHistory.name == f"{now.month}.{now.year}")
+                    .values(
+                        history={
+                            **clients_history.history,
+                            **history,
+                        }
+                    )
+                )
+                await self.db.execute(update_clients_history_query)
             await self.db.commit()
             return "Success"
 

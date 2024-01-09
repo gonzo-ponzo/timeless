@@ -16,6 +16,7 @@ from admin_panel.models import (
     RecordAdmin,
     CommentAdmin,
     ComplexAdmin,
+    ClientsHistoryAdmin,
 )
 from auth.admin import AdminAuth
 from routes import api_router
@@ -59,6 +60,7 @@ admin.add_view(ServiceAdmin)
 admin.add_view(RecordAdmin)
 admin.add_view(CommentAdmin)
 admin.add_view(ComplexAdmin)
+admin.add_view(ClientsHistoryAdmin)
 
 
 # create the instance for the routes

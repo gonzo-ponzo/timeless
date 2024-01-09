@@ -13,9 +13,9 @@ from config import EMAIL_LOGIN, EMAIL_PASSWORD
 
 
 class CommentService(Service):
-    async def create_comment(self, data: CreateCommentSchema) -> int:
+    async def create_comment(self, body: CreateCommentSchema) -> int:
         comment_dao = CommentDAO(db_session=self.db)
-        comment_id = await comment_dao.create_comment(data=data)
+        comment_id = await comment_dao.create_comment(body=body)
         return comment_id
 
     async def get_comments(self) -> list[GetCommentSchema]:

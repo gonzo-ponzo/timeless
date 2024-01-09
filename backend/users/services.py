@@ -8,6 +8,7 @@ from .schemas import (
     UpdateClientSchema,
     UpdateUserSchema,
     NewClientSchema,
+    GetClientsHistorySchema,
 )
 from utils.abstract.service import Service
 
@@ -69,6 +70,11 @@ class ClientService(Service):
         client_dao = ClientDAO(db_session=self.db)
         avatar = await client_dao.upload_client_image(client_id, image)
         return avatar
+
+    async def get_full_history(self, client_id: int) -> list[GetClientsHistorySchema]:
+        client_dao = ClientDAO(db_session=self.db)
+        full_history = await client_dao.get_full_history(client_id=client_id)
+        return full_history
 
 
 class UserService(Service):

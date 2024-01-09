@@ -21,15 +21,20 @@ const ClientPage = () => {
   const [calendarDate, setCalendarDate] = useState(new Date())
   const firstDay = new Date(calendarDate)
   const [client, setClient] = useState([])
+  const [clientsHistory, setClientsHistory] = useState([])
   const userId = localStorageService.getUserId()
   const [user, setUser] = useState(null)
-  const loadData = async (clientId, userId) => {
+  const [showFullHistory, setShowFullHistory] = useState(false)
+  const loadData = async (clientId, userId, showFullHistory) => {
     setClient(await clientService.getClientById(clientId))
     setUser(await userService.getUserById(userId))
+    if (showFullHistory) {
+      setClientsHistory(await clientService.getClientsHistoryById(clientId))
+    }
   }
   useEffect(() => {
-    loadData(clientId, userId)
-  }, [clientId, userId])
+    loadData(clientId, userId, showFullHistory)
+  }, [clientId, userId, showFullHistory])
 
   const handleDateSelect = async (date) => {
     setCalendarDate(new Date(date.year, date.month - 1, date.day))
@@ -83,7 +88,13 @@ const ClientPage = () => {
                 />
               </div>
             </div>
-            <ClientPageHeader client={client} user={user} />
+            <ClientPageHeader
+              client={client}
+              showFullHistory={showFullHistory}
+              setShowFullHistory={setShowFullHistory}
+              clientsHistory={clientsHistory}
+              user={user}
+            />
             <ClientPageRecords clientId={client.id} date={date} />
             <ClientPageComments clientId={client.id} />
           </ContainerBox>

@@ -55,11 +55,13 @@ const DetailedRecordInfo = ({
 
   const record = records?.find((record) => record.id === recordId)
   const historyList = record?.history
-    ? Object.keys(record?.history).map((key) => (
-        <p className="mb-[2px]">
-          <b>{key}:</b> {record?.history[key]}
-        </p>
-      ))
+    ? Object.keys(record?.history)
+        .reverse()
+        .map((key) => (
+          <p className="mb-[2px]">
+            <b>{key}:</b> {record?.history[key]}
+          </p>
+        ))
     : null
 
   useEffect(() => {

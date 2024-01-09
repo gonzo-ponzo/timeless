@@ -1,6 +1,6 @@
 from typing import Optional
 import datetime
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, Json
 
 
 class PhoneSchema(BaseModel):
@@ -32,6 +32,7 @@ class GetClientSchema(BaseModel):
     auth_code: Optional[str]
     cameFrom: Optional[str]
     communication: bool
+    history: Optional[Json]
 
 
 class UpdateClientSchema(BaseModel):
@@ -71,3 +72,10 @@ class GetUserSchema(BaseModel):
     services: Optional[list[int]]
     isAdmin: bool
     isStaff: bool
+
+
+class GetClientsHistorySchema(BaseModel):
+    id: int
+    name: str
+    client_id: int
+    history: Optional[Json]

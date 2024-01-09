@@ -66,6 +66,7 @@ class Client(Base):
     image = Column(
         String, default=f"https://{DOMAIN}:8000/static/defaultLogo.jpg", nullable=True
     )
+    history = Column(JSON, nullable=False, server_default="{}")
 
     user_id = Column(
         Integer, ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE")
@@ -73,6 +74,10 @@ class Client(Base):
     registered_by = relationship("User", back_populates="clients")
 
     records = relationship("Record", back_populates="client", lazy="selectin")
+
+    clients_history = relationship(
+        "ClientsHistory", back_populates="client", lazy="selectin"
+    )
 
     comments = relationship("Comment", back_populates="client")
 
@@ -234,3 +239,15 @@ class Comment(Base):
         nullable=True,
     )
     record = relationship("Record", back_populates="comments", lazy="selectin")
+
+
+class ClientsHistory(Base):
+    __tablename__ = "clients_history"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False)
+    history = Column(JSON, nullable=False, server_default="{}")
+
+    client_id = Column(
+        Integer, ForeignKey("clients.id", onupdate="CASCADE", ondelete="CASCADE")
+    )
+    client = relationship("Client", lazy="selectin", back_populates="clients_history")

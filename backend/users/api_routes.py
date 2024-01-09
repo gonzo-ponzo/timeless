@@ -18,6 +18,7 @@ from .schemas import (
     GetUserSchema,
     UpdateUserSchema,
     NewClientSchema,
+    GetClientsHistorySchema,
 )
 from .services import ClientService, UserService
 from sms.services import SmsService
@@ -156,6 +157,17 @@ async def update_client_image(
         f.write(avatar)
 
     await client_service.upload_client_image(client_id=clientId, image=file_path)
+
+
+@clients_api_router.get("/client/history/{client_id}/")
+async def get_full_client_history(
+    client_id: int,
+    db: AsyncSession = Depends(get_async_session),
+) -> list[GetClientsHistorySchema]:
+    """Get full client history by id"""
+    client_service = ClientService(db=db)
+    full_history = await client_service.get_full_history(client_id=client_id)
+    return full_history
 
 
 """USER SECTION"""

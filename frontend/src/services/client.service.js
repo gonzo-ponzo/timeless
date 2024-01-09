@@ -14,6 +14,10 @@ const clientService = {
     const { data } = await httpClient.get("client/" + clientId)
     return data
   },
+  getClientsHistoryById: async (clientId) => {
+    const { data } = await httpClient.get("client/history/" + clientId)
+    return data
+  },
   getClientByPhone: async (clientPhone) => {
     const { data } = await httpClient.get("client/phone/" + clientPhone)
     return data

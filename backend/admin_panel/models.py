@@ -6,6 +6,7 @@ from db.models import (
     Comment,
     Record,
     Complex,
+    ClientsHistory,
 )
 
 
@@ -92,6 +93,7 @@ class ClientAdmin(ModelView, model=Client):
         Client.came_from: "Откуда узнали",
         Client.records: "Записи",
         Client.comments: "Комментарии",
+        Client.history: "История",
     }
 
 
@@ -234,4 +236,32 @@ class CommentAdmin(ModelView, model=Comment):
         Comment.client: "Клиент",
         Comment.user: "Мастер",
         Comment.record: "Запись",
+    }
+
+
+class ClientsHistoryAdmin(ModelView, model=ClientsHistory):
+    column_list = [
+        ClientsHistory.id,
+        ClientsHistory.name,
+        ClientsHistory.client,
+    ]
+    column_searchable_list = [
+        ClientsHistory.name,
+        ClientsHistory.client,
+    ]
+    column_sortable_list = [
+        ClientsHistory.id,
+        ClientsHistory.name,
+        ClientsHistory.client,
+    ]
+    column_details_exclude_list = [
+        ClientsHistory.client_id,
+    ]
+    form_excluded_columns = [
+        ClientsHistory.client_id,
+    ]
+    column_labels = {
+        ClientsHistory.name: "Дата",
+        ClientsHistory.client: "Клиент",
+        ClientsHistory.history: "История",
     }
