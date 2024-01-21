@@ -864,6 +864,7 @@ class RecordDAO(DAO):
                 select(Record)
                 .where(Record.date == date)
                 .where(Record.user == user)
+                .where(Record.status == "created")
                 .order_by(Record.time)
             )
             records = await self.db.scalars(records_query)

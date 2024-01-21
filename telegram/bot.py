@@ -82,7 +82,7 @@ async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         else:
             await update.effective_message.reply_text("Notifications starts succesfully")
             context.job_queue.run_repeating(
-                alarm, 5, chat_id=chat_id, name=str(chat_id), data=5
+                alarm, 1800, chat_id=chat_id, name=str(chat_id), data=1800
             )
     except (IndexError, ValueError):
         await update.effective_message.reply_text("Usage: /notify")
