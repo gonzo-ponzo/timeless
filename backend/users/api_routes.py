@@ -54,7 +54,9 @@ async def auth_code(
         client = await client_service.register_new_client(client_phone=phone)
     auth_code = str(random.randint(10000, 99999))
     await client_service.set_client_auth_code(client_id=client.id, auth_code=auth_code)
-    await sms_service.send_auth_code_with_sms(auth_code=auth_code, client_phone=phone)
+    await sms_service.send_auth_code_with_sms(
+        auth_code=auth_code, client_phone=phone, client_id=client.id
+    )
 
     return PhoneSchema(phone=phone)
 
@@ -250,6 +252,7 @@ async def get_user_by_id(
     user_service = UserService(db=db)
     user = await user_service.get_user_by_id(user_id=user_id)
     return user
+
 
 @users_api_router.get("/user/telegram/{telegram}/")
 async def check_user_by_telegram(

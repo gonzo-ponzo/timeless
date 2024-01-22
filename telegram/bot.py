@@ -52,8 +52,9 @@ async def alarm(context: ContextTypes.DEFAULT_TYPE) -> None:
             hour, minute = int(record["time"].split(":")[0]), int(
                 record["time"].split(":")[1]
             )
-            new_hour = (minute + 15) // 60 + hour
-            new_minute = (minute + 15) % 60
+            new_hour = (current_minute + 15) // 60 + current_hour
+            new_minute = (current_minute + 15) % 60
+
             if (
                 datetime.time(hour=current_hour, minute=current_minute)
                 < datetime.time(hour=hour, minute=minute)
@@ -78,9 +79,13 @@ async def notify(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             )
             text = await response.text()
         if text == "false":
-            await update.effective_message.reply_text("Please check your telegram on Salonium profile and run /notify again.")
+            await update.effective_message.reply_text(
+                "Please check your telegram on Salonium profile and run /notify again."
+            )
         else:
-            await update.effective_message.reply_text("Notifications starts succesfully")
+            await update.effective_message.reply_text(
+                "Notifications starts succesfully"
+            )
             context.job_queue.run_repeating(
                 alarm, 1800, chat_id=chat_id, name=str(chat_id), data=1800
             )

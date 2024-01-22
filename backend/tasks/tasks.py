@@ -9,9 +9,9 @@ app.conf.timezone = "Europe/Moscow"
 
 
 @app.task(name="send_sms")
-def send_sms(text: str, client_phone: str, record_id: int) -> str:
+def send_sms(text: str, client_phone: str, record_id: int, client_id) -> str:
     sms_service = SmsService()
     response = sms_service.send_notify_with_record_start(
-        text=text, client_phone=client_phone, record_id=record_id
+        text=text, client_phone=client_phone, record_id=record_id, client_id=client_id
     )
     return response

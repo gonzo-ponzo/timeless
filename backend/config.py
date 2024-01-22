@@ -19,9 +19,7 @@ ALGORITHM = os.environ.get("ALGORITHM")
 ACCESS_TOKEN_LIFETIME = int(os.environ.get("ACCESS_TOKEN_LIFETIME"))
 ADMIN_AUTH = os.environ.get("ADMIN_AUTH")
 
-MESSAGGION_LOGIN = os.environ.get("MESSAGGION_LOGIN")
-MESSAGGIO_API_KEY = os.environ.get("MESSAGGIO_API_KEY")
-MESSAGGION_FROM = os.environ.get("MESSAGGION_FROM")
+SMS_API_KEY = os.environ.get("SMS_API_KEY")
 
 EMAIL_LOGIN = os.environ.get("EMAIL_LOGIN")
 EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD")

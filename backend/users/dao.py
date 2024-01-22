@@ -66,7 +66,7 @@ class UserDAO(DAO):
         async with self.db.begin():
             user = await self.db.scalar(query)
             return user
-    
+
     async def check_user_by_telegram(self, telegram: str) -> bool:
         query = select(User).where(User.telegram == telegram)
         async with self.db.begin():
