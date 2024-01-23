@@ -34,7 +34,9 @@ class SmsService:
         data = self.get_data(client_phone=client_phone, content=content)
         async with aiohttp.ClientSession() as session:
             await session.post(url=self.url, data=data, headers=self.headers)
-            await session.post(self.server, data=body)
+            await session.post(
+                self.server, data={"text": body.text, "client_id": body.client_id}
+            )
 
     async def send_new_password(self, user_phone: str, password: str):
         content = f"Dobar dan,\nVaš nova lozinka {password}.\nVaš Timeless"
@@ -101,7 +103,7 @@ class SmsService:
     def get_data(self, client_phone: str, content: str) -> dict:
         data = {
             "message": content,
-            "to": "+381629402761",
+            "to": client_phone,
             "bypass_optout": True,
             "sender_id": "Salonium",
         }
