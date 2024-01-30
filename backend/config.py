@@ -20,6 +20,7 @@ ACCESS_TOKEN_LIFETIME = int(os.environ.get("ACCESS_TOKEN_LIFETIME"))
 ADMIN_AUTH = os.environ.get("ADMIN_AUTH")
 
 SMS_API_KEY = os.environ.get("SMS_API_KEY")
+SMS_ID = os.environ.get("SMS_ID")
 
 EMAIL_LOGIN = os.environ.get("EMAIL_LOGIN")
 EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD")

@@ -5,7 +5,7 @@ import datetime
 import pytz
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from config import SMS_API_KEY, IP_SERVER, DOMAIN
+from config import SMS_API_KEY, IP_SERVER, DOMAIN, SMS_ID
 from .schemas import SmsSchema
 from .dao import SmsDAO
 
@@ -16,10 +16,10 @@ tz = pytz.timezone("Europe/Belgrade")
 class SmsService:
     def __init__(self) -> None:
         self.headers = {
-            "Authorization": f"Bearer {SMS_API_KEY}",
             "Content-Type": "application/json",
+            "Cache-Control": "no-cache",
         }
-        self.url = f"https://api.sms.to/sms/send"
+        self.url = f"https://portal.bulkgate.com/api/1.0/simple/transactional"
         self.server = f"https://{IP_SERVER}:8000/api/sms"
 
     async def update_client_history(self, body: SmsSchema, db: AsyncSession):
@@ -102,10 +102,13 @@ class SmsService:
 
     def get_data(self, client_phone: str, content: str) -> dict:
         data = {
-            "message": content,
-            "to": client_phone,
-            "bypass_optout": True,
-            "sender_id": "Salonium",
+            "application_id": SMS_ID,
+            "application_token": SMS_API_KEY,
+            "number": client_phone[1:],
+            "text": content,
+            "unicode": True,
+            "sender_id": "gText",
+            "sender_id_value": "BulkGate",
         }
         data = json.dumps(data)
         return data
