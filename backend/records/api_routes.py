@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, UploadFile, File
+from fastapi import APIRouter, Depends, UploadFile, File, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 import datetime
 from typing import Optional
@@ -26,41 +26,53 @@ records_api_router = APIRouter(prefix="/records")
 @records_api_router.post("/")
 async def create_new_record(
     body: NewRecordSchema,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_async_session),
 ) -> Optional[str]:
     """Create new record"""
     record_service = RecordService(db=db)
-    return await record_service.create_new_record(body=body)
+    return await record_service.create_new_record(
+        body=body, background_tasks=background_tasks
+    )
 
 
 @records_api_router.post("/register-and-record")
 async def register_and_record(
     body: NewRecordWithRegisterSchema,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_async_session),
 ) -> Optional[str]:
     """Register new user and create record for him"""
     record_service = RecordService(db=db)
-    return await record_service.create_new_record_with_register(body=body)
+    return await record_service.create_new_record_with_register(
+        body=body, background_tasks=background_tasks
+    )
 
 
 @records_api_router.post("/complex")
 async def create_new_complex(
     body: NewComplexSchema,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_async_session),
 ) -> Optional[str]:
     """Create new complex"""
     record_service = RecordService(db=db)
-    return await record_service.create_new_complex(body=body)
+    return await record_service.create_new_complex(
+        body=body, background_tasks=background_tasks
+    )
 
 
 @records_api_router.post("/complex-with-register")
 async def create_new_complex_with_register(
     body: NewComplexWithRegisterSchema,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_async_session),
 ) -> Optional[str]:
     """Register new user and create complex for him"""
     record_service = RecordService(db=db)
-    return await record_service.create_new_complex_with_register(body=body)
+    return await record_service.create_new_complex_with_register(
+        body=body, background_tasks=background_tasks
+    )
 
 
 @records_api_router.get("/get-available/{service_id}/{user_id}/{date}/")

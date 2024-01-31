@@ -1,4 +1,5 @@
 import datetime
+from fastapi import BackgroundTasks
 from typing import Optional
 
 from utils.abstract.service import Service
@@ -49,25 +50,37 @@ class RecordService(Service):
         )
         return records
 
-    async def create_new_record(self, body: NewRecordSchema) -> Optional[str]:
+    async def create_new_record(
+        self, body: NewRecordSchema, background_tasks: BackgroundTasks
+    ) -> Optional[str]:
         record_dao = RecordDAO(db_session=self.db)
-        return await record_dao.create_new_record(body=body)
+        return await record_dao.create_new_record(
+            body=body, background_tasks=background_tasks
+        )
 
     async def create_new_record_with_register(
-        self, body: NewRecordWithRegisterSchema
+        self, body: NewRecordWithRegisterSchema, background_tasks: BackgroundTasks
     ) -> Optional[str]:
         record_dao = RecordDAO(db_session=self.db)
-        return await record_dao.create_new_record_with_register(body=body)
+        return await record_dao.create_new_record_with_register(
+            body=body, background_tasks=background_tasks
+        )
 
-    async def create_new_complex(self, body: NewComplexSchema) -> Optional[str]:
+    async def create_new_complex(
+        self, body: NewComplexSchema, background_tasks: BackgroundTasks
+    ) -> Optional[str]:
         record_dao = RecordDAO(db_session=self.db)
-        return await record_dao.create_new_complex(body=body)
+        return await record_dao.create_new_complex(
+            body=body, background_tasks=background_tasks
+        )
 
     async def create_new_complex_with_register(
-        self, body: NewComplexWithRegisterSchema
+        self, body: NewComplexWithRegisterSchema, background_tasks: BackgroundTasks
     ) -> Optional[str]:
         record_dao = RecordDAO(db_session=self.db)
-        return await record_dao.create_new_complex_with_register(body=body)
+        return await record_dao.create_new_complex_with_register(
+            body=body, background_tasks=background_tasks
+        )
 
     async def get_record_datetime(self, record_id: int) -> str:
         record_dao = RecordDAO(db_session=self.db)
