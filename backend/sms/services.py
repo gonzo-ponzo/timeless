@@ -20,7 +20,7 @@ class SmsService:
             "Cache-Control": "no-cache",
         }
         self.url = f"https://portal.bulkgate.com/api/1.0/simple/transactional"
-        self.server = f"https://{IP_SERVER}:8000/api/sms"
+        self.server = f"https://{DOMAIN}:8000/api/sms"
 
     async def update_client_history(self, body: SmsSchema, db: AsyncSession):
         sms_dao = SmsDAO(db_session=db)
