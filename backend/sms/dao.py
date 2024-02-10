@@ -22,7 +22,7 @@ class SmsDAO(DAO):
         client_history = {}
 
         async with self.db.begin():
-            client_query = select(Client).where(Client.phone == body.client_id)
+            client_query = select(Client).where(Client.id == body.client_id)
             client = await self.db.scalar(client_query)
             clients_history_query = (
                 select(ClientsHistory)

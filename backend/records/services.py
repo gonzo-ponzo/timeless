@@ -14,6 +14,7 @@ from .schemas import (
     NewComplexSchema,
     NewComplexWithRegisterSchema,
     GetRecordByTelegramSchema,
+    SmsSchema,
 )
 
 
@@ -50,37 +51,25 @@ class RecordService(Service):
         )
         return records
 
-    async def create_new_record(
-        self, body: NewRecordSchema, background_tasks: BackgroundTasks
-    ) -> Optional[str]:
+    async def create_new_record(self, body: NewRecordSchema) -> Optional[str]:
         record_dao = RecordDAO(db_session=self.db)
-        return await record_dao.create_new_record(
-            body=body, background_tasks=background_tasks
-        )
+        return await record_dao.create_new_record(body=body)
 
     async def create_new_record_with_register(
-        self, body: NewRecordWithRegisterSchema, background_tasks: BackgroundTasks
+        self, body: NewRecordWithRegisterSchema
     ) -> Optional[str]:
         record_dao = RecordDAO(db_session=self.db)
-        return await record_dao.create_new_record_with_register(
-            body=body, background_tasks=background_tasks
-        )
+        return await record_dao.create_new_record_with_register(body=body)
 
-    async def create_new_complex(
-        self, body: NewComplexSchema, background_tasks: BackgroundTasks
-    ) -> Optional[str]:
+    async def create_new_complex(self, body: NewComplexSchema) -> Optional[str]:
         record_dao = RecordDAO(db_session=self.db)
-        return await record_dao.create_new_complex(
-            body=body, background_tasks=background_tasks
-        )
+        return await record_dao.create_new_complex(body=body)
 
     async def create_new_complex_with_register(
-        self, body: NewComplexWithRegisterSchema, background_tasks: BackgroundTasks
+        self, body: NewComplexWithRegisterSchema
     ) -> Optional[str]:
         record_dao = RecordDAO(db_session=self.db)
-        return await record_dao.create_new_complex_with_register(
-            body=body, background_tasks=background_tasks
-        )
+        return await record_dao.create_new_complex_with_register(body=body)
 
     async def get_record_datetime(self, record_id: int) -> str:
         record_dao = RecordDAO(db_session=self.db)
@@ -91,7 +80,12 @@ class RecordService(Service):
         self, user_telegram: int
     ) -> list[GetRecordByTelegramSchema]:
         record_dao = RecordDAO(db_session=self.db)
-        records: list[
-            GetRecordByTelegramSchema
-        ] = await record_dao.get_records_by_telegram(user_telegram=user_telegram)
+        records: list[GetRecordByTelegramSchema] = (
+            await record_dao.get_records_by_telegram(user_telegram=user_telegram)
+        )
+        return records
+
+    async def get_next_records(self) -> list[SmsSchema]:
+        record_dao = RecordDAO(db_session=self.db)
+        records = await record_dao.get_next_records()
         return records

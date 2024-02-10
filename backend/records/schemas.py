@@ -108,3 +108,10 @@ class NewComplexWithRegisterSchema(BaseModel):
     instagram: str
     name: str
     authorId: int
+
+
+class SmsSchema(BaseModel):
+    client_id: int
+    record_id: int
+    time: datetime.time
+    phone: str

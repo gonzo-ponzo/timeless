@@ -1,4 +1,3 @@
-from fastapi import BackgroundTasks
 from sqlalchemy import select, update
 import datetime
 from typing import Optional
@@ -17,9 +16,9 @@ from .schemas import (
     NewComplexWithRegisterSchema,
     NewComplexSchema,
     GetRecordByTelegramSchema,
+    SmsSchema,
 )
 from config import IP_SERVER, DOMAIN
-from sms.utils import send_sms
 from utils.abstract.dao import DAO
 
 
@@ -87,9 +86,7 @@ class RecordDAO(DAO):
             await self.db.execute(query)
             await self.db.commit()
 
-    async def create_new_record(
-        self, body: NewRecordSchema, background_tasks: BackgroundTasks
-    ) -> Optional[str]:
+    async def create_new_record(self, body: NewRecordSchema) -> Optional[str]:
         now = datetime.datetime.now(tz)
         formatted_date = now.strftime("%Y-%m-%d %H:%M:%S")
         async with self.db.begin():
@@ -202,35 +199,10 @@ class RecordDAO(DAO):
                     )
                     await self.db.execute(update_clients_history_query)
             await self.db.commit()
-
-            record_id = new_record.id
-            phone = client.phone
-            date = f"{new_record.date}"
-            time = f"{new_record.time}"
-            seconds_before_sms = self.get_seconds_before_sms(
-                date_string=date, time_string=time
-            )
-            if (
-                seconds_before_sms > 0
-                and client.name != "SERVICE"
-                and client.communication
-            ):
-                background_tasks.add_task(
-                    send_sms,
-                    time=time,
-                    phone=phone,
-                    record_id=record_id,
-                    client_id=client_id,
-                    delay=seconds_before_sms,
-                )
-                # send_sms.apply_async(
-                #     args=[time, phone, record_id, client_id],
-                #     countdown=seconds_before_sms,
-                # )
             return "Success"
 
     async def create_new_record_with_register(
-        self, body: NewRecordWithRegisterSchema, background_tasks: BackgroundTasks
+        self, body: NewRecordWithRegisterSchema
     ) -> Optional[str]:
         now = datetime.datetime.now(tz)
         formatted_date = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -293,42 +265,14 @@ class RecordDAO(DAO):
             )
             self.db.add(new_record)
             await self.db.flush()
-
-            record_id = new_record.id
-            phone = client.phone
-            date = f"{new_record.date}"
-            time = f"{new_record.time}"
-            seconds_before_sms = self.get_seconds_before_sms(
-                date_string=date, time_string=time
-            )
-            if (
-                seconds_before_sms > 0
-                and client.name != "SERVICE"
-                and client.communication
-            ):
-                background_tasks.add_task(
-                    send_sms,
-                    time=time,
-                    phone=phone,
-                    record_id=record_id,
-                    client_id=client.id,
-                    delay=seconds_before_sms,
-                )
-                # send_sms.apply_async(
-                #     args=[time, phone, record_id, client.id],
-                #     countdown=seconds_before_sms,
-                # )
             return "Success"
 
-    async def create_new_complex(
-        self, body: NewComplexSchema, background_tasks: BackgroundTasks
-    ) -> Optional[str]:
+    async def create_new_complex(self, body: NewComplexSchema) -> Optional[str]:
         now = datetime.datetime.now(tz)
         formatted_date = now.strftime("%Y-%m-%d %H:%M:%S")
         async with self.db.begin():
             client_query = select(Client).where(Client.id == body.clientId)
             client = await self.db.scalar(client_query)
-            phone = client.phone
             new_records = []
 
             for slot in body.records:
@@ -465,31 +409,10 @@ class RecordDAO(DAO):
                 await self.db.execute(update_clients_history_query)
 
             await self.db.commit()
-
-            for new_record in new_records:
-                record_id = new_record.id
-                date = f"{new_record.date}"
-                time = f"{new_record.time}"
-                seconds_before_sms = self.get_seconds_before_sms(
-                    date_string=date, time_string=time
-                )
-                if seconds_before_sms > 0 and client.communication:
-                    background_tasks.add_task(
-                        send_sms,
-                        time=time,
-                        phone=phone,
-                        record_id=record_id,
-                        client_id=client.id,
-                        delay=seconds_before_sms,
-                    )
-                    # send_sms.apply_async(
-                    #     args=[time, phone, record_id, client.id],
-                    #     countdown=seconds_before_sms,
-                    # )
             return "Success"
 
     async def create_new_complex_with_register(
-        self, body: NewComplexWithRegisterSchema, background_tasks: BackgroundTasks
+        self, body: NewComplexWithRegisterSchema
     ) -> Optional[str]:
         now = datetime.datetime.now(tz)
         formatted_date = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -553,31 +476,6 @@ class RecordDAO(DAO):
             )
             self.db.add(new_record)
             await self.db.flush()
-
-            record_id = new_record.id
-            phone = client.phone
-            date = f"{new_record.date}"
-            time = f"{new_record.time}"
-            seconds_before_sms = self.get_seconds_before_sms(
-                date_string=date, time_string=time
-            )
-            if (
-                seconds_before_sms > 0
-                and client.name != "SERVICE"
-                and client.communication
-            ):
-                background_tasks.add_task(
-                    send_sms,
-                    time=time,
-                    phone=phone,
-                    record_id=record_id,
-                    client_id=client.id,
-                    delay=seconds_before_sms,
-                )
-                # send_sms.apply_async(
-                #     args=[time, phone, record_id, client.id],
-                #     countdown=seconds_before_sms,
-                # )
             return "Success"
 
     async def update_record_by_id(
@@ -934,3 +832,37 @@ class RecordDAO(DAO):
                 )
 
             return user_records
+
+    async def get_next_records(self) -> list[SmsSchema]:
+        today = datetime.date.today()
+        time = datetime.datetime.now(tz)
+        query = (
+            select(Record)
+            .where(Record.date == today)
+            .where(Record.time > time.time())
+            .where(Record.time < (time + datetime.timedelta(hours=1)).time())
+        )
+        async with self.db.begin():
+            records = await self.db.scalars(query)
+            records_to_notify = []
+            for record in records:
+                clients_query = select(Client).where(Client.id == record.client_id)
+                client = await self.db.scalar(clients_query)
+                prev_records_query = (
+                    select(Record)
+                    .where(Record.client_id == client.id)
+                    .where(Record.date == today)
+                    .where(Record.time < record.time)
+                )
+                prev_record = await self.db.scalar(prev_records_query)
+                if prev_record and prev_record.id:
+                    continue
+                records_to_notify.append(
+                    SmsSchema(
+                        client_id=record.client_id,
+                        record_id=record.id,
+                        time=record.time,
+                        phone=client.phone,
+                    )
+                )
+        return records_to_notify
