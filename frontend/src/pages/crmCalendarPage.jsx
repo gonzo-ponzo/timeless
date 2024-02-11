@@ -10,7 +10,6 @@ import { useNavigate } from "react-router-dom"
 import localStorageService from "../services/localStorage.service"
 import AdminCalendarPage from "./adminCalendarPage"
 import userService from "../services/user.service"
-import clientService from "../services/client.service"
 import serviceService from "../services/service.service"
 import dictionary from "../utils/dictionary"
 import brownTriangle from "../assets/imgs/brownTriangle.png"
@@ -44,36 +43,40 @@ const CrmCalendarPage = () => {
   const [showUserDropdown, setShowUserDropdown] = useState(false)
   const [showServiceDropdown, setShowServiceDropdown] = useState(false)
   const [user, setUser] = useState(null)
-  const [clients, setClients] = useState(null)
   const [users, setUsers] = useState([])
   const [services, setServices] = useState([])
   const [complexes, setComplexes] = useState([])
   const [recordAdded, setRecordAdded] = useState(false)
   const complex = selectedComplex ? true : false
   const [complexNumber, setComplexNumber] = useState(0)
+  const [admin, setAdmin] = useState(null)
 
   const loadData = async (userId) => {
-    setUser(await userService.getUserById(userId))
-    setClients(await clientService.getClients())
-    const allUsers = await userService.getUsers()
-    setUsers(
-      selectedService
-        ? allUsers.filter(
-            (user) =>
-              user.isStaff &&
-              (user.services.includes(selectedService.id) ||
-                [
-                  "Day off",
-                  "Odmar 1",
-                  "Odmar 2",
-                  "Odmar 4",
-                  "Odmar 0.5",
-                ].includes(selectedService.en))
-          )
-        : allUsers.filter((user) => user.isStaff)
-    )
-    setServices(await serviceService.getServices())
-    setComplexes(await serviceService.getComplexes())
+    const userData = await userService.getUserById(userId)
+    setUser(userData)
+    if (userData.isAdmin) {
+      setAdmin(true)
+    } else {
+      const allUsers = await userService.getUsers()
+      setUsers(
+        selectedService
+          ? allUsers.filter(
+              (user) =>
+                user.isStaff &&
+                (user.services.includes(selectedService.id) ||
+                  [
+                    "Day off",
+                    "Odmar 1",
+                    "Odmar 2",
+                    "Odmar 4",
+                    "Odmar 0.5",
+                  ].includes(selectedService.en))
+            )
+          : allUsers.filter((user) => user.isStaff)
+      )
+      setServices(await serviceService.getServices())
+      setComplexes(await serviceService.getComplexes())
+    }
   }
   useEffect(() => {
     loadData(userId)
@@ -158,8 +161,7 @@ const CrmCalendarPage = () => {
       }
     }
   }, [users, selectedMaster, userId])
-
-  if (user?.isAdmin) {
+  if (admin) {
     return <AdminCalendarPage></AdminCalendarPage>
   }
   if (user) {
@@ -205,7 +207,6 @@ const CrmCalendarPage = () => {
                   selectedUser={selectedUser}
                   selectedSlot={selectedSlot}
                   selectedSlots={selectedSlots}
-                  clients={clients}
                   handleSelectedSlot={handleSelectSlot}
                   handleSelectSlots={handleSelectSlots}
                   complex={complex}

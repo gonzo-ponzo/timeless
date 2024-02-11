@@ -2,10 +2,12 @@ import PropTypes from "prop-types"
 import transformDate from "../../utils/transformDate"
 import dictionary from "../../utils/dictionary"
 import { useSelector } from "react-redux"
+import React, { useEffect, useState } from "react"
+import clientService from "../../services/client.service"
 
 const CrmCalendarBoardDay = ({
   date,
-  clients,
+  // clients,
   selectedService,
   selectedUser,
   existingRecords,
@@ -18,6 +20,26 @@ const CrmCalendarBoardDay = ({
   const selectedLanguage = useSelector((state) => state.lang.lang)
   const boardDayDate = transformDate(date)
   const weekDays = dictionary[selectedLanguage].weekdays
+  const [clients, setClients] = useState(null)
+  const loadData = async (existingRecords) => {
+    const clientsIdx = existingRecords.map((record) => {
+      return record.clientId
+    })
+    const clientsUniqueIdx = clientsIdx.filter(
+      (item, index) => clientsIdx.indexOf(item) === index
+    )
+    const clientsList = []
+    clientsUniqueIdx.map(async (id) => {
+      clientsList.push(await clientService.getClientById(id))
+    })
+
+    setClients(clientsList)
+  }
+  useEffect(() => {
+    if (existingRecords) {
+      loadData(existingRecords)
+    }
+  }, [existingRecords])
 
   function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1)
@@ -249,7 +271,6 @@ CrmCalendarBoardDay.propTypes = {
   selectedService: PropTypes.number,
   existingRecords: PropTypes.array,
   boardDayDate: PropTypes.string,
-  clients: PropTypes.array,
   handleSelectSlot: PropTypes.func,
   handleSelectSlots: PropTypes.func,
   onSlotChange: PropTypes.func,

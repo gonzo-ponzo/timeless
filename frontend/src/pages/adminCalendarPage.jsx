@@ -8,7 +8,6 @@ import AdminCalendarBoard from "../components/calendar/adminCalendarBoard"
 import AdminRecordEditor from "../components/calendar/adminRecordEditor"
 import userService from "../services/user.service"
 import serviceService from "../services/service.service"
-import clientService from "../services/client.service"
 import dictionary from "../utils/dictionary"
 import { useDispatch } from "react-redux"
 import { setDate } from "../store/dateSlice"
@@ -39,7 +38,6 @@ const AdminCalendarPage = () => {
   const [user, setUser] = useState()
   const [services, setServices] = useState([])
   const [complexes, setComplexes] = useState([])
-  const [clients, setClients] = useState(null)
   const [selectedSlot, setSelectedSlot] = useState()
   const [selectedSlots, setSelectedSlots] = useState([])
   const selectedMaster = useSelector((state) => state.user.selectedMaster)
@@ -108,7 +106,6 @@ const AdminCalendarPage = () => {
   }
 
   const loadData = async (userId) => {
-    setClients(await clientService.getClients())
     setServices(await serviceService.getServices())
     setComplexes(await serviceService.getComplexes())
     const allUsers = await userService.getUsers()
@@ -179,7 +176,6 @@ const AdminCalendarPage = () => {
                 <AdminCalendarBoard
                   key={reset}
                   firstDay={firstDay}
-                  clients={clients}
                   users={users}
                   selectedService={selectedService}
                   selectedUser={selectedUser}

@@ -10,7 +10,6 @@ import apiEnpoint from "../../services/config"
 
 const AdminCalendarBoard = ({
   firstDay,
-  clients,
   users,
   selectedService,
   selectedSlot,
@@ -83,7 +82,6 @@ const AdminCalendarBoard = ({
               selectedService={selectedService}
               existingRecords={existingRecordsWithSlots}
               boardDayDate={boardDayDate}
-              clients={clients}
               handleSelectSlot={handleSelectedSlot}
               handleSelectSlots={handleSelectSlots}
               selectedSlots={selectedSlots}
@@ -102,7 +100,6 @@ const AdminCalendarBoard = ({
             selectedService={null}
             existingRecords={userRecords}
             boardDayDate={boardDayDate}
-            clients={clients}
             selectedSlots={selectedSlots}
             handleSelectSlot={handleSelectedSlot}
             handleSelectSlots={handleSelectSlots}

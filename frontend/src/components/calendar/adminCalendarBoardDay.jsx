@@ -1,6 +1,8 @@
 import dictionary from "../../utils/dictionary"
 import PropTypes from "prop-types"
 import { useSelector } from "react-redux"
+import React, { useEffect, useState } from "react"
+import clientService from "../../services/client.service"
 
 const AdminCalendarBoardDay = ({
   userName,
@@ -8,7 +10,6 @@ const AdminCalendarBoardDay = ({
   selectedService,
   existingRecords,
   boardDayDate,
-  clients,
   handleSelectSlot,
   handleSelectSlots,
   onSlotChange,
@@ -20,6 +21,26 @@ const AdminCalendarBoardDay = ({
   function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
+  const [clients, setClients] = useState(null)
+  const loadData = async (existingRecords) => {
+    const clientsIdx = existingRecords.map((record) => {
+      return record.clientId
+    })
+    const clientsUniqueIdx = clientsIdx.filter(
+      (item, index) => clientsIdx.indexOf(item) === index
+    )
+    const clientsList = []
+    clientsUniqueIdx.map(async (id) => {
+      clientsList.push(await clientService.getClientById(id))
+    })
+
+    setClients(clientsList)
+  }
+  useEffect(() => {
+    if (existingRecords) {
+      loadData(existingRecords)
+    }
+  }, [existingRecords])
   const recordsToShowElements = existingRecords?.map((record) => {
     let content = null
     let styleName = `absolute flex justify-center left-[3px] w-[calc(100%-6px)] items-center rounded-lg p-[3px] border text-xs text-center hover:opacity-100 bg-${
@@ -243,7 +264,6 @@ AdminCalendarBoardDay.propTypes = {
   selectedService: PropTypes.object,
   existingRecords: PropTypes.array,
   boardDayDate: PropTypes.string,
-  clients: PropTypes.array,
   handleSelectSlot: PropTypes.func,
   handleSelectSlots: PropTypes.func,
   onSlotChange: PropTypes.func,

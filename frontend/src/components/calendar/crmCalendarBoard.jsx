@@ -10,7 +10,6 @@ import apiEnpoint from "../../services/config"
 
 const CrmCalendarBoard = ({
   firstDay,
-  clients,
   selectedService,
   selectedUser,
   selectedSlot,
@@ -62,7 +61,6 @@ const CrmCalendarBoard = ({
   const calendarBoardDays = _.range(daysCount).map((day) => (
     <CrmCalendarBoardDay
       date={new Date(firstDay.getTime() + 1000 * 60 * 60 * 24 * day)}
-      clients={clients}
       selectedService={selectedService ? selectedService : 1}
       selectedUser={selectedUser}
       existingRecords={
@@ -93,7 +91,6 @@ const CrmCalendarBoard = ({
 
 CrmCalendarBoard.propTypes = {
   date: PropTypes.instanceOf(Date),
-  clients: PropTypes.array,
   users: PropTypes.array,
   selectedService: PropTypes.object,
   selectedUser: PropTypes.object,
