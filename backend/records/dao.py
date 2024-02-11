@@ -77,6 +77,61 @@ class RecordDAO(DAO):
             ]
             return records
 
+    async def get_client_records_by_date(
+        self, date: datetime.date
+    ) -> list[GetRecordSchema]:
+        query = (
+            select(Record)
+            .where(Record.date == date)
+            .order_by(Record.date.desc(), Record.time.desc())
+        )
+        async with self.db.begin():
+            data = await self.db.scalars(query)
+            records = [
+                GetRecordSchema(
+                    id=object.id,
+                    date=object.date,
+                    time=object.time,
+                    status=object.status,
+                    clientId=object.client_id,
+                    price=object.price,
+                    ru=object.service.name,
+                    en=object.service.en_name,
+                    sr=object.service.sr_name,
+                    serviceId=object.service_id,
+                    history=object.history,
+                    service=GetServiceSchema(
+                        id=object.service.id,
+                        ru=object.service.name,
+                        en=object.service.en_name,
+                        sr=object.service.sr_name,
+                        price=object.service.price,
+                        duration=object.service.duration,
+                        active=object.service.active,
+                    ),
+                    userId=object.user_id,
+                    user=GetUserSchema(
+                        id=object.user.id,
+                        phone=object.user.phone,
+                        name=object.user.name,
+                        telegram=object.user.telegram,
+                        birthday=object.user.birthday,
+                        registered_at=object.user.registered_at,
+                        experience=object.user.experience,
+                        rating=5,
+                        position=object.user.position,
+                        image=object.user.image,
+                        services=[service.id for service in object.user.services],
+                        isAdmin=object.user.is_admin,
+                        isStaff=object.user.is_staff,
+                    ),
+                    image=object.image,
+                    author=object.author,
+                )
+                for object in data
+            ]
+            return records
+
     async def upload_record_image(self, record_id: int, image: str):
         async with self.db.begin():
             image_path = f"https://{DOMAIN}:8000/static{image[6:]}"

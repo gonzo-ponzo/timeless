@@ -16,6 +16,10 @@ const CrmMainPage = () => {
   const selectedLanguage = useSelector((state) => state.lang.lang)
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  let date = useSelector((state) => state.date.date).split(".")
+  date = `${date[2]}-${Number(date[1]) > 9 ? date[1] : "0" + Number(date[1])}-${
+    Number(date[0]) > 9 ? date[0] : "0" + Number(date[0])
+  }`
   const userId = localStorageService.getUserId()
   if (!userId) {
     navigate("/crm/login")
@@ -27,13 +31,14 @@ const CrmMainPage = () => {
   const [user, setUser] = useState(null)
   const [userTypeStatus, setUserTypeStatus] = useState(true)
   const [recordTypeStatus, setRecordTypeStatus] = useState("created")
-  const loadData = async (userId) => {
-    setRecords(await recordService.getRecords())
+  const loadData = async (userId, date) => {
+    setRecords(await recordService.getRecordsByDate(date))
     setUser(await userService.getUserById(userId))
   }
+
   useEffect(() => {
-    loadData(userId)
-  }, [userId, reset])
+    loadData(userId, date)
+  }, [userId, reset, date])
 
   const handleDateSelect = async (date) => {
     setCalendarDate(new Date(date.year, date.month - 1, date.day))
@@ -49,16 +54,10 @@ const CrmMainPage = () => {
     await dispatch(setDate(dateStore))
   }
 
-  let date = useSelector((state) => state.date.date).split(".")
-  date = `${date[2]}-${Number(date[1]) > 9 ? date[1] : "0" + Number(date[1])}-${
-    Number(date[0]) > 9 ? date[0] : "0" + Number(date[0])
-  }`
-
-  const recordsByDate = records.filter((record) => record.date === date)
   const recordsByRecordStatus =
     recordTypeStatus === "all"
-      ? recordsByDate
-      : recordsByDate.filter((record) => record.status === recordTypeStatus)
+      ? records
+      : records.filter((record) => record.status === recordTypeStatus)
   const userRecords =
     (user?.isAdmin && user?.isStaff && userTypeStatus) || !user?.isAdmin
       ? recordsByRecordStatus.filter(

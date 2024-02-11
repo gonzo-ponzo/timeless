@@ -101,6 +101,17 @@ async def get_records(
     return records
 
 
+@records_api_router.get("/by-date/{date}")
+async def get_records(
+    date: datetime.date,
+    db: AsyncSession = Depends(get_async_session),
+) -> list[GetRecordSchema]:
+    """Get all records by date"""
+    record_service = RecordService(db=db)
+    records = await record_service.get_client_records_by_date(date=date)
+    return records
+
+
 @records_api_router.patch("/record/{recordId}/")
 async def update_record_by_id(
     recordId: int,

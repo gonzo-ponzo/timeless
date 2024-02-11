@@ -10,6 +10,10 @@ const recordService = {
     const { data } = await httpRecord.get("")
     return data
   },
+  getRecordsByDate: async (date) => {
+    const { data } = await httpRecord.get(`by-date/${date}`)
+    return data
+  },
   getAvailableRecords: async (
     selectedServiceId,
     selectedUserId,
