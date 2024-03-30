@@ -3,6 +3,7 @@ import PropTypes from "prop-types"
 import { useSelector } from "react-redux"
 import React, { useEffect, useState } from "react"
 import clientService from "../../services/client.service"
+import recordService from "../../services/record.service"
 
 const AdminCalendarBoardDay = ({
   userName,
@@ -16,8 +17,10 @@ const AdminCalendarBoardDay = ({
   selectedSlot,
   date,
   complex,
+  setReset,
 }) => {
   const selectedLanguage = useSelector((state) => state.lang.lang)
+  const [showXMap, setShowXMap] = useState({})
   function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
@@ -41,6 +44,17 @@ const AdminCalendarBoardDay = ({
       loadData(existingRecords)
     }
   }, [existingRecords])
+
+  const handleShowX = (record, value) => {
+    setShowXMap(prevState => ({
+      ...prevState,
+      [record.recordId]: value
+    }))
+  }
+  const handleDeleteRecord = async (recordId) => {
+    await recordService.deleteBreak(recordId)
+    setReset(Math.random())
+  }
   const recordsToShowElements = existingRecords?.map((record) => {
     let content = null
     let styleName = `absolute flex justify-center left-[3px] w-[calc(100%-6px)] items-center rounded-lg p-[3px] border text-xs text-center hover:opacity-100 bg-${
@@ -152,6 +166,8 @@ const AdminCalendarBoardDay = ({
             ? () => onSlotChange(record.recordId)
             : null
         }
+        onMouseEnter={() => handleShowX(record, true)}
+        onMouseLeave={() => handleShowX(record, false)}
         className={
           selectedSlot &&
           selectedSlot.slotId === date + record.start + user.name
@@ -166,6 +182,9 @@ const AdminCalendarBoardDay = ({
         }}
         key={date + record.start}
       >
+       {showXMap[record.recordId] && record.type === "gray" && (
+          <span className="absolute cursor-pointer top-5 right-5" onClick={() => handleDeleteRecord(record.recordId)}>X</span>
+        )}
         <span
           className={elementStyleName}
           style={{

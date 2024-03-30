@@ -30,6 +30,12 @@ class RecordService(Service):
         record_dao = RecordDAO(db_session=self.db)
         records = await record_dao.get_client_records_by_date(date=date)
         return records
+    
+    async def delete_break(
+        self, record_id: int
+    ) -> None:
+        record_dao = RecordDAO(db_session=self.db)
+        await record_dao.delete_break(record_id=record_id)
 
     async def update_record_by_id(
         self, record_id: int, body: UpdateRecordSchema

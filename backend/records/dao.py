@@ -1,4 +1,4 @@
-from sqlalchemy import select, update
+from sqlalchemy import select, update, delete
 import datetime
 from typing import Optional
 import pytz
@@ -131,6 +131,17 @@ class RecordDAO(DAO):
                 for object in data
             ]
             return records
+    
+    async def delete_break(
+        self, record_id: int
+    ) -> None:
+        query = (
+            delete(Record)
+            .where(Record.id == record_id)
+        )
+        async with self.db.begin():
+            await self.db.execute(query)
+            await self.db.commit()
 
     async def upload_record_image(self, record_id: int, image: str):
         async with self.db.begin():

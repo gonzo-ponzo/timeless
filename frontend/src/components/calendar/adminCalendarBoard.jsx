@@ -18,6 +18,7 @@ const AdminCalendarBoard = ({
   handleSelectSlots,
   complex,
   setSlotForChange,
+  setReset,
 }) => {
   let calendarBoardDays
   const [existingRecords, setExistingRecords] = useState({})
@@ -88,6 +89,7 @@ const AdminCalendarBoard = ({
               onSlotChange={onSlotChange}
               selectedSlot={selectedSlot}
               date={date}
+              setReset={setReset}
               complex={complex}
             />
           )
@@ -107,6 +109,7 @@ const AdminCalendarBoard = ({
             selectedSlot={selectedSlot}
             date={date}
             complex={complex}
+            setReset={setReset}
           />
         )
       }

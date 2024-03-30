@@ -112,6 +112,16 @@ async def get_records(
     return records
 
 
+@records_api_router.get("/delete-break/{record_id}")
+async def delete_break(
+    record_id: int,
+    db: AsyncSession = Depends(get_async_session),
+) -> list[GetRecordSchema]:
+    """Delete break by id"""
+    record_service = RecordService(db=db)
+    await record_service.delete_break(record_id=record_id)
+
+
 @records_api_router.patch("/record/{recordId}/")
 async def update_record_by_id(
     recordId: int,

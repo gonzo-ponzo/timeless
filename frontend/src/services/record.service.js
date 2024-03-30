@@ -14,6 +14,10 @@ const recordService = {
     const { data } = await httpRecord.get(`by-date/${date}`)
     return data
   },
+  deleteBreak: async (recordId) => {
+    const { data } = await httpRecord.get(`delete-break/${recordId}`)
+    return data
+  },
   getAvailableRecords: async (
     selectedServiceId,
     selectedUserId,

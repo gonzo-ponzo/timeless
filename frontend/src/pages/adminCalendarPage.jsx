@@ -185,6 +185,7 @@ const AdminCalendarPage = () => {
                   handleSelectSlots={handleSelectSlots}
                   complex={complex}
                   setSlotForChange={setSlotForChange}
+                  setReset={setReset}
                 ></AdminCalendarBoard>
               </div>
               <div className="flex flex-col w-full relative max-md:-order-1 max-md:mb-[10px]">
